@@ -24,10 +24,8 @@ for result in `ls result.*`; do
         fi
 done
 ((total=$passed + $failed))
-echo "scale=4 $failed/$total" | bc
-echo $passed/$total | bc
-
-echo $total
+fper=`echo -e "scale=2\n$failed/$total*100" | bc`
+pper=`echo -e "scale=2\n$passed/$total*100" | bc`
 echo
 echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)"
 
