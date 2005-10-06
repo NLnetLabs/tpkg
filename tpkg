@@ -16,10 +16,21 @@ function cleanup() {
 }
 
 function err() {
-        echo $1 > /dev/stderr
+        echo -e "$1" > /dev/stderr
 }
 function out() {
-        echo $1 
+        echo -e "$1"
+}
+
+function usage() {
+        out "Usage $0 [exe|create|extract|tmpl] test.tpkg"
+        out
+        out " exe:\t\texecute a test, safe the result result.testname"
+        out " create:\tcreate a .tpkg out of the test.{pre, post, test} files"
+        out " extract:\textract a .tpkg to tmp. dir"
+        out " tmpl:\t\tthe template files for a new test"
+        out
+        out " (c) NLnetlabs, Miek Gieben. Licensed under the GPL version 2"
 }
 
 ### Main 
@@ -27,12 +38,12 @@ function out() {
 goal=$1
 archive=$2
 if [ -z $goal ]; then
-        out "Usage $0 [exe|create|extract|tmpl] test.tpkg"
-        exit 0;
+        usage
+        exit 0
 fi
 
 if [ -z $archive ]; then
-        out "Usage: $0 [exe|create|extract|tpml] test.tpkg"
+        usage
         exit 0
 fi
 
