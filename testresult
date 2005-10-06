@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# walk all the result.* files and generate a nice overview
+
+passed=0
+failed=0
+
+for result in `ls result.*`; do 
+        passfailed=`head -1 $result | awk ' { print $2 }'`
+        basename=`head -2 $result |grep BaseName | awk -F': ?' ' { print $2 }'`
+        description=`head -3 $result |grep Description | awk -F': ?' ' { print $2 }'`
+        
+#        echo $passfailed
+#        echo $result
+#        echo $basename
+#        echo $description
+
+        if [ $passfailed = "FAILED" ]; then
+                ((failed=$failed + 1))
+                echo -e "$basename: !! $passfailed !! : $description"
+        else
+                ((passed=$passed + 1))
+                echo -e "$basename: ** $passfailed ** : $description"
+        fi
+done
+((total=$passed + $failed))
+echo $failed/$total | bc
+echo $passed/$total | bc
+
+echo $total
+echo
+echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)"
+
+
