@@ -23,14 +23,40 @@ function out() {
 }
 
 function usage() {
-        out "Usage $0 [exe|create|extract|tmpl] test.tpkg"
+        out "Usage $0 [exe|create|extract|tmpl] [report] test.tpkg"
         out
         out " exe:\t\texecute a test, safe the result result.testname"
         out " create:\tcreate a .tpkg out of the test.{pre, post, test} files"
         out " extract:\textract a .tpkg to tmp. dir"
         out " tmpl:\t\tthe template files for a new test"
         out
+        out " report:\tcreate a nice report from all the result files"
         out " (c) NLnetlabs, Miek Gieben. Licensed under the GPL version 2"
+}
+
+function report() {
+        # generate a report from the result. files.
+        passed=0
+        failed=0
+
+        for result in `ls result.*`; do 
+                passfailed=`head -1 $result | awk ' { print $2 }'`
+                basename=`head -2 $result |grep BaseName | awk -F': ?' ' { print $2 }'`
+                description=`head -3 $result |grep Description | awk -F': ?' ' { print $2 }'`
+                
+                if [ $passfailed = "FAILED" ]; then
+                        ((failed=$failed + 1))
+                        echo -e "$basename: !! $passfailed !! : $description"
+                else
+                        ((passed=$passed + 1))
+                        echo -e "$basename: ** $passfailed ** : $description"
+                fi
+        done
+        ((total=$passed + $failed))
+        fper=`echo -e "scale=2\n$failed/$total*100" | bc`
+        pper=`echo -e "scale=2\n$passed/$total*100" | bc`
+        echo
+        echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)"
 }
 
 ### Main 
@@ -39,6 +65,13 @@ goal=$1
 archive=$2
 if [ -z $goal ]; then
         usage
+        exit 0
+fi
+
+### REPORT ###
+# no extra args required
+if [ $goal = "report" ]; then
+        report
         exit 0
 fi
 
