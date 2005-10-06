@@ -1,0 +1,217 @@
+#!/bin/sh
+# This is a shell archive (produced by GNU sharutils 4.2.1).
+# To extract the files from this archive, save it to some FILE, remove
+# everything before the `!/bin/sh' line above, then type `sh FILE'.
+#
+# Made on 2005-10-06 15:00 CEST by <miekg@elektron>.
+# Source directory was `/home/miekg/test'.
+#
+# Existing files will *not* be overwritten unless `-c' is specified.
+#
+# This shar contains:
+# length mode       name
+# ------ ---------- ------------------------------------------
+#    280 -rw------- test1.dsc
+#     59 -rw------- test1.post
+#     52 -rw------- test1.pre
+#     63 -rw------- test1.querygood
+#    206 -rw------- test1.test
+#
+save_IFS="${IFS}"
+IFS="${IFS}:"
+gettext_dir=FAILED
+locale_dir=FAILED
+first_param="$1"
+for dir in $PATH
+do
+  if test "$gettext_dir" = FAILED && test -f $dir/gettext \
+     && ($dir/gettext --version >/dev/null 2>&1)
+  then
+    set `$dir/gettext --version 2>&1`
+    if test "$3" = GNU
+    then
+      gettext_dir=$dir
+    fi
+  fi
+  if test "$locale_dir" = FAILED && test -f $dir/shar \
+     && ($dir/shar --print-text-domain-dir >/dev/null 2>&1)
+  then
+    locale_dir=`$dir/shar --print-text-domain-dir`
+  fi
+done
+IFS="$save_IFS"
+if test "$locale_dir" = FAILED || test "$gettext_dir" = FAILED
+then
+  echo=echo
+else
+  TEXTDOMAINDIR=$locale_dir
+  export TEXTDOMAINDIR
+  TEXTDOMAIN=sharutils
+  export TEXTDOMAIN
+  echo="$gettext_dir/gettext -s"
+fi
+if touch -am -t 200112312359.59 $$.touch >/dev/null 2>&1 && test ! -f 200112312359.59 -a -f $$.touch; then
+  shar_touch='touch -am -t $1$2$3$4$5$6.$7 "$8"'
+elif touch -am 123123592001.59 $$.touch >/dev/null 2>&1 && test ! -f 123123592001.59 -a ! -f 123123592001.5 -a -f $$.touch; then
+  shar_touch='touch -am $3$4$5$6$1$2.$7 "$8"'
+elif touch -am 1231235901 $$.touch >/dev/null 2>&1 && test ! -f 1231235901 -a -f $$.touch; then
+  shar_touch='touch -am $3$4$5$6$2 "$8"'
+else
+  shar_touch=:
+  echo
+  $echo 'WARNING: not restoring timestamps.  Consider getting and'
+  $echo "installing GNU \`touch', distributed in GNU File Utilities..."
+  echo
+fi
+rm -f 200112312359.59 123123592001.59 123123592001.5 1231235901 $$.touch
+#
+if mkdir _sh07912; then
+  $echo 'x -' 'creating lock directory'
+else
+  $echo 'failed to create lock directory'
+  exit 1
+fi
+# ============= test1.dsc ==============
+if test -f 'test1.dsc' && test "$first_param" != -c; then
+  $echo 'x -' SKIPPING 'test1.dsc' '(file already exists)'
+else
+  $echo 'x -' extracting 'test1.dsc' '(text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'test1.dsc' &&
+BaseName: test1
+Version: 0.1
+Description: Test negative SOA TTL, added to test BUG #6
+CreationDate: 05-10-2005
+Maintainer: Miek Gieben
+Category: 
+Component:
+Depends: 
+Pre: test1.pre
+Post: test1.post
+Test: test1.test
+AuxFiles: test1.querygood
+Success: "matched"
+Report: 
+SHA1sum: 
+SHAR_EOF
+  (set 20 05 10 06 15 00 26 'test1.dsc'; eval "$shar_touch") &&
+  chmod 0600 'test1.dsc' ||
+  $echo 'restore of' 'test1.dsc' 'failed'
+  if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
+  && ( md5sum --version 2>&1 | grep -v 'textutils 1.12' ) >/dev/null; then
+    md5sum -c << SHAR_EOF >/dev/null 2>&1 \
+    || $echo 'test1.dsc:' 'MD5 check failed'
+ddc2860e78f9ff3efa6dea2562f40391  test1.dsc
+SHAR_EOF
+  else
+    shar_count="`LC_ALL= LC_CTYPE= LANG= wc -c < 'test1.dsc'`"
+    test 280 -eq "$shar_count" ||
+    $echo 'test1.dsc:' 'original size' '280,' 'current size' "$shar_count!"
+  fi
+fi
+# ============= test1.post ==============
+if test -f 'test1.post' && test "$first_param" != -c; then
+  $echo 'x -' SKIPPING 'test1.post' '(file already exists)'
+else
+  $echo 'x -' extracting 'test1.post' '(text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'test1.post' &&
+#!/bin/sh
+X
+echo "He! Ruim toch eens een keer je troep op!"
+SHAR_EOF
+  (set 20 05 10 06 12 59 45 'test1.post'; eval "$shar_touch") &&
+  chmod 0600 'test1.post' ||
+  $echo 'restore of' 'test1.post' 'failed'
+  if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
+  && ( md5sum --version 2>&1 | grep -v 'textutils 1.12' ) >/dev/null; then
+    md5sum -c << SHAR_EOF >/dev/null 2>&1 \
+    || $echo 'test1.post:' 'MD5 check failed'
+64d70899789748b2d683c4657fc7333a  test1.post
+SHAR_EOF
+  else
+    shar_count="`LC_ALL= LC_CTYPE= LANG= wc -c < 'test1.post'`"
+    test 59 -eq "$shar_count" ||
+    $echo 'test1.post:' 'original size' '59,' 'current size' "$shar_count!"
+  fi
+fi
+# ============= test1.pre ==============
+if test -f 'test1.pre' && test "$first_param" != -c; then
+  $echo 'x -' SKIPPING 'test1.pre' '(file already exists)'
+else
+  $echo 'x -' extracting 'test1.pre' '(text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'test1.pre' &&
+#!/bin/sh
+X
+echo "Dit script word vooraf uitgevoerd"
+SHAR_EOF
+  (set 20 05 10 06 12 59 45 'test1.pre'; eval "$shar_touch") &&
+  chmod 0600 'test1.pre' ||
+  $echo 'restore of' 'test1.pre' 'failed'
+  if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
+  && ( md5sum --version 2>&1 | grep -v 'textutils 1.12' ) >/dev/null; then
+    md5sum -c << SHAR_EOF >/dev/null 2>&1 \
+    || $echo 'test1.pre:' 'MD5 check failed'
+ad4df315f4f4ecfbebd4c0fb2ef081d0  test1.pre
+SHAR_EOF
+  else
+    shar_count="`LC_ALL= LC_CTYPE= LANG= wc -c < 'test1.pre'`"
+    test 52 -eq "$shar_count" ||
+    $echo 'test1.pre:' 'original size' '52,' 'current size' "$shar_count!"
+  fi
+fi
+# ============= test1.querygood ==============
+if test -f 'test1.querygood' && test "$first_param" != -c; then
+  $echo 'x -' SKIPPING 'test1.querygood' '(file already exists)'
+else
+  $echo 'x -' extracting 'test1.querygood' '(text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'test1.querygood' &&
+elektron.atoom.net.3600INAAAA2001:7b8:32a:0:280:48ff:feb3:26eb
+SHAR_EOF
+  (set 20 05 10 06 12 59 45 'test1.querygood'; eval "$shar_touch") &&
+  chmod 0600 'test1.querygood' ||
+  $echo 'restore of' 'test1.querygood' 'failed'
+  if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
+  && ( md5sum --version 2>&1 | grep -v 'textutils 1.12' ) >/dev/null; then
+    md5sum -c << SHAR_EOF >/dev/null 2>&1 \
+    || $echo 'test1.querygood:' 'MD5 check failed'
+da7dd7161c9d3d2ecf5afbb2b68eeadc  test1.querygood
+SHAR_EOF
+  else
+    shar_count="`LC_ALL= LC_CTYPE= LANG= wc -c < 'test1.querygood'`"
+    test 63 -eq "$shar_count" ||
+    $echo 'test1.querygood:' 'original size' '63,' 'current size' "$shar_count!"
+  fi
+fi
+# ============= test1.test ==============
+if test -f 'test1.test' && test "$first_param" != -c; then
+  $echo 'x -' SKIPPING 'test1.test' '(file already exists)'
+else
+  $echo 'x -' extracting 'test1.test' '(text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'test1.test' &&
+#!/bin/sh
+X
+dig miek.nl | grep AAAA | sed 's/[ \t]*//g' > $$.digout
+diff -u test1.querygood $$.digout
+if [ $? -ne 0 ]; then 
+X        echo "Query failed"
+else 
+X        echo "Query matched"
+fi
+rm -f $$.digout
+SHAR_EOF
+  (set 20 05 10 06 13 28 43 'test1.test'; eval "$shar_touch") &&
+  chmod 0600 'test1.test' ||
+  $echo 'restore of' 'test1.test' 'failed'
+  if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
+  && ( md5sum --version 2>&1 | grep -v 'textutils 1.12' ) >/dev/null; then
+    md5sum -c << SHAR_EOF >/dev/null 2>&1 \
+    || $echo 'test1.test:' 'MD5 check failed'
+2b981e6bb401d4269d29a0aea45fd791  test1.test
+SHAR_EOF
+  else
+    shar_count="`LC_ALL= LC_CTYPE= LANG= wc -c < 'test1.test'`"
+    test 206 -eq "$shar_count" ||
+    $echo 'test1.test:' 'original size' '206,' 'current size' "$shar_count!"
+  fi
+fi
+rm -fr _sh07912
+exit 0

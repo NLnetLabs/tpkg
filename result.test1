@@ -1,0 +1,5 @@
+!! FAILED !!
+BaseName: test1
+Description: Test negative SOA TTL, added to test BUG #6
+--------------- Test Output ------------------
+Query matched

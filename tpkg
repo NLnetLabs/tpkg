@@ -1,0 +1,216 @@
+#!/bin/bash
+
+# a utlity to run a shar test archive
+
+# make a tmp dir
+# cd to the dir
+# unshar the shar archive
+# execute the files accoring to the tpkg
+
+### Helper functions
+function cleanup() {
+        echo "[log] Cleaning up" > /dev/stderr
+        [ -f result.$dsc_basename ] && cp result.$dsc_basename ../
+        cd ..
+        rm -rf $dir/
+}
+
+function err() {
+        echo $1 > /dev/stderr
+}
+function out() {
+        echo $1 
+}
+
+### Main 
+# either create a tpkg (ie. call shar) or exe (do a test)
+goal=$1
+archive=$2
+if [ -z $goal ]; then
+        out "Usage $0 [exe|create|extract|tmpl] test.tpkg"
+        exit 0;
+fi
+
+if [ -z $archive ]; then
+        out "Usage: $0 [exe|create|extract|tpml] test.tpkg"
+        exit 0
+fi
+
+testname=`basename $archive .tpkg`
+dsc_file=$testname.dsc                  
+if  [ -z $testname ]; then
+        err "[fatal] The test package should have a .tpkg extension. Abort"
+        exit 1
+fi
+
+
+if [ $goal = "create" ]; then
+### CREATE ###
+# get all files with the same basename except those that ends in .tpkg
+        if [ -f $testname.tpkg ]; then
+                err "[warning] Overwriting existing $testname.tpkg."
+        fi
+        i=$( ls $testname.* | grep -v $testname.tpkg )  # keep this check
+        shar $i > $testname.tpkg
+        exit 0
+fi
+
+### TMPL ####
+# write out a .dsc and touch a .pre/.post/.test
+if [ $goal = "tmpl" ]; then
+        if [ -f $testname.dsc ]; then
+                err "[fatal] $testname.dsc already exists. Abort."
+                exit 1
+        fi
+        
+        cat <<TMPL_EOF > $testname.dsc
+BaseName: $testname
+Version: 1.0
+Description: [Put something nice here]
+CreationDate: `date`
+Maintainer: `grep $LOGNAME /etc/passwd | awk -F: ' { print $5 }' | sed s/,//g`
+Category: 
+Component:
+Depends:
+Pre: $testname.pre
+Post: $testname.post
+Test: $testname.test
+AuxFiles: 
+Passed:
+Failure:
+TMPL_EOF
+        touch $testname.pre
+        touch $testname.post
+        touch $testname.test
+
+        out "[log] created $testname.{dsc, pre, post, test}"
+        out "[log] please create the test script and then run: tpkg create $testname"
+        exit 0
+fi
+
+dir=`mktemp -d "./tmp.XXXXXX"`
+if [ ! -d $dir ]; then 
+        err "[fatal] Failure to create a temporary working directory. Abort."
+        exit 1
+fi
+
+## EXTRACT
+err "[log] Extracting..."
+cp $archive $dir/
+cd $dir
+sh ./$archive > /dev/stderr
+
+if [ $goal = "extract" ]; then
+        # stop here
+        err "[log] extracted $archive to $dir."
+        rm $archive
+        exit 0
+fi
+
+### EXE ###
+# extract the information out of the *.dsc files
+if [ ! -f $dsc_file ]; then
+        err "[fatal] Can't locate the description file: $dsc_file. Abort."
+        cleanup
+        exit 1
+fi
+
+# this is the template for .dsc files
+dsc_basename=$testname
+dsc_version=`IFS=: awk -F': ?' < $dsc_file '/^Version/ { print $2 }'`
+dsc_description=`IFS=: awk -F': ?' < $dsc_file '/^Description/ { print $2 }'`
+dsc_creationdate=`IFS=: awk -F': ?' < $dsc_file '/^CreationDate/ { print $2 }'`
+dsc_category=`IFS=: awk -F': ?' < $dsc_file '/^Category/ { print $2 }'`
+dsc_component=`IFS=: awk -F': ?' < $dsc_file '/^Component/ { print $2 }'`
+dsc_depends=`IFS=: awk -F': ?' < $dsc_file '/^Depends/ { print $2 }'`
+dsc_maintainer=`IFS=: awk -F': ?' < $dsc_file '/^Maintainer/ { print $2 }'`
+dsc_pre=`IFS=: awk -F': ?' < $dsc_file '/^Pre/ { print $2 }'`
+dsc_post=`IFS=: awk -F': ?' < $dsc_file '/^Post/ { print $2 }'`
+dsc_test=`IFS=: awk -F': ?' < $dsc_file '/^Test/ { print $2 }'`
+dsc_aux=`IFS=: awk -F': ?' < $dsc_file '/^AuxFiles/ { print $2 }'`
+dsc_passed=`IFS=: awk -F': ?' < $dsc_file '/^Passed/ { print $2 }'`
+dsc_failure=`IFS=: awk -F': ?' < $dsc_file '/^Failure/ { print $2 }'`
+dsc_report=`IFS=: awk -F': ?' < $dsc_file '/^Report/ { print $2 }'`
+dsc_sha1=`IFS=: awk -F': ?' < $dsc_file '/^SHA1sum/ { print $2 }'`
+
+# this enhances the template from above
+## Post Processing of some of these variables
+# dsc_aux is a comma seperated list of files, max 4 files (TODO)
+i=$( echo $dsc_aux | awk -F', ?' '{ print $1 "\n" $2 "\n" $3 "\n" $4 }' )
+dsc_aux_files=($i)
+dsc_aux_files_total=${#dsc_aux_files[*]}
+# depends can also be a comma seperated list of package
+# TODO
+
+# check is the aux files are also really in the shar
+for i in ${dsc_aux_files[*]}; do
+        if [ ! -f $i ]; then
+                err "[fatal] Aux. file $i must be in the archive. Abort"
+                cleanup
+                exit 1
+        fi
+done
+
+if [ ! -f $dsc_test ]; then
+        err "[fatal] Can't locate the test script: $dsc_test. Abort"
+        cleanup
+        exit 1
+fi
+
+### Actual executing of the scripts
+err "[log] Executing pre-script" 
+[ -f $dsc_pre ] && /bin/sh $dsc_pre 
+if [ $? -ne 0 ]; then
+        err "[fatal] Pre-script executed with errors: $?. Abort"
+        cleanup
+        exit 1
+fi
+
+err "[log] Executing test" 
+# save the test output in a file together with some extra info
+# TODO put other values into here too??
+echo "BaseName: $dsc_basename" > result.$dsc_basename
+echo "Description: $dsc_description" >> result.$dsc_basename
+echo "DateRun: `date`" >> result.$dsc_basename
+echo "--------------- Test Output ------------------" >> result.$dsc_basename
+/bin/sh $dsc_test 2>&1 | tee result.$dsc_basename.$$ >> result.$dsc_basename
+if [ $? -ne 0 ]; then
+        err "[warning] Test executed with errors: $?. Trying to continue" 
+fi
+
+result=0
+## PASSED
+# not we can both fail and pass... TODO???
+[ ! -z $dsc_passed ] && egrep "$dsc_passed" result.$dsc_basename.$$ > /dev/null
+if [ $? -eq 0 ]; then
+        echo "** PASSED **     ** PASSED **" > result.$dsc_basename.tmp
+        cat result.$dsc_basename >> result.$dsc_basename.tmp
+        mv result.$dsc_basename.tmp result.$dsc_basename
+        result=1
+fi 
+## FAILED
+[ ! -z $dsc_failure ] && egrep "$dsc_failure" result.$dsc_basename.$$ > /dev/null
+if [ $? -eq 0 ]; then
+        echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
+        cat result.$dsc_basename >> result.$dsc_basename.tmp
+        mv result.$dsc_basename.tmp result.$dsc_basename
+        result=1
+fi
+## UKNOWN
+if [ $result -eq 0 ]; then
+        # not failed nor passed
+        echo "!! UNKNOWN !!     !! UNKNOWN !!" > result.$dsc_basename.tmp
+        cat result.$dsc_basename >> result.$dsc_basename.tmp
+        mv result.$dsc_basename.tmp result.$dsc_basename
+fi
+        
+[ -f $dsc_post ] && echo "[log] Executing post script" > /dev/stderr
+/bin/sh $dsc_post
+if [ $? -ne 0 ]; then
+        err "[fatal] Post-script executed with errors: $?. Abort"
+        cleanup
+        exit 1
+fi
+
+cleanup
+exit 0
