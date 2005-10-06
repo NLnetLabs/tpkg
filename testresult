@@ -24,7 +24,7 @@ for result in `ls result.*`; do
         fi
 done
 ((total=$passed + $failed))
-echo $failed/$total | bc
+echo "scale=4 $failed/$total" | bc
 echo $passed/$total | bc
 
 echo $total
