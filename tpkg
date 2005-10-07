@@ -4,7 +4,7 @@
 # Created by Miek Gieben, NLnetLabs, (c) 2005
 # Licensed under GPL version 2
 
-export TPKG_VAR=tpkg.var
+export TPKG_VAR=`pwd`/tpkg.var
 
 ### Helper functions
 function cleanup() {
@@ -115,7 +115,7 @@ function report() {
         echo
         echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)\t\tUNKNOWN: $unknown ($uper %)"
         # rm any .var files
-        rm -f $TPKG_VARFILE
+        rm -f $TPKG_VAR
 }
 
 SHELL=`which bash`

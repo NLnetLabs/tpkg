@@ -1,0 +1,75 @@
+typeset in restructered test
+
+
+Test Package
+
+
+Writting Test Packages
+
+
+        .test file
+                Start each test with a source of the $TPKG_VAR
+             
+        
+
+
+
+Test Output
+        
+        result. files
+
+                A typical example of a result. file is test:
+                
+                ** PASSED **     ** PASSED **
+                BaseName: svn-build
+                Description: Check out and build libdns/trunk
+                DateRun: Fri Oct  7 20:28:23 CEST 2005
+                --------------- Test Output ------------------
+
+
+
+
+Running Tests:
+        =tpkg exe test1=
+        =tpkg exe test2=
+        ...
+        =tpkg exe testN=
+
+        =tpkg report=
+                generate a report of all the tests
+
+        =tpkg clean=
+                remove all the result. files
+
+Reading Reports:
+
+        Typical example:
+
+        ldns-splint: ** PASSED ** : Run a make lint test on the libdns sources
+        svn-build: ** PASSED ** : Check out and build libdns/trunk
+
+        PASSED: 2 (100.00 %)            FAILED: 0 (0 %)         UNKNOWN: 0 (0 %)
+
+
+
+
+
+
+Conventions
+        In the toplevel test directory (where all the .tpkg files live) 
+        different tests should communicate (exchanges variable contents) 
+        by appending to the file "tpkg.var"
+        This is currently the only way to implement persistent variabeles.
+
+        The location of this file is known in tpkg as $TPKG_VAR - which is 
+        exported when =tpkg= is run.
+
+        It is also wise to name all variables with a "TPKG_" prefix, for
+        instance when some test builds the code in a directory, it could
+        use a TPKG_BUILD variable that points to that dir.
+        The test-script itself should write this var to to the $TPKG_VAR
+        file. Like this:
+
+        echo "export TPKG_BUILD=$TPKG_BUILD" >> $TPKG_VAR
+
+        Not the use of '>>' here.
