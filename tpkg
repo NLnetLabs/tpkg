@@ -46,16 +46,20 @@ function report() {
                 basename=`head -2 $result |grep BaseName | awk -F': ?' ' { print $2 }'`
                 description=`head -3 $result |grep Description | awk -F': ?' ' { print $2 }'`
                 
-                if [ $passfailed = "FAILED" ]; then
+                case $passfailed in
+                "FAILED")
                         ((failed=$failed + 1))
                         echo -e "$basename: !! $passfailed !! : $description"
-                else if [ $passedfailed = "PASSED" ]; then
+                ;;
+                "PASSED")
                         ((passed=$passed + 1))
                         echo -e "$basename: ** $passfailed ** : $description"
-                else 
+                ;;
+                *) 
                         ((unknown=$unknown + 1))
                         echo -e "$basename: -- $passfailed -- : $description"
-                fi
+                ;;
+                esac
         done
         ((total=$passed + $failed + $unknown))
         fper=`echo -e "scale=2\n$failed/$total*100" | bc`
