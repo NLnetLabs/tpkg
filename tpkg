@@ -66,21 +66,21 @@ function report() {
         pper=`echo -e "scale=2\n$passed/$total*100" | bc`
         uper=`echo -e "scale=2\n$unknown/$total*100" | bc`
         echo
-        echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)\t\tUNKNOWN: $unknown ($uper)"
+        echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)\t\tUNKNOWN: $unknown ($uper %)"
 }
 
 ### Main 
 # either create a tpkg (ie. call shar) or exe (do a test)
 goal=$1
 archive=$2
-if [ -z $goal ]; then
+if [ -z "${goal}" ]; then
         usage
         exit 0
 fi
 
 ### REPORT ###
 # no extra args required
-if [ $goal = "report" ]; then
+if [ "${goal}" = "report" ]; then
         report
         exit 0
 fi
@@ -236,32 +236,44 @@ fi
 failed=0  # undef, 1 passed, 2 failed
 ## PASSED
 # not we can both fail and pass... TODO???
-[ ! -z $dsc_passed ] && egrep "$dsc_passed" result.$dsc_basename.$$ > /dev/null
+[ ! -z "${dsc_passed}" ] && egrep "${dsc_passed}" result.$dsc_basename.$$ > /dev/null
 if [ $? -eq 0 ]; then
         echo "** PASSED **     ** PASSED **" > result.$dsc_basename.tmp
+        err "[log] ** PASSED **"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         failed=1
 fi 
 ## FAILED
-[ ! -z $dsc_failure ] && egrep "$dsc_failure" result.$dsc_basename.$$ > /dev/null
+[ ! -z "${dsc_failure}" ] && egrep "${dsc_failure}" result.$dsc_basename.$$ > /dev/null
+# if not found this actually means PASSED
 if [ $? -eq 0 ]; then
         echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
+        err "1 [log] !! FAILED !!"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         failed=2
+else
+        echo "** PASSED **     ** PASSED **" > result.$dsc_basename.tmp
+        err "[log] ** PASSED **"
+        cat result.$dsc_basename >> result.$dsc_basename.tmp
+        mv result.$dsc_basename.tmp result.$dsc_basename
+        failed=1
 fi
-if [ $test_result -ne 0 ]; then
+if [ $test_result -ne 0 -a $failed -eq 0 ]; then
         # test script exited with non-zero value, failed!
         echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
+        err "2 [log] !! FAILED !!"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         failed=2
 fi
+## UNKNOWN
 if [ $failed -eq 0 ]; then
         # neither failed, not success, unknown
         # test script exited with non-zero value, failed!
         echo "-- UNKNOWN --     -- UNKNOWN --" > result.$dsc_basename.tmp
+        err "[log] -- UNKNOWN --"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
 fi

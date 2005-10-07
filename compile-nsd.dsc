@@ -11,4 +11,4 @@ Post: compile-nsd.post
 Test: compile-nsd.test
 AuxFiles: 
 Passwd:
-Failure: error
+Failure: syntax error

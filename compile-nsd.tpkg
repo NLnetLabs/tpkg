@@ -3,15 +3,15 @@
 # To extract the files from this archive, save it to some FILE, remove
 # everything before the `!/bin/sh' line above, then type `sh FILE'.
 #
-# Made on 2005-10-06 15:34 CEST by <miekg@floep>.
-# Source directory was `/home/miekg/nsd-test'.
+# Made on 2005-10-07 11:26 CEST by <miekg@floep>.
+# Source directory was `/home/miekg/svn/tpkg/trunk'.
 #
 # Existing files will *not* be overwritten unless `-c' is specified.
 #
 # This shar contains:
 # length mode       name
 # ------ ---------- ------------------------------------------
-#    249 -rw------- compile-nsd.dsc
+#    256 -rw------- compile-nsd.dsc
 #      0 -rw------- compile-nsd.post
 #      0 -rw------- compile-nsd.pre
 #     50 -rw------- compile-nsd.test
@@ -64,7 +64,7 @@ else
 fi
 rm -f 200112312359.59 123123592001.59 123123592001.5 1231235901 $$.touch
 #
-if mkdir _sh20417; then
+if mkdir _sh08593; then
   $echo 'x -' 'creating lock directory'
 else
   $echo 'failed to create lock directory'
@@ -89,21 +89,21 @@ Post: compile-nsd.post
 Test: compile-nsd.test
 AuxFiles: 
 Passwd:
-Failure: error
+Failure: syntax error
 SHAR_EOF
-  (set 20 05 10 06 15 30 53 'compile-nsd.dsc'; eval "$shar_touch") &&
+  (set 20 05 10 07 11 26 29 'compile-nsd.dsc'; eval "$shar_touch") &&
   chmod 0600 'compile-nsd.dsc' ||
   $echo 'restore of' 'compile-nsd.dsc' 'failed'
   if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
   && ( md5sum --version 2>&1 | grep -v 'textutils 1.12' ) >/dev/null; then
     md5sum -c << SHAR_EOF >/dev/null 2>&1 \
     || $echo 'compile-nsd.dsc:' 'MD5 check failed'
-740873cb4cd4029c90495c49fd6fd485  compile-nsd.dsc
+3bca55e23612e2a11a7f068b6ab3e476  compile-nsd.dsc
 SHAR_EOF
   else
     shar_count="`LC_ALL= LC_CTYPE= LANG= wc -c < 'compile-nsd.dsc'`"
-    test 249 -eq "$shar_count" ||
-    $echo 'compile-nsd.dsc:' 'original size' '249,' 'current size' "$shar_count!"
+    test 256 -eq "$shar_count" ||
+    $echo 'compile-nsd.dsc:' 'original size' '256,' 'current size' "$shar_count!"
   fi
 fi
 # ============= compile-nsd.post ==============
@@ -112,7 +112,7 @@ if test -f 'compile-nsd.post' && test "$first_param" != -c; then
 else
   $echo 'x -' extracting 'compile-nsd.post' '(empty)'
   > 'compile-nsd.post' &&
-  (set 20 05 10 06 15 22 25 'compile-nsd.post'; eval "$shar_touch") &&
+  (set 20 05 10 06 15 50 31 'compile-nsd.post'; eval "$shar_touch") &&
   chmod 0600 'compile-nsd.post' ||
   $echo 'restore of' 'compile-nsd.post' 'failed'
   if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
@@ -133,7 +133,7 @@ if test -f 'compile-nsd.pre' && test "$first_param" != -c; then
 else
   $echo 'x -' extracting 'compile-nsd.pre' '(empty)'
   > 'compile-nsd.pre' &&
-  (set 20 05 10 06 15 22 25 'compile-nsd.pre'; eval "$shar_touch") &&
+  (set 20 05 10 06 15 50 31 'compile-nsd.pre'; eval "$shar_touch") &&
   chmod 0600 'compile-nsd.pre' ||
   $echo 'restore of' 'compile-nsd.pre' 'failed'
   if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
@@ -158,7 +158,7 @@ X
 cd /home/miekg/svn/nsd/trunk/
 X./configure ; make
 SHAR_EOF
-  (set 20 05 10 06 15 24 29 'compile-nsd.test'; eval "$shar_touch") &&
+  (set 20 05 10 06 15 50 31 'compile-nsd.test'; eval "$shar_touch") &&
   chmod 0600 'compile-nsd.test' ||
   $echo 'restore of' 'compile-nsd.test' 'failed'
   if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
@@ -173,5 +173,5 @@ SHAR_EOF
     $echo 'compile-nsd.test:' 'original size' '50,' 'current size' "$shar_count!"
   fi
 fi
-rm -fr _sh20417
+rm -fr _sh08593
 exit 0

@@ -1,7 +1,7 @@
-!! FAILED !!     !! FAILED !!
+** PASSED **     ** PASSED **
 BaseName: compile-nsd
 Description: 
-DateRun: Fri Oct  7 11:02:06 CEST 2005
+DateRun: Fri Oct  7 11:30:26 CEST 2005
 --------------- Test Output ------------------
 checking for gawk... no
 checking for mawk... mawk
@@ -158,10 +158,4 @@ configure: creating ./config.status
 config.status: creating Makefile
 config.status: creating config.h
 config.status: config.h is unchanged
-gcc -I/usr/include -DHAVE_CONFIG_H -I. -DCONFIGFILE=\"/etc/nsd/nsd.conf\" -DDATADIR=\"/usr/local/share\" -DDBFILE=\"/etc/nsd/nsd.db\" -DPIDFILE=\"/var/run/nsd.pid\" -DUSER=\"nsd\" -I/usr/include/libxml2 -g -O2 -c namedb.c
-In file included from /usr/include/bits/types.h:31,
-                 from /usr/include/sys/types.h:31,
-                 from ./config.h:367,
-                 from namedb.c:11:
-/usr/lib/gcc/i486-linux-gnu/4.0.2/include/stddef.h:214: error: syntax error before ‘typedef’
-make: *** [namedb.o] Error 1
+make: Nothing to be done for `all'.
