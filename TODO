@@ -1,3 +1,26 @@
 don't overwrite result files but add .1 or .2 affix
+
 export some environment vars. like a tmp dir that
   is used for test and/or checking out code
+
+trap control-c
+when creating remove the original files...?
+
+# current working directory
+  TPKG_CWD
+
+  make a sourceable temp file with everything you
+  want to save
+
+  in $dir: testname.var   # holds the shared variables
+  TPKG_TESTDIR=$pwd/$dir
+  TPKG_VARFILE=$DPKG_TESTDIR/testname.var
+
+  script can source  $TPKG_VARFILE and have
+  all the info
+
+  tpkg defined var
+  TPKG_TESTDIR=where is the test shar unpacked
+  TPKG_VARFILE=file with all the variables
+
+

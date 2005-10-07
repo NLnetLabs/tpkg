@@ -9,7 +9,14 @@ function cleanup() {
         echo "[log] Cleaning up" > /dev/stderr
         [ -f result.$dsc_basename ] && cp result.$dsc_basename ../
         cd ..
-        rm -rf $dir/
+        if [ -d $dir ]; then
+                rm -rf $dir/
+        fi
+}
+
+function cleanup_and_exit() {
+        cleanup
+        exit 1
 }
 
 function err() {
@@ -19,8 +26,32 @@ function out() {
         echo -e "$1"
 }
 
+function post() {
+        if [ -f "${dsc_post}" ]; then 
+                err "[log] Executing post script"
+                ${SHELL} ${dsc_post}
+                if [ $? -ne 0 ]; then
+                        err "[fatal] Post-script executed with errors: $?. Abort"
+                        cleanup
+                        exit 1
+                fi
+        fi
+}
+
+function pre() {
+        if [ -f "${dsc_pre}" ]; then 
+                err "[log] Executing pre-script"
+                ${SHELL} ${dsc_pre}
+                if [ $? -ne 0 ]; then
+                        err "[fatal] Pre-script executed with errors: $?. Abort"
+                        cleanup
+                        exit 1
+                fi
+        fi
+}
+
 function usage() {
-        out "Usage $0 [exe|create|extract|tmpl] [report] test.tpkg"
+        out "Usage $0 [exe|create|extract|tmpl] [report|clean] test.tpkg"
         out
         out " exe:\t\texecute a test, safe the result result.testname"
         out " create:\tcreate a .tpkg out of the test.{pre, post, test} files"
@@ -28,8 +59,17 @@ function usage() {
         out " tmpl:\t\tthe template files for a new test"
         out
         out " report:\tcreate a nice report from all the result files"
+        out " clean:\tremove all the result files"
         out
         out " (c) NLnetLabs, Miek Gieben. Licensed under the GPL version 2"
+}
+
+function cleanreport() {
+        # cleanup all the result. files
+        for result in `ls result.*`; do 
+                err "[log] rm $result"
+                rm $result
+        done
 }
 
 function report() {
@@ -88,6 +128,10 @@ if [ "${goal}" = "report" ]; then
         report
         exit 0
 fi
+if [ "${goal}" = "clean" ]; then
+        cleanreport
+        exit 0
+fi
 
 if [ -z $archive ]; then
         usage
@@ -106,10 +150,17 @@ if [ $goal = "create" ]; then
 ### CREATE ###
 # get all files with the same basename except those that ends in .tpkg
         if [ -f $testname.tpkg ]; then
-                err "[warning] Overwriting existing $testname.tpkg."
+                err "[fatal] Not overwriting existing $testname.tpkg. Abort."
+                exit 1
         fi
-        i=$( ls $testname.* | grep -v $testname.tpkg )  # keep this check
+        i=$( ls $testname.* 2>/dev/null )
+        if [ -z "${i}" ]; then
+                err "[fatal] No $testname.* files found. Abort."
+                exit 1
+        fi
         shar $i > $testname.tpkg
+        err "[log] Removing member files: $i"
+        rm $i
         exit 0
 fi
 
@@ -129,7 +180,7 @@ CreationDate: `date`
 Maintainer: `grep $LOGNAME /etc/passwd | awk -F: ' { print $5 }' | sed s/,//g`
 Category: 
 Component:
-Depends: [not implemented]
+Depends: 
 Pre: $testname.pre
 Post: $testname.post
 Test: $testname.test
@@ -158,12 +209,20 @@ cp $archive $dir/
 cd $dir
 ${SHELL} ./$archive > /dev/stderr
 
+trap cleanup_and_exit INT
+
 if [ $goal = "extract" ]; then
         # stop here
         err "[log] extracted $archive to $dir."
         rm $archive
         exit 0
 fi
+
+### GLOBAL VARIABLES
+export TPKG_TESTDIR=`pwd`
+export TPKG_VARFILE=$TPKG_TESTDIR/$testname.var
+echo "export TPKG_TESTDIR=$TPKG_TESTDIR" >  $TPKG_VARFILE
+echo "export TPKG_VARFILE=$TPKG_VARFILE" >> $TPKG_VARFILE
 
 ### EXE ###
 # extract the information out of the *.dsc files
@@ -189,10 +248,24 @@ dsc_aux=`IFS=: awk -F': ?' < $dsc_file '/^AuxFiles/ { print $2 }'`
 dsc_passed=`IFS=: awk -F': ?' < $dsc_file '/^Passed/ { print $2 }'`
 dsc_failure=`IFS=: awk -F': ?' < $dsc_file '/^Failure/ { print $2 }'`
 
+# if we depend on another test to that one first and then return
+if [ -f "${dsc_depends}" ]; then
+        cd ..  # go up one dir
+        $0 exe $dsc_depends
+        test_result=$?
+        cd -   # back where we belong
+        if [ $test_result -ne 0 ]; then
+                err "[fatal] Test depends on $dsc_depends which failed.  Abort."
+                cleanup
+                exit 1;
+        fi
+fi
+
 # this enhances the template from above
 ## Post Processing of some of these variables
 # dsc_aux is a comma seperated list of files, max 4 files (TODO)
-i=$( echo $dsc_aux | awk -F', ?' '{ print $1 "\n" $2 "\n" $3 "\n" $4 }' )
+i=$( echo $dsc_aux | awk -F', ?' '{ print $1 "\n" $2 "\n" $3 "\n" $4 "\n" \
+$5 "\n" $6 "\n" $7 "\n" $8 }' )
 dsc_aux_files=($i)
 dsc_aux_files_total=${#dsc_aux_files[*]}
 # depends can also be a comma seperated list of package
@@ -214,13 +287,7 @@ if [ ! -f $dsc_test ]; then
 fi
 
 ### Actual executing of the scripts
-err "[log] Executing pre-script" 
-[ -f $dsc_pre ] && ${SHELL} $dsc_pre 
-if [ $? -ne 0 ]; then
-        err "[fatal] Pre-script executed with errors: $?. Abort"
-        cleanup
-        exit 1
-fi
+pre
 
 err "[log] Executing test" 
 # save the test output in a file together with some extra info
@@ -229,11 +296,20 @@ echo "BaseName: $dsc_basename" > result.$dsc_basename
 echo "Description: $dsc_description" >> result.$dsc_basename
 echo "DateRun: `date`" >> result.$dsc_basename
 echo "--------------- Test Output ------------------" >> result.$dsc_basename
-${SHELL} $dsc_test 2>&1 | tee result.$dsc_basename.$$ >> result.$dsc_basename
+( ${SHELL} $dsc_test 2>&1 ) >> result.$dsc_basename
 test_result=$?
 if [ $test_result -ne 0 ]; then
-        err "[warning] Test executed with errors: $?. Trying to continue" 
+        err "[warning] Test executed with errors: $test_result." 
+        echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
+        err "[log] !! FAILED !!"
+        cat result.$dsc_basename >> result.$dsc_basename.tmp
+        mv result.$dsc_basename.tmp result.$dsc_basename
+        post
+        cleanup
+        exit 1
 fi
+# 
+cp result.$dsc_basename result.$dsc_basename.$$
 
 failed=-1  # -1 undef, 0 passed, 1 failed
 ## PASSED
@@ -251,7 +327,7 @@ fi
 # if not found this actually means PASSED
 if [ $? -eq 0 ]; then
         echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
-        err "1 [log] !! FAILED !!"
+        err "[log] !! FAILED !!"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         failed=1
@@ -281,13 +357,6 @@ if [ $failed -eq -1 ]; then
         failed=1 # not passed
 fi
         
-[ -f $dsc_post ] && echo "[log] Executing post script" > /dev/stderr
-${SHELL} $dsc_post
-if [ $? -ne 0 ]; then
-        err "[fatal] Post-script executed with errors: $?. Abort"
-        cleanup
-        exit 1
-fi
-
+post
 cleanup
 exit $failed
