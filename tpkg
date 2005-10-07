@@ -229,7 +229,7 @@ echo "DateRun: `date`" >> result.$dsc_basename
 echo "--------------- Test Output ------------------" >> result.$dsc_basename
 /bin/sh $dsc_test 2>&1 | tee result.$dsc_basename.$$ >> result.$dsc_basename
 test_result=$?
-if [ $dsc_result -ne 0 ]; then
+if [ $test_result -ne 0 ]; then
         err "[warning] Test executed with errors: $?. Trying to continue" 
 fi
 

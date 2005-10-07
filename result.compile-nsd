@@ -1,7 +1,7 @@
 !! FAILED !!     !! FAILED !!
 BaseName: compile-nsd
 Description: 
-DateRun: Thu Oct  6 15:46:36 CEST 2005
+DateRun: Fri Oct  7 11:02:06 CEST 2005
 --------------- Test Output ------------------
 checking for gawk... no
 checking for mawk... mawk
