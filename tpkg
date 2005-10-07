@@ -31,13 +31,15 @@ function usage() {
         out " tmpl:\t\tthe template files for a new test"
         out
         out " report:\tcreate a nice report from all the result files"
-        out " (c) NLnetlabs, Miek Gieben. Licensed under the GPL version 2"
+        out
+        out " (c) NLnetLabs, Miek Gieben. Licensed under the GPL version 2"
 }
 
 function report() {
         # generate a report from the result. files.
         passed=0
         failed=0
+        unknown=0
 
         for result in `ls result.*`; do 
                 passfailed=`head -1 $result | awk ' { print $2 }'`
@@ -47,16 +49,20 @@ function report() {
                 if [ $passfailed = "FAILED" ]; then
                         ((failed=$failed + 1))
                         echo -e "$basename: !! $passfailed !! : $description"
-                else
+                else if [ $passedfailed = "PASSED" ]; then
                         ((passed=$passed + 1))
                         echo -e "$basename: ** $passfailed ** : $description"
+                else 
+                        ((unknown=$unknown + 1))
+                        echo -e "$basename: -- $passfailed -- : $description"
                 fi
         done
-        ((total=$passed + $failed))
+        ((total=$passed + $failed + $unknown))
         fper=`echo -e "scale=2\n$failed/$total*100" | bc`
         pper=`echo -e "scale=2\n$passed/$total*100" | bc`
+        uper=`echo -e "scale=2\n$unknown/$total*100" | bc`
         echo
-        echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)"
+        echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)\t\tUNKNOWN: $unknown ($uper)"
 }
 
 ### Main 
@@ -218,11 +224,12 @@ echo "Description: $dsc_description" >> result.$dsc_basename
 echo "DateRun: `date`" >> result.$dsc_basename
 echo "--------------- Test Output ------------------" >> result.$dsc_basename
 /bin/sh $dsc_test 2>&1 | tee result.$dsc_basename.$$ >> result.$dsc_basename
-if [ $? -ne 0 ]; then
+test_result=$?
+if [ $dsc_result -ne 0 ]; then
         err "[warning] Test executed with errors: $?. Trying to continue" 
 fi
 
-result=0
+failed=0  # undef, 1 passed, 2 failed
 ## PASSED
 # not we can both fail and pass... TODO???
 [ ! -z $dsc_passed ] && egrep "$dsc_passed" result.$dsc_basename.$$ > /dev/null
@@ -230,7 +237,7 @@ if [ $? -eq 0 ]; then
         echo "** PASSED **     ** PASSED **" > result.$dsc_basename.tmp
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
-        result=1
+        failed=1
 fi 
 ## FAILED
 [ ! -z $dsc_failure ] && egrep "$dsc_failure" result.$dsc_basename.$$ > /dev/null
@@ -238,12 +245,19 @@ if [ $? -eq 0 ]; then
         echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
-        result=1
+        failed=2
 fi
-## UKNOWN
-if [ $result -eq 0 ]; then
-        # not failed nor passed
-        echo "!! UNKNOWN !!     !! UNKNOWN !!" > result.$dsc_basename.tmp
+if [ $test_result -ne 0 ]; then
+        # test script exited with non-zero value, failed!
+        echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
+        cat result.$dsc_basename >> result.$dsc_basename.tmp
+        mv result.$dsc_basename.tmp result.$dsc_basename
+        failed=2
+fi
+if [ $failed -eq 0 ]; then
+        # neither failed, not success, unknown
+        # test script exited with non-zero value, failed!
+        echo "-- UNKNOWN --     -- UNKNOWN --" > result.$dsc_basename.tmp
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
 fi
