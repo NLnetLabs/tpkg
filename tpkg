@@ -233,7 +233,7 @@ if [ $test_result -ne 0 ]; then
         err "[warning] Test executed with errors: $?. Trying to continue" 
 fi
 
-failed=0  # undef, 1 passed, 2 failed
+failed=-1  # -1 undef, 0 passed, 1 failed
 ## PASSED
 # not we can both fail and pass... TODO???
 [ ! -z "${dsc_passed}" ] && egrep "${dsc_passed}" result.$dsc_basename.$$ > /dev/null
@@ -242,7 +242,7 @@ if [ $? -eq 0 ]; then
         err "[log] ** PASSED **"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
-        failed=1
+        failed=0
 fi 
 ## FAILED
 [ ! -z "${dsc_failure}" ] && egrep "${dsc_failure}" result.$dsc_basename.$$ > /dev/null
@@ -252,30 +252,31 @@ if [ $? -eq 0 ]; then
         err "1 [log] !! FAILED !!"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
-        failed=2
+        failed=1
 else
         echo "** PASSED **     ** PASSED **" > result.$dsc_basename.tmp
         err "[log] ** PASSED **"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
-        failed=1
+        failed=0
 fi
-if [ $test_result -ne 0 -a $failed -eq 0 ]; then
+if [ $test_result -ne 0 -a $failed -eq -1 ]; then
         # test script exited with non-zero value, failed!
         echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
         err "2 [log] !! FAILED !!"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
-        failed=2
+        failed=1
 fi
 ## UNKNOWN
-if [ $failed -eq 0 ]; then
+if [ $failed -eq -1 ]; then
         # neither failed, not success, unknown
         # test script exited with non-zero value, failed!
         echo "-- UNKNOWN --     -- UNKNOWN --" > result.$dsc_basename.tmp
         err "[log] -- UNKNOWN --"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
+        failed=1 # not passed
 fi
         
 [ -f $dsc_post ] && echo "[log] Executing post script" > /dev/stderr
@@ -287,4 +288,4 @@ if [ $? -ne 0 ]; then
 fi
 
 cleanup
-exit 0
+exit $failed
