@@ -20,10 +20,18 @@ function cleanup_and_exit() {
 }
 
 function err() {
-        echo -e "$1" > /dev/stderr
+        if [ -z $testname ]; then
+                echo -e "    $1" > /dev/stderr
+        else
+                echo -e "[$testname]  $1" > /dev/stderr
+        fi
 }
 function out() {
-        echo -e "$1"
+        if [ -z $testname ]; then
+                echo -e "    $1"
+        else
+                echo -e "[$testname]  $1"
+        fi
 }
 
 function post() {
@@ -66,7 +74,7 @@ function usage() {
 
 function cleanreport() {
         # cleanup all the result. files
-        for result in `ls result.*`; do 
+        for result in `ls result.* 2>/dev/null`; do 
                 err "[log] rm $result"
                 rm $result
         done
@@ -233,6 +241,7 @@ if [ ! -f $dsc_file ]; then
 fi
 
 # this is the template for .dsc files
+# we need to check if all these files also exist TODO
 dsc_basename=$testname
 dsc_version=`IFS=: awk -F': ?' < $dsc_file '/^Version/ { print $2 }'`
 dsc_description=`IFS=: awk -F': ?' < $dsc_file '/^Description/ { print $2 }'`
@@ -249,8 +258,9 @@ dsc_passed=`IFS=: awk -F': ?' < $dsc_file '/^Passed/ { print $2 }'`
 dsc_failure=`IFS=: awk -F': ?' < $dsc_file '/^Failure/ { print $2 }'`
 
 # if we depend on another test to that one first and then return
-if [ -f "${dsc_depends}" ]; then
+if [ -f "../${dsc_depends}" ]; then
         cd ..  # go up one dir
+        err "[log] executing dependency test: $dsc_depends"
         $0 exe $dsc_depends
         test_result=$?
         cd -   # back where we belong
