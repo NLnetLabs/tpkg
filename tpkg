@@ -1,11 +1,8 @@
 #!/bin/bash
 
-# a utlity to run a shar test archive
-
-# make a tmp dir
-# cd to the dir
-# unshar the shar archive
-# execute the files accoring to the tpkg
+# a utlity to run a shar test archive (aka tpkg)
+# Created by Miek Gieben, NLnetLabs, (c) 2005
+# Licensed under GPL version 2
 
 ### Helper functions
 function cleanup() {
@@ -69,6 +66,13 @@ function report() {
         echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)\t\tUNKNOWN: $unknown ($uper %)"
 }
 
+SHELL=`which bash`
+if [ -z ${SHELL} ]; then
+        err "[fatal] Can't find the bash shell. Abort"
+        exit 1
+fi
+
+
 ### Main 
 # either create a tpkg (ie. call shar) or exe (do a test)
 goal=$1
@@ -125,7 +129,7 @@ CreationDate: `date`
 Maintainer: `grep $LOGNAME /etc/passwd | awk -F: ' { print $5 }' | sed s/,//g`
 Category: 
 Component:
-Depends:
+Depends: [not implemented]
 Pre: $testname.pre
 Post: $testname.post
 Test: $testname.test
@@ -152,7 +156,7 @@ fi
 err "[log] Extracting..."
 cp $archive $dir/
 cd $dir
-sh ./$archive > /dev/stderr
+${SHELL} ./$archive > /dev/stderr
 
 if [ $goal = "extract" ]; then
         # stop here
@@ -184,8 +188,6 @@ dsc_test=`IFS=: awk -F': ?' < $dsc_file '/^Test/ { print $2 }'`
 dsc_aux=`IFS=: awk -F': ?' < $dsc_file '/^AuxFiles/ { print $2 }'`
 dsc_passed=`IFS=: awk -F': ?' < $dsc_file '/^Passed/ { print $2 }'`
 dsc_failure=`IFS=: awk -F': ?' < $dsc_file '/^Failure/ { print $2 }'`
-dsc_report=`IFS=: awk -F': ?' < $dsc_file '/^Report/ { print $2 }'`
-dsc_sha1=`IFS=: awk -F': ?' < $dsc_file '/^SHA1sum/ { print $2 }'`
 
 # this enhances the template from above
 ## Post Processing of some of these variables
@@ -213,7 +215,7 @@ fi
 
 ### Actual executing of the scripts
 err "[log] Executing pre-script" 
-[ -f $dsc_pre ] && /bin/sh $dsc_pre 
+[ -f $dsc_pre ] && ${SHELL} $dsc_pre 
 if [ $? -ne 0 ]; then
         err "[fatal] Pre-script executed with errors: $?. Abort"
         cleanup
@@ -227,7 +229,7 @@ echo "BaseName: $dsc_basename" > result.$dsc_basename
 echo "Description: $dsc_description" >> result.$dsc_basename
 echo "DateRun: `date`" >> result.$dsc_basename
 echo "--------------- Test Output ------------------" >> result.$dsc_basename
-/bin/sh $dsc_test 2>&1 | tee result.$dsc_basename.$$ >> result.$dsc_basename
+${SHELL} $dsc_test 2>&1 | tee result.$dsc_basename.$$ >> result.$dsc_basename
 test_result=$?
 if [ $test_result -ne 0 ]; then
         err "[warning] Test executed with errors: $?. Trying to continue" 
@@ -280,7 +282,7 @@ if [ $failed -eq -1 ]; then
 fi
         
 [ -f $dsc_post ] && echo "[log] Executing post script" > /dev/stderr
-/bin/sh $dsc_post
+${SHELL} $dsc_post
 if [ $? -ne 0 ]; then
         err "[fatal] Post-script executed with errors: $?. Abort"
         cleanup
