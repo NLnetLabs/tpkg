@@ -6,7 +6,7 @@
 
 ### Helper functions
 function cleanup() {
-        echo "[log] Cleaning up" > /dev/stderr
+        err "[log] Cleaning up" 
         [ -f result.$dsc_basename ] && cp result.$dsc_basename ../
         cd ..
         if [ -d $dir ]; then
@@ -215,7 +215,11 @@ fi
 err "[log] Extracting..."
 cp $archive $dir/
 cd $dir
-${SHELL} ./$archive > /dev/stderr
+${SHELL} ./$archive > /dev/null
+if [ $? -ne 0 ]; then
+        err "[fatal] Could not unshar archive. Abort."
+        exit 1;
+fi
 
 trap cleanup_and_exit INT
 
