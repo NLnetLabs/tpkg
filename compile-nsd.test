@@ -1,3 +1,0 @@
-
-cd /home/miekg/svn/nsd/trunk/
-./configure ; make

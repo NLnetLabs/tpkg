@@ -9,6 +9,7 @@ Depends:
 Pre: test1.pre
 Post: test1.post
 Test: test1.test
-# These files are uses by the .test script
+# These files are used by the .test script
 AuxFiles: test1.querytest, test1.querygood
-Success: 
+Passed:
+Failure: 

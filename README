@@ -12,6 +12,9 @@ Writting Test Packages
                 this:
 
                 [ -f $TPKG_VAR ] && source $TPKG_VAR
+
+                This is automaticly added when =tpkg tmpl TEST=
+                is called.
              
         
 

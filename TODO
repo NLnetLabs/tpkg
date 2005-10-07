@@ -3,3 +3,9 @@ don't overwrite result files but add .1 or .2 affix
 make create smarter. If you give it a directory is looks
 into the dir, create the tpkg, moves it up and deletes
 the dir.
+
+make the depend smarter, use the TPKG_VAR file for this?
+if a test is already done, it should be done again
+
+make a function-lib that can be used in the test-script
+to make some things easier
