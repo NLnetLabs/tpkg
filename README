@@ -8,7 +8,10 @@ Writting Test Packages
 
 
         .test file
-                Start each test with a source of the $TPKG_VAR
+                Start each test with a source of the $TPKG_VAR, like
+                this:
+
+                [ -f $TPKG_VAR ] && source $TPKG_VAR
              
         
 

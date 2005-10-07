@@ -201,7 +201,7 @@ Failure:
 TMPL_EOF
         touch $testname.pre
         touch $testname.post
-        touch $testname.test
+        echo "[ -f $TPKG_VAR ] && source $TPKG_VAR" > $testname.test 
 
         out "[log] created $testname.{dsc, pre, post, test}"
         out "[log] please create the test script and then run: tpkg create $testname"
