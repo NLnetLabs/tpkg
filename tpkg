@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # a utlity to run a shar test archive (aka tpkg)
 # Created by Miek Gieben, NLnetLabs, (c) 2005
@@ -251,6 +251,15 @@ if [ ! -f $dsc_file ]; then
         err "[fatal] Can't locate the description file: $dsc_file. Abort."
         cleanup
         exit 1
+fi
+
+SHELL=`which bash`
+if [ -z ${SHELL} ]; then
+       SHELL=/usr/local/bin/bash
+       if [ ! -x $SHELL ]; then
+               err "[fatal] Can't find the bash shell. Abort"
+               exit 1
+       fi
 fi
 
 # check for a .done file
