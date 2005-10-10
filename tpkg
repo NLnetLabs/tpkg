@@ -1,10 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 
 # a utlity to run a shar test archive (aka tpkg)
 # Created by Miek Gieben, NLnetLabs, (c) 2005
 # Licensed under GPL version 2
 
 export TPKG_VAR="../.tpkg.var"
+export SHELL="/bin/sh"
 
 ### Helper functions
 function cleanup() {
@@ -134,14 +135,6 @@ function report() {
         echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)\t\tUNKNOWN: $unknown ($uper %)"
 }
 
-SHELL=`which bash`
-if [ -z ${SHELL} ]; then
-	SHELL=/usr/local/bin/bash
-	if [ ! -x $SHELL ]; then
-		err "[fatal] Can't find the bash shell. Abort"
-		exit 1
-	fi
-fi
 
 ### Main 
 # either create a tpkg (ie. call shar) or exe (do a test)
