@@ -61,13 +61,15 @@ function pre() {
 }
 
 function usage() {
-        out "Usage $0 [exe|create|extract|tmpl] [report|clean] test.tpkg"
+        out "Usage: $0 [exe|create|extract|tmpl] [report|clean] test.tpkg"
         out
+        out "Testing"
         out " exe:\t\texecute a test, safe the result result.testname"
         out " create:\tcreate a .tpkg out of the test.{pre, post, test} files"
         out " extract:\textract a .tpkg to tmp. dir"
-        out " tmpl:\t\tthe template files for a new test"
+        out " tmpl:\tcreate empty template files for a new test"
         out
+        out "Reporting/Cleanup"
         out " report:\tcreate a nice report from all the result files"
         out " clean:\tremove all the result files"
         out
