@@ -285,7 +285,7 @@ dsc_failure=`IFS=: awk -F': ?' < $dsc_file '/^Failure/ { print $2 }'`
 if [ -f "../${dsc_depends}" ]; then
         cd ..  # go up one dir
         err "[log] executing dependency test: $dsc_depends"
-        $0 exe $dsc_depends
+        ${SHELL} $0 exe $dsc_depends
         test_result=$?
         cd - > /dev/null  # back where we belong
         if [ $test_result -ne 0 ]; then
