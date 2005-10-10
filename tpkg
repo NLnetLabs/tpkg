@@ -136,8 +136,11 @@ function report() {
 
 SHELL=`which bash`
 if [ -z ${SHELL} ]; then
-        err "[fatal] Can't find the bash shell. Abort"
-        exit 1
+	SHELL=/usr/local/bin/bash
+	if [ ! -x $SHELL ]; then
+		err "[fatal] Can't find the bash shell. Abort"
+		exit 1
+	fi
 fi
 
 ### Main 
