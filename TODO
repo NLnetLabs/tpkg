@@ -10,3 +10,6 @@ if a test is already done, it should be done again
 
 make a function-lib that can be used in the test-script
 to make some things easier
+
+make a cache so that you can give multiple tests, which also
+depends on eachother. No test should be executed twice

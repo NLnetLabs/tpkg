@@ -61,7 +61,7 @@ function pre() {
 }
 
 function usage() {
-        out "Usage: $0 [exe|create|extract|tmpl] [report|clean] test.tpkg"
+        out "Usage $0 [exe|create|extract|tmpl] [report|clean] tests"
         out
         out "Testing"
         out " exe:\t\texecute a test, safe the result result.testname"
@@ -73,6 +73,9 @@ function usage() {
         out " report:\tcreate a nice report from all the result files"
         out " clean:\tremove all the result files"
         out
+        out " When multiple tests are given tkpg will execute each test"
+        out " once. Even when there are multilpe depencies"
+        out 
         out " (c) NLnetLabs, Miek Gieben. Licensed under the GPL version 2"
 }
 
