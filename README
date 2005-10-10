@@ -11,12 +11,13 @@ Writting Test Packages
                 Start each test with a source of the $TPKG_VAR, like
                 this:
 
-                [ -f $TPKG_VAR ] && source $TPKG_VAR
+                [ -f ../$TPKG_VAR ] && source ../$TPKG_VAR
 
                 This is automaticly added when =tpkg tmpl TEST=
                 is called.
-             
-        
+
+		We use '../' here cause '.' is cleaned up after
+		the test is run
 
 
 

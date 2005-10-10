@@ -4,7 +4,7 @@
 # Created by Miek Gieben, NLnetLabs, (c) 2005
 # Licensed under GPL version 2
 
-export TPKG_VAR="../.tpkg.var"
+export TPKG_VAR=".tpkg.var"
 export SHELL="/bin/sh"
 
 ### Helper functions
@@ -213,7 +213,7 @@ Failure:
 TMPL_EOF
         #touch $testname.pre
         #touch $testname.post
-        echo "[ -f $TPKG_VAR ] && source $TPKG_VAR" > $testname.test 
+        echo "[ -f ../$TPKG_VAR ] && source ../$TPKG_VAR" > $testname.test 
 
         out "[log] created $testname.{dsc, test}"
         out "[log] please create the test script and then run: tpkg create $testname"
