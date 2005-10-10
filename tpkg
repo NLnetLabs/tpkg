@@ -59,9 +59,17 @@ function pre() {
                 fi
         fi
 }
+ 
+function write_done() {
+        # we are executing in a subdir
+        if [ -f "../.done-${$testname}" ]; then
+                err "[warning] Overwriting .done-${$testname}"
+        fi
+        > ../.done-${$testname}
+}
 
 function usage() {
-        out "Usage $0 [exe|create|extract|tmpl] [report|clean] tests"
+        out "Usage $0 [exe|create|extract|tmpl] [report|clean] test.tpkg"
         out
         out "Testing"
         out " exe:\t\texecute a test, safe the result result.testname"
@@ -74,9 +82,9 @@ function usage() {
         out " clean:\tremove all the result files"
         out
         out " When multiple tests are given tkpg will execute each test"
-        out " once. Even when there are multilpe depencies"
+        out " once. Even when there are multilpe depencies to that test."
         out 
-        out " (c) NLnetLabs, Miek Gieben. Licensed under the GPL version 2"
+        out " (c) NLnetLabs, Miek Gieben. Licensed under the GPL version 2."
 }
 
 function cleanreport() {
@@ -88,6 +96,8 @@ function cleanreport() {
         # rm any .var files
         err "[log] rm $TPKG_VAR"
         rm -f $TPKG_VAR
+        err "[log] rm .done files"
+        rm -f .done*
 }
 
 function report() {
@@ -247,6 +257,13 @@ if [ ! -f $dsc_file ]; then
         exit 1
 fi
 
+# check for a .done file
+if [ -f "../.done-${$testname}" ]; then
+        err "[log] Found .done-${$testname}. Stopping this test."
+        cleanup
+        exit 0
+fi
+
 # this is the template for .dsc files
 # we need to check if all these files also exist TODO
 dsc_basename=$testname
@@ -326,7 +343,7 @@ if [ $test_result -ne 0 ]; then
         exit 1
 fi
 # 
-cp result.$dsc_basename result.$dsc_basename.$$
+cp -f result.$dsc_basename result.$dsc_basename.$$
 
 failed=-1  # -1 undef, 0 passed, 1 failed
 ## PASSED
@@ -337,6 +354,9 @@ if [ $? -eq 0 ]; then
         err "[log] ** PASSED **"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
+
+        write_done
+        
         failed=0
 fi 
 ## FAILED
@@ -353,6 +373,9 @@ else
         err "[log] ** PASSED **"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
+
+        write_done
+        
         failed=0
 fi
 if [ $test_result -ne 0 -a $failed -eq -1 ]; then
@@ -361,6 +384,9 @@ if [ $test_result -ne 0 -a $failed -eq -1 ]; then
         err "2 [log] !! FAILED !!"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
+
+        write_done
+        
         failed=1
 fi
 ## UNKNOWN
@@ -371,6 +397,9 @@ if [ $failed -eq -1 ]; then
         err "[log] -- UNKNOWN --"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
+
+        write_done
+        
         failed=1 # not passed
 fi
         

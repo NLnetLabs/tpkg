@@ -48,7 +48,6 @@ Running Tests:
                 remove all the result. files
 
 Reading Reports:
-
         Typical example:
 
         ldns-splint: ** PASSED ** : Run a make lint test on the libdns sources
@@ -79,3 +78,13 @@ Conventions
         echo "export TPKG_BUILD=$TPKG_BUILD" >> $TPKG_VAR
 
         Not the use of '>>' here.
+
+        For each test a .done.TESTNAME file is created when a test is
+        performed. When such a .done file is found and matches the
+        current test - the test is aborted. This way a test that
+        is referenced multiple times via a "Depends"-directive is
+        only execute once.
+
+        tpkg cleanup, will remove all these files too.
+
+        
