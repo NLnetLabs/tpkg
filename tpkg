@@ -62,10 +62,10 @@ function pre() {
  
 function write_done() {
         # we are executing in a subdir
-        if [ -f "../.done-${$testname}" ]; then
-                err "[warning] Overwriting .done-${$testname}"
+        if [ -f "../.done-${testname}" ]; then
+                err "[warning] Overwriting .done-${testname}"
         fi
-        > ../.done-${$testname}
+        > ../.done-${testname}
 }
 
 function usage() {
@@ -258,8 +258,8 @@ if [ ! -f $dsc_file ]; then
 fi
 
 # check for a .done file
-if [ -f "../.done-${$testname}" ]; then
-        err "[log] Found .done-${$testname}. Stopping this test."
+if [ -f "../.done-${testname}" ]; then
+        err "[log] Found .done-${testname}. Stopping this test."
         cleanup
         exit 0
 fi
