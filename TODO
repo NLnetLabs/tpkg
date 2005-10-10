@@ -1,15 +1,18 @@
-don't overwrite result files but add .1 or .2 affix
-low prio and then?? so what??
+High Prio:
 
+# really something
 make create smarter. If you give it a directory is looks
 into the dir, create the tpkg, moves it up and deletes
 the dir.
 
-make the depend smarter, use the TPKG_VAR file for this?
-if a test is already done, it should be done again
 
+Low Prio:
+
+# usefull, everything is usually run once
+don't overwrite result files but add .1 or .2 affix
+low prio and then?? so what??
+
+# really? Most test scripts will be perl or C or whatever
+# not bash in any case...??
 make a function-lib that can be used in the test-script
 to make some things easier
-
-make a cache so that you can give multiple tests, which also
-depends on eachother. No test should be executed twice

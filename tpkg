@@ -224,7 +224,7 @@ TMPL_EOF
         exit 0
 fi
 
-dir=`mktemp -d "./tmp.XXXXXX"`
+dir=`mktemp -d "./$testname.XXXXXX"`
 if [ ! -d $dir ]; then 
         err "[fatal] Failure to create a temporary working directory. Abort."
         exit 1
