@@ -259,7 +259,7 @@ fi
 
 # check for a .done file
 if [ -f "../.done-${testname}" ]; then
-        err "[log] Found .done-${testname}. Stopping this test."
+        err "[log] Found .done-${testname}. Not executing this test."
         cleanup
         exit 0
 fi
