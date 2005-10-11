@@ -20,6 +20,12 @@ Writting Test Packages
 		the test is run
 
 
+        Each test is executed in a temporary directory, keep this
+        in mind when using relative pathnames. ../exe must become
+        ../../exe will the test be able to find it.
+
+        Test your test before creating a .tpkg file
+
 
 Test Output
         
@@ -37,6 +43,10 @@ Test Output
 
 
 Running Tests:
+        Each test is executed in the new temporary directory.
+             
+
+
         =tpkg exe test1=
         =tpkg exe test2=
         ...

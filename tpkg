@@ -72,7 +72,7 @@ function write_done() {
 function usage() {
         out "Usage:"
         out "$0 [exe|create|extract|tmpl] [report|clean] test.tpkg"
-        out "or"
+        out "or:"
         out "$0 clone test1.tpkg test2.tpkg"
         out
         out "Testing"
