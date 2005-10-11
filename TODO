@@ -1,18 +1,13 @@
 High Prio:
 
-# really something
-make create smarter. If you give it a directory is looks
-into the dir, create the tpkg, moves it up and deletes
-the dir.
-
 tpkg clone
 to clone simular tests
 
-create tmpl in subdir * DONE
-adapt create to work with subdirs... TODO
-
 Low Prio:
 
+
+
+Will not do:
 # usefull, everything is usually run once
 don't overwrite result files but add .1 or .2 affix
 low prio and then?? so what??
