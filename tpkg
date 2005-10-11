@@ -213,7 +213,10 @@ Failure:
 TMPL_EOF
         #touch $testname.pre
         #touch $testname.post
+        echo "# source the var file when it's there" > $testname.test
         echo "[ -f ../$TPKG_VAR ] && source ../$TPKG_VAR" > $testname.test 
+        echo "# svnserve resets the path" > $testname.test
+        echo "export PATH=$PATH:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:." > $testname.test
 
         out "[log] created $testname.{dsc, test}"
         out "[log] please create the test script and then run: tpkg create $testname"
