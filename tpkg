@@ -72,6 +72,8 @@ function write_done() {
 function usage() {
         out "Usage:"
         out "$0 [exe|create|extract|tmpl] [report|clean] test.tpkg"
+        out "or"
+        out "$0 clone test1.tpkg test2.tpkg"
         out
         out "Testing"
         out " exe....:\texecute a test, safe the result result.testname"
@@ -82,6 +84,7 @@ function usage() {
         out "Reporting/Cleanup"
         out " report.:\tcreate a nice report from all the result files"
         out " clean..:\tremove all the result files"
+        out " clone..:\tclone test1.tpkg to test2.tkpg. TODO wait for better create"
         out
         out " When multiple tests are given tkpg will execute each test"
         out " once. Even when there are multilpe depencies to that test."
@@ -196,6 +199,14 @@ if [ $goal = "tmpl" ]; then
                 exit 1
         fi
         
+        # make tmp dir
+        dir=`mktemp -d "./$testname.XXXXXX"`
+        if [ ! -d $dir ]; then 
+                err "[fatal] Failure to create a temporary working directory. Abort."
+                exit 1
+        fi
+        cd $dir
+        
         cat <<TMPL_EOF > $testname.dsc
 BaseName: $testname
 Version: 1.0
@@ -220,7 +231,9 @@ TMPL_EOF
         echo "# you may need to adjust it" >> $testname.test
 
         out "[log] created $testname.{dsc, test}"
-        out "[log] please create the test script and then run: tpkg create $testname"
+        out "[log] please create the test script(s) and then run: tpkg create $testname"
+        err "[log] created $testname in $dir."
+        cd ..
         exit 0
 fi
 

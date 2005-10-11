@@ -5,6 +5,11 @@ make create smarter. If you give it a directory is looks
 into the dir, create the tpkg, moves it up and deletes
 the dir.
 
+tpkg clone
+to clone simular tests
+
+create tmpl in subdir * DONE
+adapt create to work with subdirs... TODO
 
 Low Prio:
 
