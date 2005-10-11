@@ -176,6 +176,15 @@ fi
 if [ $goal = "create" ]; then
 ### CREATE ###
 # get all files with the same basename except those that ends in .tpkg
+
+        # assume there is a dir named $testname.dir
+
+        if [ ! -d "${testname}.dir" ]; then
+                err "[fatal] No $testname.dir directory found. Abort."
+                exit 1
+        fi
+        cd $testname.dir
+        
         if [ -f $testname.tpkg ]; then
                 err "[fatal] Not overwriting existing $testname.tpkg. Abort."
                 exit 1
@@ -188,6 +197,9 @@ if [ $goal = "create" ]; then
         shar $i > $testname.tpkg
         err "[log] Removing member files"
         rm $i
+        mv $testname.tpkg ../
+        cd ../
+        rmdir $testname.dir
         exit 0
 fi
 
@@ -200,7 +212,8 @@ if [ $goal = "tmpl" ]; then
         fi
         
         # make tmp dir
-        dir=`mktemp -d "./$testname.XXXXXX"`
+        dir="$testname.dir"
+        mkdir $dir
         if [ ! -d $dir ]; then 
                 err "[fatal] Failure to create a temporary working directory. Abort."
                 exit 1
@@ -237,9 +250,10 @@ TMPL_EOF
         exit 0
 fi
 
-dir=`mktemp -d "./$testname.XXXXXX"`
+dir="${testname}.dir"
+mkdir $dir
 if [ ! -d $dir ]; then 
-        err "[fatal] Failure to create a temporary working directory. Abort."
+        err "[fatal] Failure to create $dir directory. Abort."
         exit 1
 fi
 
@@ -261,6 +275,24 @@ if [ $goal = "extract" ]; then
         rm $archive
         exit 0
 fi
+
+# make a tmp dir during execution
+
+dir=`mktemp -d "./$testname.XXXXXX"`
+if [ ! -d $dir ]; then 
+        err "[fatal] Failure to create a temporary working directory. Abort."
+        exit 1
+fi
+## EXTRACT
+err "[log] Extracting..."
+cp $archive $dir/
+cd $dir
+${SHELL} ./$archive > /dev/null
+if [ $? -ne 0 ]; then
+        err "[fatal] Could not unshar archive. Abort."
+        exit 1;
+fi
+
 
 ### EXE ###
 # extract the information out of the *.dsc files
