@@ -1,0 +1,76 @@
+.\" @(#)tpkg.1 0.1 12-Oct-2005 OF; 
+.TH tpkg 1 "12 Oct 2005"
+.SH NAME
+tpkg \- test package - manipulate tests
+.SH SYNOPSIS
+.B tpkg
+[
+.IR exe|create|extract|tmpl
+]
+[
+.IR report|clean
+]
+.IR test.tpkg
+(1st format)
+.PP
+.B tpkg
+.IR clone
+.IR test1.tpkg
+.IR test2.tpkg
+(2nd format)
+
+.SH DESCRIPTION
+\fBtpkg\fR is used to manipulate test packages. A test package
+is nothing more than a shell archive which holds a number of
+scripts. The general idea is that by using \fBtpkg\fR you can
+keep your tests organized.
+.PP
+All errors are send to stderr, the output of the scripts is
+stored in a result. file.
+
+.SS First format
+.TP
+\fBexe\fR
+Execute a test.
+.TP
+\fBcreate\fR
+Create a tpkg file out of the test files.
+.TP
+\fBextract\fR
+Extract a tpkg file. A user can then edit these files and
+recreate the tpkg by running \fBtpkg create\fR.
+.TP
+\fBtmpl\fR
+Create new test template files. A \fIdsc\fR and \fItest\fR file are created.
+
+.SS Second format
+.TP
+\fBreport\fR
+Create a report by gathering information from the \fIresult\fR files.
+Nothing is deleted when you run \fBtpkg report\fR.
+.TP
+\fBclean\fR
+Clean up all auxilary files, that is remove: \fI.done*\fR, \fIresult*\fR and
+the \fI.tpkg.var\fR file.
+.TP
+\fBclone\fR
+Clone \fItest1.tpkg\fR to \fItest2.tpkg\fR. Care is taken to also rename
+the member files and to update the \fIdsc\fR file. You should always check
+the new test.
+
+.SH AUTHOR
+Written by Miek Gieben, NLnet Labs.
+
+.SH REPORTING BUGS
+Report bugs to <miek@nlnetlabs.nl>
+
+.SH BUGS
+None sofar.
+
+.SH COPYRIGHT
+Copyright (C) 2005 NLnet Labs. This is free software. There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Licensed under the GPL version 2.
+
+.SH SEE ALSO
+\fBREADME\fR for information about how to actually write tests.

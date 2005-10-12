@@ -86,8 +86,8 @@ function usage() {
         out " clean..:\tremove all the result files"
         out " clone..:\tclone test1.tpkg to test2.tkpg"
         out
-        out " When multiple tests are given tkpg will execute each test"
-        out " once. Even when there are multilpe depencies to that test."
+        out " When multiple tests depend on a single other test, this"
+        out " other test is only executed once."
         out 
         out " (c) NLnetLabs, Miek Gieben. Licensed under the GPL version 2."
 }
@@ -282,34 +282,36 @@ TMPL_EOF
         exit 0
 fi
 
-dir="${testname}.dir"
-if [ -d $dir ]; then 
-        err "[fatal] Directory $dir already exists. Abort."
-        exit 1
-fi
-mkdir $dir
-if [ ! -d $dir ]; then 
-        err "[fatal] Failure to create $dir directory. Abort."
-        exit 1
-fi
-
 ## EXTRACT
-err "[log] Extracting..."
-cp $archive $dir/
-cd $dir
-${SHELL} ./$archive > /dev/null
-if [ $? -ne 0 ]; then
-        err "[fatal] Could not unshar archive. Abort."
-        exit 1;
-fi
-
-trap cleanup_and_exit INT
-
 if [ $goal = "extract" ]; then
-        # stop here
-        err "[log] extracted $archive to $dir."
-        rm $archive
-        exit 0
+        dir="${testname}.dir"
+        if [ -d $dir ]; then 
+                err "[fatal] Directory $dir already exists. Abort."
+                exit 1
+        fi
+        mkdir $dir
+        if [ ! -d $dir ]; then 
+                err "[fatal] Failure to create $dir directory. Abort."
+                exit 1
+        fi
+
+        err "[log] Extracting..."
+        cp $archive $dir/
+        cd $dir
+        ${SHELL} ./$archive > /dev/null
+        if [ $? -ne 0 ]; then
+                err "[fatal] Could not unshar archive. Abort."
+                exit 1;
+        fi
+
+        trap cleanup_and_exit INT
+
+        if [ $goal = "extract" ]; then
+                # stop here
+                err "[log] extracted $archive to $dir."
+                rm $archive
+                exit 0
+        fi
 fi
 
 # make a tmp dir during execution
@@ -468,17 +470,20 @@ else
         
         failed=0
 fi
-if [ $test_result -ne 0 -a $failed -eq -1 ]; then
-        # test script exited with non-zero value, failed!
-        echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
-        err "2 [log] !! FAILED !!"
-        cat result.$dsc_basename >> result.$dsc_basename.tmp
-        mv result.$dsc_basename.tmp result.$dsc_basename
 
-        write_done
-        
-        failed=1
-fi
+# this will not execute:
+#if [ $test_result -ne 0 -a $failed -eq -1 ]; then
+#        # test script exited with non-zero value, failed!
+#       echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
+#       err "[log] !! FAILED !!"
+#       cat result.$dsc_basename >> result.$dsc_basename.tmp
+#       mv result.$dsc_basename.tmp result.$dsc_basename
+
+#       write_done
+#       
+#       failed=1
+#i
+
 ## UNKNOWN
 if [ $failed -eq -1 ]; then
         # neither failed, not success, unknown

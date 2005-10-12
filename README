@@ -1,9 +1,124 @@
-typeset in restructered test
+TEST PACKAGE -- TPKG
 
+(c) NLnet Labs, 2005. Miek Gieben
+Licensed under the GPL version 2.
 
 Test Package
 
+        The most important file in each test is the description
+        file, the one with the .dsc extension. The file is line based,
+        so options spanning multiple lines are not recognized are worse,
+        make tpkg fail.
 
+        A typical example looks like this:
+        
+                BaseName: test1
+                Version: 0.1
+                Description: Test negative SOA TTL, added to test BUG #6
+                CreationDate: 05-10-2005
+                Maintainer: Miek Gieben
+                Category: 
+                Component:
+                Depends: 
+                Pre: test1.pre
+                Post: test1.post
+                Test: test1.test
+                AuxFiles: test1.a, test2.b
+                Passed:
+                Failure: 
+
+        Details of each line follow:
+
+        BaseName:
+                The basename of the test. This is the name of the .dsc
+                file without the .dsc extension
+
+        Version:
+                Currently nothing is done with this. It could either
+                evolve in a version for the .dsc file or it could
+                be used to version your tests.
+
+        Description:
+                A short explanation of what this test is supposed to test.
+                'tpkg report' uses this.
+
+        CreationDate: 
+                Automaticly set by 'tpkg tpml'. The original creation date
+                for this test.
+
+        Maintainer:
+                Who created/maintains this test
+
+        Category:
+                Under what category does this test fall. This is not
+                used by tpkg, but is a hint to the users of the tests.
+                This could something like: 'building', 'running', etc.
+                
+        Component:
+                What software component are you testing, this could be
+                the name of the executeable. User decides what to put
+                here, but it should be consistend for all tests.
+
+        Depends:
+                On what other test does this test depend. The full
+                package name should be given, with the .tpkg extension.
+
+                Currently this is limited to one test. 
+
+        Pre:
+                Name of a script that should be executed before the
+                test is run. If the pre-script fails the test fails.
+
+        Post:
+                Name of a script that should be executed after the 
+                test has run. If the post-script fails the test fails.
+
+        Test:
+                Name fo the main test script.
+
+        Auxfiles:
+                Other files that are needed to run this test, i.e. to 
+                compare against. Currently this list is limited to 8
+                other files. The list should use commas sa delimiters:
+                fileA, fileB, FileC, ...
+
+        Passed:
+                A regular expression that is matched against the output
+                of the main test script. If the expression matches the
+                test is a succes.
+
+        Failure:
+                A regular expression that is matched against the output
+                of the main test script. If the expression matches the
+                test is a failure.
+
+        All files used in 1 test must have the same basename, otherwise
+        'tpkg create' will not pick them up.
+
+
+When is a Test Successfull and When Not
+
+        A test is failed when:
+           *   The test script returns with a non-zero value.
+
+           *   The test script returns with zero, and
+               the 'Failure' regexp matches.
+                
+
+        A test is passed when:
+           *   The test script returns with zero.
+
+           *   The test script returns with zero, and
+               the 'Passed' regexp matches.
+                
+        A test is neither failed nor passed when:
+           *   Test test script returns with zero, and
+               neither the 'Passed' nor 'Failure' regular
+               expressions matched.
+
+        If this happens you should rewrite your test.
+
+                
 Writting Test Packages
 
 
@@ -19,19 +134,19 @@ Writting Test Packages
 		We use '../' here cause '.' is cleaned up after
 		the test is run
 
-
         Each test is executed in a temporary directory, keep this
         in mind when using relative pathnames. ../exe must become
         ../../exe will the test be able to find it.
 
-        Test your test before creating a .tpkg file
+        Test your test before creating a .tpkg file, this can 
+        be as simple as: bash ./testX.test
 
 
 Test Output
         
         result. files
 
-                A typical example of a result. file is test:
+                A typical example of a result. file is this:
                 
                 ** PASSED **     ** PASSED **
                 BaseName: svn-build
@@ -39,23 +154,22 @@ Test Output
                 DateRun: Fri Oct  7 20:28:23 CEST 2005
                 --------------- Test Output ------------------
 
-
+        A summery of result files of test can be seen by running
+        tpkg report.
 
 
 Running Tests:
         Each test is executed in the new temporary directory.
              
-
-
-        =tpkg exe test1=
-        =tpkg exe test2=
+        tpkg exe test1
+        tpkg exe test2
         ...
-        =tpkg exe testN=
+        tpkg exe testN
 
-        =tpkg report=
+        tpkg report
                 generate a report of all the tests
 
-        =tpkg clean=
+        tpkg clean
                 remove all the result. files
 
 Reading Reports:
@@ -66,11 +180,6 @@ Reading Reports:
 
         PASSED: 2 (100.00 %)            FAILED: 0 (0 %)         UNKNOWN: 0 (0 %)
 
-
-
-
-
-
 Conventions
         In the toplevel test directory (where all the .tpkg files live) 
         different tests should communicate (exchanges variable contents) 
@@ -78,7 +187,7 @@ Conventions
         This is currently the only way to implement persistent variabeles.
 
         The location of this file is known in tpkg as $TPKG_VAR - which is 
-        exported when =tpkg= is run.
+        exported when tpkg is run.
 
         It is also wise to name all variables with a "TPKG_" prefix, for
         instance when some test builds the code in a directory, it could
@@ -98,4 +207,39 @@ Conventions
 
         tpkg cleanup, will remove all these files too.
 
+Sample Output For NSD
+        I've written a few tests for unit testing NSD, running these tests
+        looks like this:
+
+        % tpkg exe rfc3597-good.tpkg && tpkg exe rfc3597-bad.tpkg
+        [rfc3597-good]  [log] Extracting...
+        [rfc3597-good]  [log] executing dependency test: nsd-compile.tpkg
+        [nsd-compile]  [log] Extracting...
+        [nsd-compile]  [log] Executing test
+        [nsd-compile]  [log] ** PASSED **
+        [nsd-compile]  [log] Cleaning up
+        [rfc3597-good]  [log] Executing test
+        [rfc3597-good]  [log] ** PASSED **
+        [rfc3597-good]  [log] Cleaning up
+        [rfc3597-bad]  [log] Extracting...
+        [rfc3597-bad]  [log] executing dependency test: nsd-compile.tpkg
+        [nsd-compile]  [log] Extracting...
+        [nsd-compile]  [log] Found .done-nsd-compile. Not executing this test.
+        [nsd-compile]  [log] Cleaning up
+        [rfc3597-bad]  [log] Executing test
+        [rfc3597-bad]  [log] ** PASSED **
+        [rfc3597-bad]  [log] Cleaning up
+
+        % tpkg report
+        nsd-compile: ** PASSED ** : Compile NSD
+        rfc3597-bad: ** PASSED ** : Compile a zone with unknown rr data (the zone is BAD)
+        rfc3597-good: ** PASSED ** : Compile a zone with unknown rr data (the zone is good)
+
+        PASSED: 3 (100.00 %)            FAILED: 0 (0 %)         UNKNOWN: 0 (0 %)
         
+        % tpkg clean
+          [log] rm result.nsd-compile
+          [log] rm result.rfc3597-bad
+          [log] rm result.rfc3597-good
+          [log] rm .tpkg.var
+          [log] rm .done files
