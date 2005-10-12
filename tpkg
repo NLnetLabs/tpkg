@@ -273,11 +273,10 @@ TMPL_EOF
         #touch $testname.post
         echo "# source the var file when it's there" > $testname.test
         echo "[ -f ../$TPKG_VAR ] && source ../$TPKG_VAR" >> $testname.test 
-        echo "# svnserve resets the path" >> $testname.test
-        echo "# you may need to adjust it" >> $testname.test
+        echo "# svnserve resets the path, you may need to adjust it" >> $testname.test
 
         out "[log] created $testname.{dsc, test}"
-        out "[log] please create the test script(s) and then run: tpkg create $testname"
+        out "[log] please create the test script(s) and then run: tpkg create $testname.tpkg"
         err "[log] created $testname in $dir."
         cd ..
         exit 0
