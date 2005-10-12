@@ -155,7 +155,9 @@ function clone() {
                 fi
         done
         # edit the dsc file too
-        sed -i "s/$test1/$test2/g" $test2.dsc
+        # don't use sed -i, its a gnu-ism
+        sed  "s/$test1/$test2/g" < $test2.dsc > $test2.dsc.$$
+        mv $test2.dsc.$$ $test2.dsc
         cd ..
         # rename the dir
         mv $test1.dir $test2.dir
