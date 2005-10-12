@@ -12,9 +12,11 @@ function cleanup() {
         err "[log] Cleaning up" 
         [ -f result.$dsc_basename ] && cp result.$dsc_basename ../
         cd ..
-        if [ -d $dir ]; then
-                rm -rf $dir/
-        fi
+	if [ ! -z "$dir" ]; then
+		if [ -d "$dir" ]; then
+			rm -rf $dir
+		fi
+	fi
 }
 
 function cleanup_and_exit() {
