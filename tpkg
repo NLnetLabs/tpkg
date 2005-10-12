@@ -141,7 +141,7 @@ function report() {
 
 # clone test1 to test2
 function clone() {
-        $0 extract $test1.tpkg
+        ${SHELL} $0 extract $test1.tpkg
         
         if [ ! -d "$test1.dir" ]; then
                 err "[fatal] No $test1.dir directory? Abort."
@@ -159,7 +159,7 @@ function clone() {
         cd ..
         # rename the dir
         mv $test1.dir $test2.dir
-        $0 create $test2.tpkg
+        ${SHELL} $0 create $test2.tpkg
 }
 
 ### Main 
