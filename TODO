@@ -3,30 +3,7 @@ High Prio:
 tpkg clone
 to clone simular tests
 
-add argument parsing
-to control tpkg
-and to give to test --args " fjdfjd'
-
-<F7>#!/bin/sh
-#
-	
-conf=default.conf
-while getopts c:hv o
-do case "$o" in
-    c)  conf="$OPTARG";;
-    h)  echo "Usage: $0 -hv -c <config> [start|stop|restart|status]" && exit 1;;
-    v)  verbose="yes";;
-    ?)  echo "Usage: $0 -hv -c <config> [start|stop|restart|status]" && exit 1;;
-esac
-done
-	
-# Reset $@
-shift `echo $OPTIND-1 | bc`
-	
-echo "conf: $conf"
-echo "command: $1"
-
-
+$TPKG_CURRENT and TPKG_BASE and cd ..
 
 Low Prio:
 

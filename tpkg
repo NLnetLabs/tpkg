@@ -5,7 +5,11 @@
 # Licensed under GPL version 2
 
 export TPKG_VAR=".tpkg.var"
+export TPKG_VERSION="0.01_TPKG_ALPHA";
 export SHELL="/bin/sh"
+TPKG_BASE="."
+TPKG_ARGS=""
+TPKG_CURRENT=`pwd`
 
 ### Helper functions
 function cleanup() {
@@ -17,6 +21,7 @@ function cleanup() {
 			rm -rf $dir
 		fi
 	fi
+	cd $TPKG_CURRENT
 }
 
 function cleanup_and_exit() {
@@ -42,7 +47,7 @@ function out() {
 function post() {
         if [ -f "${dsc_post}" ]; then 
                 err "[log] Executing post script"
-                ${SHELL} ${dsc_post}
+                ${SHELL} ${dsc_post} ${TPKG_ARGS}
                 if [ $? -ne 0 ]; then
                         err "[fatal] Post-script executed with errors: $?. Abort"
                         cleanup
@@ -54,7 +59,7 @@ function post() {
 function pre() {
         if [ -f "${dsc_pre}" ]; then 
                 err "[log] Executing pre-script"
-                ${SHELL} ${dsc_pre}
+                ${SHELL} ${dsc_pre} ${TPKG_ARGS}
                 if [ $? -ne 0 ]; then
                         err "[fatal] Pre-script executed with errors: $?. Abort"
                         cleanup
@@ -73,9 +78,9 @@ function write_done() {
 
 function usage() {
         out "Usage:"
-        out "$0 [exe|create|extract|tmpl] [report|clean] test.tpkg"
+        out "$0 [OPTIONS] [exe|create|extract|tmpl] [report|clean] test.tpkg"
         out "or:"
-        out "$0 clone test1.tpkg test2.tpkg"
+        out "$0 [OPTIONS] clone test1.tpkg test2.tpkg"
         out
         out "Testing"
         out " exe....:\texecute a test, safe the result result.testname"
@@ -90,8 +95,24 @@ function usage() {
         out
         out " When multiple tests depend on a single other test, this"
         out " other test is only executed once."
+	out
+	out "OPTIONS"
+	out "-h\t\tshow this help"
+	out "-v\t\tshow version"
+	out "-b DIR\tuse DIR is a base directory in stead of ."
+	out "-a ARGS\tpass the string ARGS through to the test scripts"
         out 
         out " (c) NLnetLabs, Miek Gieben. Licensed under the GPL version 2."
+}
+
+function version() {
+	out "tpkg (test package), version $TPKG_VERSION"
+	out "Written by Miek Gieben, NLnet Labs"
+	out
+	out "Copyright (C) 2005 NLnet Labs"
+	out
+	out "This is free software; see the source for copying conditions. There is no"
+	out "warranty; even not for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE"
 }
 
 function cleanreport() {
@@ -105,6 +126,7 @@ function cleanreport() {
         rm -f $TPKG_VAR
         err "[log] rm .done files"
         rm -f .done*
+	cd $TPKG_CURRENT
 }
 
 function report() {
@@ -139,6 +161,7 @@ function report() {
         uper=`echo -e "scale=2\n$unknown/$total*100" | bc`
         echo
         echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)\t\tUNKNOWN: $unknown ($uper %)"
+	cd $TPKG_CURRENT
 }
 
 # clone test1 to test2
@@ -164,14 +187,35 @@ function clone() {
         # rename the dir
         mv $test1.dir $test2.dir
         $0 create $test2.tpkg
+	cd $TPKG_CURRENT
 }
 
 ### Main 
+# check the arguments
+while getopts ":vhb:a:" o
+do case "$o" in
+	b) 	TPKG_BASE="$OPTARG";;
+	h) 	usage; exit 0;;
+	v) 	version; exit 0;;
+	a) 	TPKG_ARGS="$OPTARG";;
+esac
+done
+shift $(($OPTIND - 1))
+
+# go to the base dir
+if [ ! -d $TPKG_BASE ]; then
+	err "[fatal] Directory $TPKG_BASE does not exist. Abort"
+	exit 1
+else
+	cd $TPKG_BASE
+fi
+
 # either create a tpkg (ie. call shar) or exe (do a test)
 goal=$1
 archive=$2
 if [ -z "${goal}" ]; then
         usage
+	cd $TPKG_CURRENT
         exit 0
 fi
 
@@ -191,6 +235,7 @@ if [ "${goal}" = "clone" ]; then
         test2=`basename $3 .tpkg`;
         if [ -z "$test1" -o -z "$test2" ]; then
                 usage
+		cd $TPKG_CURRENT
                 exit 0
         fi
         clone
@@ -199,6 +244,7 @@ fi
 
 if [ -z $archive ]; then
         usage
+	cd $TPKG_CURRENT
         exit 0
 fi
 
@@ -206,6 +252,7 @@ testname=`basename $archive .tpkg`
 dsc_file=$testname.dsc                  
 if  [ -z $testname ]; then
         err "[fatal] The test package should have a .tpkg extension. Abort"
+	cd $TPKG_CURRENT
         exit 1
 fi
 
@@ -218,17 +265,20 @@ if [ $goal = "create" ]; then
 
         if [ ! -d "${testname}.dir" ]; then
                 err "[fatal] No $testname.dir directory found. Abort."
+	cd $TPKG_CURRENT
                 exit 1
         fi
         cd $testname.dir
         
         if [ -f $testname.tpkg ]; then
                 err "[fatal] Not overwriting existing $testname.tpkg. Abort."
+		cd $TPKG_CURRENT
                 exit 1
         fi
         i=$( ls $testname.* 2>/dev/null )
         if [ -z "${i}" ]; then
                 err "[fatal] No $testname.* files found. Abort."
+		cd $TPKG_CURRENT
                 exit 1
         fi
         shar $i > $testname.tpkg
@@ -237,6 +287,7 @@ if [ $goal = "create" ]; then
         mv $testname.tpkg ../
         cd ../
         rmdir $testname.dir
+	cd $TPKG_CURRENT
         exit 0
 fi
 
@@ -245,6 +296,7 @@ fi
 if [ $goal = "tmpl" ]; then
         if [ -f $testname.dsc ]; then
                 err "[fatal] $testname.dsc already exists. Abort."
+		cd $TPKG_CURRENT
                 exit 1
         fi
         
@@ -253,6 +305,7 @@ if [ $goal = "tmpl" ]; then
         mkdir $dir
         if [ ! -d $dir ]; then 
                 err "[fatal] Failure to create a temporary working directory. Abort."
+		cd $TPKG_CURRENT
                 exit 1
         fi
         cd $dir
@@ -283,6 +336,7 @@ TMPL_EOF
         out "[log] please create the test script(s) and then run: tpkg create $testname.tpkg"
         err "[log] created $testname in $dir."
         cd ..
+	cd $TPKG_CURRENT
         exit 0
 fi
 
@@ -291,11 +345,13 @@ if [ $goal = "extract" ]; then
         dir="${testname}.dir"
         if [ -d $dir ]; then 
                 err "[fatal] Directory $dir already exists. Abort."
+		cd $TPKG_CURRENT
                 exit 1
         fi
         mkdir $dir
         if [ ! -d $dir ]; then 
                 err "[fatal] Failure to create $dir directory. Abort."
+		cd $TPKG_CURRENT
                 exit 1
         fi
 
@@ -305,6 +361,7 @@ if [ $goal = "extract" ]; then
         ${SHELL} ./$archive > /dev/null
         if [ $? -ne 0 ]; then
                 err "[fatal] Could not unshar archive. Abort."
+		cd $TPKG_CURRENT
                 exit 1;
         fi
 
@@ -314,6 +371,7 @@ if [ $goal = "extract" ]; then
                 # stop here
                 err "[log] extracted $archive to $dir."
                 rm $archive
+		cd $TPKG_CURRENT
                 exit 0
         fi
 fi
@@ -323,6 +381,7 @@ fi
 dir=`mktemp -d "./$testname.XXXXXX"`
 if [ ! -d $dir ]; then 
         err "[fatal] Failure to create a temporary working directory. Abort."
+	cd $TPKG_CURRENT
         exit 1
 fi
 ## EXTRACT
@@ -332,6 +391,7 @@ cd $dir
 ${SHELL} ./$archive > /dev/null
 if [ $? -ne 0 ]; then
         err "[fatal] Could not unshar archive. Abort."
+	cd $TPKG_CURRENT
         exit 1;
 fi
 
@@ -349,6 +409,7 @@ if [ -z ${SHELL} ]; then
        SHELL=/usr/local/bin/bash
        if [ ! -x $SHELL ]; then
                err "[fatal] Can't find the bash shell. Abort"
+         	cleanup
                exit 1
        fi
 fi
@@ -381,7 +442,7 @@ dsc_failure=`IFS=: awk -F': ?' < $dsc_file '/^Failure/ { print $2 }'`
 if [ -f "../${dsc_depends}" ]; then
         cd ..  # go up one dir
         err "[log] executing dependency test: $dsc_depends"
-        ${SHELL} $0 exe $dsc_depends
+        ${SHELL} $0 "-b ${TPKG_BASE}" exe $dsc_depends
         test_result=$?
         cd - > /dev/null  # back where we belong
         if [ $test_result -ne 0 ]; then
@@ -426,7 +487,7 @@ echo "BaseName: $dsc_basename" > result.$dsc_basename
 echo "Description: $dsc_description" >> result.$dsc_basename
 echo "DateRun: `date`" >> result.$dsc_basename
 echo "--------------- Test Output ------------------" >> result.$dsc_basename
-( ${SHELL} $dsc_test 2>&1 ) >> result.$dsc_basename
+( ${SHELL} $dsc_test ${TPKG_ARGS} 2>&1 ) >> result.$dsc_basename
 test_result=$?
 if [ $test_result -ne 0 ]; then
         err "[warning] Test executed with errors: $test_result." 
@@ -450,9 +511,7 @@ if [ $? -eq 0 ]; then
         err "[log] ** PASSED **"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
-
         write_done
-        
         failed=0
 fi 
 ## FAILED
@@ -469,24 +528,9 @@ else
         err "[log] ** PASSED **"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
-
         write_done
-        
         failed=0
 fi
-
-# this will not execute:
-#if [ $test_result -ne 0 -a $failed -eq -1 ]; then
-#        # test script exited with non-zero value, failed!
-#       echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
-#       err "[log] !! FAILED !!"
-#       cat result.$dsc_basename >> result.$dsc_basename.tmp
-#       mv result.$dsc_basename.tmp result.$dsc_basename
-
-#       write_done
-#       
-#       failed=1
-#i
 
 ## UNKNOWN
 if [ $failed -eq -1 ]; then
@@ -496,9 +540,7 @@ if [ $failed -eq -1 ]; then
         err "[log] -- UNKNOWN --"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
-
         write_done
-        
         failed=1 # not passed
 fi
         

@@ -5,6 +5,9 @@ tpkg \- test package - manipulate tests
 .SH SYNOPSIS
 .B tpkg
 [
+.IR OPTIONS
+]
+[
 .IR exe|create|extract|tmpl
 ]
 [
@@ -14,6 +17,9 @@ tpkg \- test package - manipulate tests
 (1st format)
 .PP
 .B tpkg
+[
+.IR OPTIONS
+]
 .IR clone
 .IR test1.tpkg
 .IR test2.tpkg
@@ -27,6 +33,15 @@ keep your tests organized.
 .PP
 All errors are send to stderr, the output of the scripts is
 stored in a result. file.
+.PP
+When a test is executed it is first unpacked, after unpacking 
+the pre-script is run. If this script executes successfully
+the actual test is run. The test may read the \fI.tpkg.var\fR
+file to get a hold of shared variables. During the test run
+a \fIresult.\fR file is written with the output of the test. 
+After the test the post-script is run.
+.PP
+All files created by \fBtpkg\fR are removed when \fBtpkg\fR \fIclean\fR is run.
 
 .SS First format
 .TP
@@ -57,6 +72,23 @@ the \fI.tpkg.var\fR file.
 Clone \fItest1.tpkg\fR to \fItest2.tpkg\fR. Care is taken to also rename
 the member files and to update the \fIdsc\fR file. You should always check
 the new test.
+
+.SH OPTIONS
+.TP
+\fB\-h\fR
+Show a short help message
+.TP
+\fB\-v\fR
+Show the version of \fItpkg\fR
+.TP
+\fB\-d\fR \fIDIR\fR
+Use \fIDIR\fR as a basedirectory. This is also the place where files
+like \fI.tpkg.var\fR will be kept and where the \fIresult.\fR files are written.
+.TP
+\fB-a\fR \fIARGS\fR
+Pass the unmodified string \fIARGS\fR through to the test being run.
+This way options and/or arguments can be given to the test. The pre,
+test and post script will all be given this string as an argument.
 
 .SH AUTHOR
 Written by Miek Gieben, NLnet Labs.
