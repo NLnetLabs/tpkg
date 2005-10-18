@@ -5,7 +5,7 @@
 # Licensed under GPL version 2
 
 export TPKG_VAR=".tpkg.var"
-export TPKG_VERSION="0.01_TPKG_ALPHA";
+export TPKG_VERSION="0.50";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
@@ -261,11 +261,18 @@ if [ $goal = "create" ]; then
 ### CREATE ###
 # get all files with the same basename except those that ends in .tpkg
 
-        # assume there is a dir named $testname.dir
+        # check for shar
+        which shar >/dev/null
+        if [ $? -ne 0 ]; then
+                err "[fatal] Shar command not found. Abort"
+                cd $TPKG_CURRENT
+                exit 1
+        fi
 
+        # assume there is a dir named $testname.dir
         if [ ! -d "${testname}.dir" ]; then
                 err "[fatal] No $testname.dir directory found. Abort."
-	cd $TPKG_CURRENT
+        	cd $TPKG_CURRENT
                 exit 1
         fi
         cd $testname.dir

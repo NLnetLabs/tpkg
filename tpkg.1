@@ -57,8 +57,6 @@ recreate the tpkg by running \fBtpkg create\fR.
 .TP
 \fBtmpl\fR
 Create new test template files. A \fIdsc\fR and \fItest\fR file are created.
-
-.SS Second format
 .TP
 \fBreport\fR
 Create a report by gathering information from the \fIresult\fR files.
@@ -67,6 +65,8 @@ Nothing is deleted when you run \fBtpkg report\fR.
 \fBclean\fR
 Clean up all auxilary files, that is remove: \fI.done*\fR, \fIresult*\fR and
 the \fI.tpkg.var\fR file.
+
+.SS Second format
 .TP
 \fBclone\fR
 Clone \fItest1.tpkg\fR to \fItest2.tpkg\fR. Care is taken to also rename
@@ -93,8 +93,8 @@ test and post script will all be given this string as an argument.
 .SH FORMAT OF THE .DSC FILE
 The most important file in each test is the description
 file, the one with the .dsc extension. The file is line based,
-so options spanning multiple lines are not recognized are worse,
-make tpkg fail.
+so options spanning multiple lines are not recognized and worse,
+they probably make tpkg fail in unexpected ways.
 .PP
 A typical example looks like this:
         
@@ -134,7 +134,7 @@ Automaticly set by 'tpkg tpml'. The original creation date
 for this test.
 .TP 
 \fBMaintainer\fR
-Who created/maintains this test
+Who created/maintains this test.
 .TP 
 \fBCategory\fR
 Under what category does this test fall. This is not
@@ -179,7 +179,7 @@ of the main test script. If the expression matches the
 test is a failure.
 
 .PP
-All files used in 1 test must have the same basename, otherwise 'tpkg create' 
+All files used in one test must have the same basename, otherwise 'tpkg create' 
 will not pick them up.
 
 .SH FAILED OR PASSED
