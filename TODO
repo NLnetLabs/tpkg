@@ -1,20 +1,2 @@
-High Prio:
-
-tpkg clone
-to clone simular tests
-
-$TPKG_CURRENT and TPKG_BASE and cd ..
-
-Low Prio:
-
-
-
-Will not do:
-# usefull, everything is usually run once
-don't overwrite result files but add .1 or .2 affix
-low prio and then?? so what??
-
-# really? Most test scripts will be perl or C or whatever
-# not bash in any case...??
-make a function-lib that can be used in the test-script
-to make some things easier
+- empty -
+ :-)
