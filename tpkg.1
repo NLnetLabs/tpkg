@@ -13,7 +13,7 @@ tpkg \- test package - manipulate tests
 [
 .IR report|clean
 ]
-.IR test.tpkg
+test.tpkg
 (1st format)
 .PP
 .B tpkg
@@ -21,8 +21,8 @@ tpkg \- test package - manipulate tests
 .IR OPTIONS
 ]
 .IR clone
-.IR test1.tpkg
-.IR test2.tpkg
+test1.tpkg
+test2.tpkg
 (2nd format)
 
 .SH DESCRIPTION
@@ -98,18 +98,18 @@ make tpkg fail.
 .PP
 A typical example looks like this:
         
-        \fBBaseName:\fR \fItest1\fR
-        \fBVersion:\fR \fI0.1\fR
-        \fBDescription:\fR \fITest negative SOA TTL, added to test BUG #6\fR
-        \fBCreationDate:\fR \fI05-10-2005\fR
-        \fBMaintainer:\fR \fIMiek Gieben\fR
+        \fBBaseName:\fR test1
+        \fBVersion:\fR 0.1
+        \fBDescription:\fR  Test negative SOA TTL, added to test BUG #6
+        \fBCreationDate:\fR 05-10-2005
+        \fBMaintainer:\fR Miek Gieben
         \fBCategory:\fR 
         \fBComponent:\fR
-        \fBDepends:\fR 
-        \fBPre:\fR \fItest1.pre\fR
-        \fBPost:\fR \fItest1.post\fR
-        \fBTest:\fR \fItest1.test\fR
-        \fBAuxFiles: \fR\fItest1.a, test2.b\fR
+        \fBDepends:\fR
+        \fBPre:\fR test1.pre
+        \fBPost:\fR test1.post
+        \fBTest:\fR test1.test
+        \fBAuxFiles:\fRtest1.a, test2.b
         \fBPassed:\fR
         \fBFailure:\fR 
 
