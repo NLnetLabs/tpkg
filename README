@@ -79,7 +79,7 @@ Test Package
         Auxfiles:
                 Other files that are needed to run this test, i.e. to 
                 compare against. Currently this list is limited to 8
-                other files. The list should use commas sa delimiters:
+                other files. The list should use commas as delimiters:
                 fileA, fileB, FileC, ...
 
         Passed:

@@ -90,6 +90,125 @@ Pass the unmodified string \fIARGS\fR through to the test being run.
 This way options and/or arguments can be given to the test. The pre,
 test and post script will all be given this string as an argument.
 
+.SH FORMAT OF THE .DSC FILE
+The most important file in each test is the description
+file, the one with the .dsc extension. The file is line based,
+so options spanning multiple lines are not recognized are worse,
+make tpkg fail.
+.PP
+A typical example looks like this:
+        
+        \fBBaseName:\fR \fItest1\fR
+        \fBVersion:\fR \fI0.1\fR
+        \fBDescription:\fR \fITest negative SOA TTL, added to test BUG #6\fR
+        \fBCreationDate:\fR \fI05-10-2005\fR
+        \fBMaintainer:\fR \fIMiek Gieben\fR
+        \fBCategory:\fR 
+        \fBComponent:\fR
+        \fBDepends:\fR 
+        \fBPre:\fR \fItest1.pre\fR
+        \fBPost:\fR \fItest1.post\fR
+        \fBTest:\fR \fItest1.test\fR
+        \fBAuxFiles: \fR\fItest1.a, test2.b\fR
+        \fBPassed:\fR
+        \fBFailure:\fR 
+
+.PP
+Details of each line follow:
+.TP 
+\fBBaseName\fR
+The basename of the test. This is the name of the .dsc
+file without the .dsc extension
+.TP 
+\fBVersion\fR
+Currently nothing is done with this. It could either
+evolve in a version for the .dsc file or it could
+be used to version your tests.
+.TP 
+\fBDescription\fR
+A short explanation of what this test is supposed to test.
+ 'tpkg report' uses this.
+.TP 
+\fBCreationDate \fR
+Automaticly set by 'tpkg tpml'. The original creation date
+for this test.
+.TP 
+\fBMaintainer\fR
+Who created/maintains this test
+.TP 
+\fBCategory\fR
+Under what category does this test fall. This is not
+used by tpkg, but is a hint to the users of the tests.
+This could something like: 'building', 'running', etc.
+.TP 
+\fBComponent\fR
+What software component are you testing, this could be
+the name of the executeable. User decides what to put
+here, but it should be consistend for all tests.
+.TP 
+\fBDepends\fR
+On what other test does this test depend. The full
+package name should be given, with the .tpkg extension.
+Currently this is limited to one test. 
+.TP 
+\fBPre\fR
+Name of a script that should be executed before the
+test is run. If the pre-script fails the test fails.
+.TP 
+\fBPost\fR
+Name of a script that should be executed after the 
+test has run. If the post-script fails the test fails.
+.TP 
+\fBTest\fR
+Name fo the main test script.
+.TP 
+\fBAuxfiles\fR
+Other files that are needed to run this test, i.e. to 
+compare against. Currently this list is limited to 8
+other files. The list should use commas as delimiters:
+fileA, fileB, FileC, ...
+.TP 
+\fBPassed\fR
+A regular expression that is matched against the output
+of the main test script. If the expression matches the
+test is a succes.
+.TP 
+\fBFailure\fR
+A regular expression that is matched against the output
+of the main test script. If the expression matches the
+test is a failure.
+
+.PP
+All files used in 1 test must have the same basename, otherwise 'tpkg create' 
+will not pick them up.
+
+.SH FAILED OR PASSED
+.PP
+A test is \fIfailed\fR when:
+.TP 
+o  
+The test script returns with a non-zero value.
+.TP
+o
+The test script returns with zero, and the 'Failure' regexp matches.
+                
+.PP
+A test is \fIpassed\fR when:
+.TP
+o
+The test script returns with zero.
+.TP
+o
+The test script returns with zero, and the 'Passed' regexp matches.
+                
+.PP                
+A test is \fIneither\fR failed nor passed when:
+.TP
+o
+Test test script returns with zero, and neither the 'Passed' nor 'Failure'
+regular expressions matched.
+If this happens you should rewrite your test.
+
 .SH AUTHOR
 Written by Miek Gieben, NLnet Labs.
 
