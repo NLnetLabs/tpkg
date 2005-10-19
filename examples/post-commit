@@ -4,10 +4,14 @@
 PATH=$PATH:/usr/local/bin:/usr/local/sbin:.
 
 TPKG=/home/miekg/svn/tpkg/trunk/tpkg
+MAILTO="ldns-team@nlnetlabs.nl"
 REPOS="$1"
 REV="$2"
 
 BUILD_DIR=`mktemp -d /tmp/XXXXXX`
+if [ ! -d $BUILD_DIR ]; then
+        exit 0
+fi
 TMP_FILE=`mktemp /tmp/XXXXXXX`
 
 # checkout
@@ -15,6 +19,7 @@ TMP_FILE=`mktemp /tmp/XXXXXXX`
 cd $BUILD_DIR
 svn log -r$REV > $TMP_FILE
 
+# set the path for our sibling test scripts
 echo "PATH=$PATH" > $BUILD_DIR/test/.tpkg.var
 
 # RUN THE TESTS
@@ -22,9 +27,6 @@ for tests in $BUILD_DIR/test/*.tpkg ; do
         /usr/bin/nice /usr/local/bin/bash \
         $TPKG -b $BUILD_DIR/test -a $BUILD_DIR exe `basename $tests`
 done
-
-#/usr/bin/nice /usr/local/bin/bash \
-#$TPKG -b $BUILD_DIR/test -a $BUILD_DIR exe 02-lint.tpkg
 
 /usr/local/bin/bash $TPKG -b $BUILD_DIR/test report 2>&1 >> $TMP_FILE
 /usr/local/bin/bash $TPKG -b $BUILD_DIR/test clean >> $TMP_FILE
@@ -37,5 +39,5 @@ svn diff -rPREV:$REV >> $TMP_FILE
 rm -rf $BUILD_DIR
 
 cat $TMP_FILE | \
-mail -s "[svn: libdns] $REV status" ldns-team@nlnetlabs.nl 
+mail -s "[svn: libdns] $REV status" $MAILTO
 rm -f $TMP_FILE
