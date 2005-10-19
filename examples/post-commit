@@ -18,15 +18,16 @@ svn log -r$REV > $TMP_FILE
 echo "PATH=$PATH" > $BUILD_DIR/test/.tpkg.var
 
 # RUN THE TESTS
-/usr/bin/nice /usr/local/bin/bash \
-$TPKG -b $BUILD_DIR/test -a $BUILD_DIR exe 01-compile.tpkg 
-/usr/bin/nice /usr/local/bin/bash \
-$TPKG -b $BUILD_DIR/test -a $BUILD_DIR exe 02-lint.tpkg
+for tests in $BUILD_DIR/test/*.tpkg ; do
+        /usr/bin/nice /usr/local/bin/bash \
+        $TPKG -b $BUILD_DIR/test -a $BUILD_DIR exe `basename $tests`
+done
+
+#/usr/bin/nice /usr/local/bin/bash \
+#$TPKG -b $BUILD_DIR/test -a $BUILD_DIR exe 02-lint.tpkg
 
 /usr/local/bin/bash $TPKG -b $BUILD_DIR/test report 2>&1 >> $TMP_FILE
-
-/usr/bin/nice /usr/local/bin/bash \
-$TPKG -b $BUILD_DIR/test clean >> $TMP_FILE
+/usr/local/bin/bash $TPKG -b $BUILD_DIR/test clean >> $TMP_FILE
 # END
 
 # SVN STUFF
