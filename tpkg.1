@@ -50,12 +50,13 @@ Execute a test. This will create a \fIresult.\fR file which looks
 like this:
 
         ** PASSED **     ** PASSED **
-        DateRunEnd: Fri Oct  7 20:31:23 CEST 2005
+        DateRunEnd: 1000023
         BaseName: svn-build
         Description: Check out and build libdns/trunk
-        DateRunStart: Fri Oct  7 20:28:23 CEST 2005
+        DateRunStart: 1000021
         --------------- Test Output ------------------
 
+TODO
 The first line indicates if a test was failed or passed (or unknown
 in some cases). The second line is the basename as given in de description file.
 The third line is the test's description, and the fourth line tells when
@@ -79,8 +80,8 @@ Create a report by gathering information from the \fIresult\fR files.
 Nothing is deleted when you run \fBtpkg report\fR.
 A typical example of a result. file is this:
         
-        ldns-splint: ** PASSED ** : Run a make lint test on the libdns sources
-        svn-build: ** PASSED ** : Check out and build libdns/trunk
+        ldns-splint: 5 s : ** PASSED ** : Run a make lint test on the libdns sources
+        svn-build: 15 s : ** PASSED ** : Check out and build libdns/trunk
 
         PASSED: 2 (100.00 %)     FAILED: 0 (0 %)    UNKNOWN: 0 (0 %)
 
