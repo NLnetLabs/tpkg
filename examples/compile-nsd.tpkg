@@ -1,43 +1,178 @@
-# This is a shell archive.  Save it in a file, remove anything before
-# this line, and then unpack it by entering "sh file".  Note, it may
-# create directories; files and directories will be owned by you and
-# have default permissions.
+#!/bin/sh
+# This is a shell archive (produced by GNU sharutils 4.2.1).
+# To extract the files from this archive, save it to some FILE, remove
+# everything before the `!/bin/sh' line above, then type `sh FILE'.
 #
-# This archive contains:
+# Made on 2005-10-20 19:48 CEST by <miekg@peer>.
+# Source directory was `/home/miekg/svn/tpkg/trunk/examples/compile-nsd.dir'.
 #
-#	compile-nsd.dsc
-#	compile-nsd.post
-#	compile-nsd.pre
-#	compile-nsd.test
+# Existing files will *not* be overwritten unless `-c' is specified.
 #
-echo x - compile-nsd.dsc
-sed 's/^X//' >compile-nsd.dsc << 'END-of-compile-nsd.dsc'
-XBaseName: compile-nsd
-XVersion: 1.0
-XDescription: 
-XCreationDate: Thu Oct  6 15:22:25 CEST 2005
-XMaintainer: Miek Gieben
-XCategory: 
-XComponent:
-XDepends:
-XPre: compile-nsd.pre
-XPost: compile-nsd.post
-XTest: compile-nsd.test
-XAuxFiles: 
-XPasswd:
-XFailure: syntax error
-END-of-compile-nsd.dsc
-echo x - compile-nsd.post
-sed 's/^X//' >compile-nsd.post << 'END-of-compile-nsd.post'
-END-of-compile-nsd.post
-echo x - compile-nsd.pre
-sed 's/^X//' >compile-nsd.pre << 'END-of-compile-nsd.pre'
-END-of-compile-nsd.pre
-echo x - compile-nsd.test
-sed 's/^X//' >compile-nsd.test << 'END-of-compile-nsd.test'
+# This shar contains:
+# length mode       name
+# ------ ---------- ------------------------------------------
+#    256 -rw------- compile-nsd.dsc
+#      0 -rw------- compile-nsd.post
+#      0 -rw------- compile-nsd.pre
+#     58 -rw------- compile-nsd.test
+#
+save_IFS="${IFS}"
+IFS="${IFS}:"
+gettext_dir=FAILED
+locale_dir=FAILED
+first_param="$1"
+for dir in $PATH
+do
+  if test "$gettext_dir" = FAILED && test -f $dir/gettext \
+     && ($dir/gettext --version >/dev/null 2>&1)
+  then
+    set `$dir/gettext --version 2>&1`
+    if test "$3" = GNU
+    then
+      gettext_dir=$dir
+    fi
+  fi
+  if test "$locale_dir" = FAILED && test -f $dir/shar \
+     && ($dir/shar --print-text-domain-dir >/dev/null 2>&1)
+  then
+    locale_dir=`$dir/shar --print-text-domain-dir`
+  fi
+done
+IFS="$save_IFS"
+if test "$locale_dir" = FAILED || test "$gettext_dir" = FAILED
+then
+  echo=echo
+else
+  TEXTDOMAINDIR=$locale_dir
+  export TEXTDOMAINDIR
+  TEXTDOMAIN=sharutils
+  export TEXTDOMAIN
+  echo="$gettext_dir/gettext -s"
+fi
+if touch -am -t 200112312359.59 $$.touch >/dev/null 2>&1 && test ! -f 200112312359.59 -a -f $$.touch; then
+  shar_touch='touch -am -t $1$2$3$4$5$6.$7 "$8"'
+elif touch -am 123123592001.59 $$.touch >/dev/null 2>&1 && test ! -f 123123592001.59 -a ! -f 123123592001.5 -a -f $$.touch; then
+  shar_touch='touch -am $3$4$5$6$1$2.$7 "$8"'
+elif touch -am 1231235901 $$.touch >/dev/null 2>&1 && test ! -f 1231235901 -a -f $$.touch; then
+  shar_touch='touch -am $3$4$5$6$2 "$8"'
+else
+  shar_touch=:
+  echo
+  $echo 'WARNING: not restoring timestamps.  Consider getting and'
+  $echo "installing GNU \`touch', distributed in GNU File Utilities..."
+  echo
+fi
+rm -f 200112312359.59 123123592001.59 123123592001.5 1231235901 $$.touch
+#
+if mkdir _sh02627; then
+  $echo 'x -' 'creating lock directory'
+else
+  $echo 'failed to create lock directory'
+  exit 1
+fi
+# ============= compile-nsd.dsc ==============
+if test -f 'compile-nsd.dsc' && test "$first_param" != -c; then
+  $echo 'x -' SKIPPING 'compile-nsd.dsc' '(file already exists)'
+else
+  $echo 'x -' extracting 'compile-nsd.dsc' '(text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'compile-nsd.dsc' &&
+BaseName: compile-nsd
+Version: 1.0
+Description: 
+CreationDate: Thu Oct  6 15:22:25 CEST 2005
+Maintainer: Miek Gieben
+Category: 
+Component:
+Depends:
+Pre: compile-nsd.pre
+Post: compile-nsd.post
+Test: compile-nsd.test
+AuxFiles: 
+Passwd:
+Failure: syntax error
+SHAR_EOF
+  (set 20 05 10 20 19 47 59 'compile-nsd.dsc'; eval "$shar_touch") &&
+  chmod 0600 'compile-nsd.dsc' ||
+  $echo 'restore of' 'compile-nsd.dsc' 'failed'
+  if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
+  && ( md5sum --version 2>&1 | grep -v 'textutils 1.12' ) >/dev/null; then
+    md5sum -c << SHAR_EOF >/dev/null 2>&1 \
+    || $echo 'compile-nsd.dsc:' 'MD5 check failed'
+3bca55e23612e2a11a7f068b6ab3e476  compile-nsd.dsc
+SHAR_EOF
+  else
+    shar_count="`LC_ALL= LC_CTYPE= LANG= wc -c < 'compile-nsd.dsc'`"
+    test 256 -eq "$shar_count" ||
+    $echo 'compile-nsd.dsc:' 'original size' '256,' 'current size' "$shar_count!"
+  fi
+fi
+# ============= compile-nsd.post ==============
+if test -f 'compile-nsd.post' && test "$first_param" != -c; then
+  $echo 'x -' SKIPPING 'compile-nsd.post' '(file already exists)'
+else
+  $echo 'x -' extracting 'compile-nsd.post' '(empty)'
+  > 'compile-nsd.post' &&
+  (set 20 05 10 20 19 47 59 'compile-nsd.post'; eval "$shar_touch") &&
+  chmod 0600 'compile-nsd.post' ||
+  $echo 'restore of' 'compile-nsd.post' 'failed'
+  if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
+  && ( md5sum --version 2>&1 | grep -v 'textutils 1.12' ) >/dev/null; then
+    md5sum -c << SHAR_EOF >/dev/null 2>&1 \
+    || $echo 'compile-nsd.post:' 'MD5 check failed'
+d41d8cd98f00b204e9800998ecf8427e  compile-nsd.post
+SHAR_EOF
+  else
+    shar_count="`LC_ALL= LC_CTYPE= LANG= wc -c < 'compile-nsd.post'`"
+    test 0 -eq "$shar_count" ||
+    $echo 'compile-nsd.post:' 'original size' '0,' 'current size' "$shar_count!"
+  fi
+fi
+# ============= compile-nsd.pre ==============
+if test -f 'compile-nsd.pre' && test "$first_param" != -c; then
+  $echo 'x -' SKIPPING 'compile-nsd.pre' '(file already exists)'
+else
+  $echo 'x -' extracting 'compile-nsd.pre' '(empty)'
+  > 'compile-nsd.pre' &&
+  (set 20 05 10 20 19 47 59 'compile-nsd.pre'; eval "$shar_touch") &&
+  chmod 0600 'compile-nsd.pre' ||
+  $echo 'restore of' 'compile-nsd.pre' 'failed'
+  if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
+  && ( md5sum --version 2>&1 | grep -v 'textutils 1.12' ) >/dev/null; then
+    md5sum -c << SHAR_EOF >/dev/null 2>&1 \
+    || $echo 'compile-nsd.pre:' 'MD5 check failed'
+d41d8cd98f00b204e9800998ecf8427e  compile-nsd.pre
+SHAR_EOF
+  else
+    shar_count="`LC_ALL= LC_CTYPE= LANG= wc -c < 'compile-nsd.pre'`"
+    test 0 -eq "$shar_count" ||
+    $echo 'compile-nsd.pre:' 'original size' '0,' 'current size' "$shar_count!"
+  fi
+fi
+# ============= compile-nsd.test ==============
+if test -f 'compile-nsd.test' && test "$first_param" != -c; then
+  $echo 'x -' SKIPPING 'compile-nsd.test' '(file already exists)'
+else
+  $echo 'x -' extracting 'compile-nsd.test' '(text)'
+  sed 's/^X//' << 'SHAR_EOF' > 'compile-nsd.test' &&
 X
-Xcd /home/miekg/svn/nsd/trunk/
+cd /home/miekg/svn/nsd/trunk/
 X./configure ; make
-END-of-compile-nsd.test
-exit
-
+sleep 5
+SHAR_EOF
+  (set 20 05 10 20 19 48 14 'compile-nsd.test'; eval "$shar_touch") &&
+  chmod 0600 'compile-nsd.test' ||
+  $echo 'restore of' 'compile-nsd.test' 'failed'
+  if ( md5sum --help 2>&1 | grep 'sage: md5sum \[' ) >/dev/null 2>&1 \
+  && ( md5sum --version 2>&1 | grep -v 'textutils 1.12' ) >/dev/null; then
+    md5sum -c << SHAR_EOF >/dev/null 2>&1 \
+    || $echo 'compile-nsd.test:' 'MD5 check failed'
+6b12688f28ae05873cbc0b3830220e42  compile-nsd.test
+SHAR_EOF
+  else
+    shar_count="`LC_ALL= LC_CTYPE= LANG= wc -c < 'compile-nsd.test'`"
+    test 58 -eq "$shar_count" ||
+    $echo 'compile-nsd.test:' 'original size' '58,' 'current size' "$shar_count!"
+  fi
+fi
+rm -fr _sh02627
+exit 0

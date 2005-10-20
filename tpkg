@@ -44,6 +44,19 @@ function out() {
         fi
 }
 
+function epoch() {
+        # make this sorta portable allthough not needed now
+        epoch=0
+        case $OSTYPE in
+                linux*)
+                epoch=`date +%s`
+                ;;
+                freebsd*)
+                epoch=`date +%s`
+                ;;
+        esac
+}
+
 function post() {
         if [ -f "${dsc_post}" ]; then 
                 err "[log] Executing post script"
@@ -136,22 +149,26 @@ function report() {
         unknown=0
 
         for result in `ls result.*`; do 
-                passfailed=`head -2 $result | awk ' { print $2 }'`
-                basename=`head -3 $result |grep BaseName | awk -F': ?' ' { print $2 }'`
-                description=`head -4 $result |grep Description | awk -F': ?' ' { print $2 }'`
-                
+                passfailed=`head -1 $result | awk ' { print $2 }'`
+                basename=`head -3 $result | grep BaseName | awk -F': ?' ' { print $2 }'`
+                description=`head -4 $result | grep Description | awk -F': ?' ' { print $2 }'`
+                runend=`head -2 $result | grep DateRunEnd | awk -F': ?' ' { print $2 }'`
+                runstart=`head -5 $result | grep DateRunStart | awk -F': ?' ' { print $2 }'`
+
+                ((period=$runend - $runstart))
+
                 case $passfailed in
                 "FAILED")
                         ((failed=$failed + 1))
-                        echo -e "$basename: !! $passfailed !! : $description"
+                        echo -e "$basename: $period s : !! $passfailed !! : $description"
                 ;;
                 "PASSED")
                         ((passed=$passed + 1))
-                        echo -e "$basename: ** $passfailed ** : $description"
+                        echo -e "$basename: $period s : ** $passfailed ** : $description"
                 ;;
                 *) 
                         ((unknown=$unknown + 1))
-                        echo -e "$basename: -- $passfailed -- : $description"
+                        echo -e "$basename: $period s : -- $passfailed -- : $description"
                 ;;
                 esac
         done
@@ -489,18 +506,20 @@ fi
 
 ### Actual executing of the scripts
 pre
+epoch
 
 err "[log] Executing test" 
 echo "BaseName: $dsc_basename" > result.$dsc_basename
 echo "Description: $dsc_description" >> result.$dsc_basename
-echo "DateRunStart: `date`" >> result.$dsc_basename
+echo "DateRunStart: $epoch " >> result.$dsc_basename
 echo "--------------- Test Output ------------------" >> result.$dsc_basename
 ( ${SHELL} $dsc_test ${TPKG_ARGS} 2>&1 ) >> result.$dsc_basename
 test_result=$?
+epoch
 if [ $test_result -ne 0 ]; then
         err "[warning] Test executed with errors: $test_result." 
         echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
-        echo "DateRunEnd: `date`" >> result.$dsc_basename.tmp
+        echo "DateRunEnd: $epoch" >> result.$dsc_basename.tmp
         err "[log] !! FAILED !!"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
@@ -517,7 +536,7 @@ failed=-1  # -1 undef, 0 passed, 1 failed
 if [ $? -eq 0 ]; then
         err "[log] ** PASSED **"
         echo "** PASSED **     ** PASSED **" > result.$dsc_basename.tmp
-        echo "DateRunEnd: `date`" >> result.$dsc_basename.tmp
+        echo "DateRunEnd: $epoch" >> result.$dsc_basename.tmp
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         write_done
@@ -529,14 +548,14 @@ fi
 if [ $? -eq 0 ]; then
         err "[log] !! FAILED !!"
         echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
-        echo "DateRunEnd: `date`" >> result.$dsc_basename.tmp
+        echo "DateRunEnd: $epoch" >> result.$dsc_basename.tmp
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         failed=1
 else
         err "[log] ** PASSED **"
         echo "** PASSED **     ** PASSED **" > result.$dsc_basename.tmp
-        echo "DateRunEnd: `date`" >> result.$dsc_basename.tmp
+        echo "DateRunEnd: $epoch" >> result.$dsc_basename.tmp
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         write_done
@@ -548,7 +567,7 @@ if [ $failed -eq -1 ]; then
         # neither failed, not success, unknown
         err "[log] -- UNKNOWN --"
         echo "-- UNKNOWN --     -- UNKNOWN --" > result.$dsc_basename.tmp
-        echo "DateRunEnd: `date`" >> result.$dsc_basename.tmp
+        echo "DateRunEnd: $epoch" >> result.$dsc_basename.tmp
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         write_done
