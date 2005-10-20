@@ -1,2 +1,8 @@
+datestart in sec after epoch
+datetend idem
+
+tpkg report will substract the two and report a running time
+
+
 - empty -
  :-)

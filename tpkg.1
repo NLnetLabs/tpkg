@@ -46,7 +46,23 @@ All files created by \fBtpkg\fR are removed when \fBtpkg\fR \fIclean\fR is run.
 .SS First format
 .TP
 \fBexe\fR
-Execute a test.
+Execute a test. This will create a \fIresult.\fR file which looks
+like this:
+
+        ** PASSED **     ** PASSED **
+        DateRunEnd: Fri Oct  7 20:31:23 CEST 2005
+        BaseName: svn-build
+        Description: Check out and build libdns/trunk
+        DateRunStart: Fri Oct  7 20:28:23 CEST 2005
+        --------------- Test Output ------------------
+
+The first line indicates if a test was failed or passed (or unknown
+in some cases). The second line is the basename as given in de description file.
+The third line is the test's description, and the fourth line tells when
+the test was run.
+Everything after "----- Test Output ----" is the captured output of the
+test script.
+
 .TP
 \fBcreate\fR
 Create a tpkg file out of the test files.
@@ -61,6 +77,16 @@ Create new test template files. A \fIdsc\fR and \fItest\fR file are created.
 \fBreport\fR
 Create a report by gathering information from the \fIresult\fR files.
 Nothing is deleted when you run \fBtpkg report\fR.
+A typical example of a result. file is this:
+        
+        ldns-splint: ** PASSED ** : Run a make lint test on the libdns sources
+        svn-build: ** PASSED ** : Check out and build libdns/trunk
+
+        PASSED: 2 (100.00 %)     FAILED: 0 (0 %)    UNKNOWN: 0 (0 %)
+
+Essentially \fBreport\fR takes a bunch a \fIresult.\fR files and creates a
+nice test report of it.
+
 .TP
 \fBclean\fR
 Clean up all auxilary files, that is remove: \fI.done*\fR, \fIresult*\fR and
