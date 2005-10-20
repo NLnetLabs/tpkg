@@ -12,12 +12,11 @@ BUILD_DIR=`mktemp -d /tmp/XXXXXX`
 if [ ! -d $BUILD_DIR ]; then
         exit 0
 fi
-TMP_FILE=`mktemp /tmp/XXXXXXX`
+MAIL_FILE=`mktemp /tmp/XXXXXXX`
 
-# checkout
+# checkout to $BUILD_DIR
 /usr/local/bin/svn co -r$REV file:///svn/libdns/trunk $BUILD_DIR
-cd $BUILD_DIR
-svn log -r$REV > $TMP_FILE
+( cd $BUILD_DIR ; svn log -r$REV > $MAIL_FILE )
 
 # set the path for our sibling test scripts
 echo "PATH=$PATH" > $BUILD_DIR/test/.tpkg.var
@@ -28,16 +27,16 @@ for tests in $BUILD_DIR/test/*.tpkg ; do
         $TPKG -b $BUILD_DIR/test -a $BUILD_DIR exe `basename $tests`
 done
 
-/usr/local/bin/bash $TPKG -b $BUILD_DIR/test report 2>&1 >> $TMP_FILE
-/usr/local/bin/bash $TPKG -b $BUILD_DIR/test clean >> $TMP_FILE
+/usr/local/bin/bash $TPKG -b $BUILD_DIR/test report 2>&1 >> $MAIL_FILE
+/usr/local/bin/bash $TPKG -b $BUILD_DIR/test clean >> $MAIL_FILE
 # END
 
 # SVN STUFF
-cd $BUILD_DIR
-svn diff -rPREV:$REV >> $TMP_FILE
+echo $REPOS >> $MAIL_FILE
+( cd $BUILD_DIR ; svn diff -rPREV:$REV >> $MAIL_FILE )
 
 rm -rf $BUILD_DIR
 
-cat $TMP_FILE | \
+cat $MAIL_FILE | \
 mail -s "[svn: libdns] $REV status" $MAILTO
-rm -f $TMP_FILE
+rm -f $MAIL_FILE
