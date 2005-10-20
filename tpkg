@@ -256,7 +256,6 @@ if  [ -z $testname ]; then
         exit 1
 fi
 
-
 if [ $goal = "create" ]; then
 ### CREATE ###
 # get all files with the same basename except those that ends in .tpkg
@@ -383,7 +382,7 @@ if [ $goal = "extract" ]; then
 fi
 
 # make a tmp dir during execution
-if [ "$goal" != "extract" ]; then
+if [ "$goal" != "exe" ]; then
         err "[fatal] What do you mean with $goal?. Abort"
 	cd $TPKG_CURRENT
         exit 1
