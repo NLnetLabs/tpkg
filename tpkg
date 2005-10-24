@@ -177,7 +177,7 @@ function report() {
         pper=`echo -e "scale=2\n$passed/$total*100" | bc`
         uper=`echo -e "scale=2\n$unknown/$total*100" | bc`
         echo
-        echo -e "PASSED: $passed ($pper %)\t\tFAILED: $failed ($fper %)\t\tUNKNOWN: $unknown ($uper %)"
+        echo -e "PASSED: $passed ($pper %)\tFAILED: $failed ($fper %)\tUNKNOWN: $unknown ($uper %)"
 	cd $TPKG_CURRENT
 }
 
