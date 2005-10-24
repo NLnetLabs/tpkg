@@ -91,7 +91,7 @@ function write_done() {
 
 function usage() {
         out "Usage:"
-        out "$0 [OPTIONS] [exe|create|extract|tmpl] [report|clean] test.tpkg"
+        out "$0 [OPTIONS] [exe|create|extract|tmpl|list] [report|clean] test.tpkg"
         out "or:"
         out "$0 [OPTIONS] clone test1.tpkg test2.tpkg"
         out
@@ -100,6 +100,7 @@ function usage() {
         out " create.:\tcreate a .tpkg out of the test.{pre, post, test} files"
         out " extract:\textract a .tpkg to tmp. dir"
         out " tmpl...:\tcreate empty template files for a new test"
+        out " list...:\tprint to files of the test to stdout"
         out
         out "Reporting/Cleanup"
         out " report.:\tcreate a nice report from all the result files"
@@ -184,7 +185,7 @@ function report() {
 # clone test1 to test2
 function clone() {
         $0 extract $test1.tpkg
-        
+
         if [ ! -d "$test1.dir" ]; then
                 err "[fatal] No $test1.dir directory? Abort."
                 exit 1
@@ -357,9 +358,14 @@ TMPL_EOF
         out "[log] created $testname.{dsc, test}"
         out "[log] please create the test script(s) and then run: tpkg create $testname.tpkg"
         err "[log] created $testname in $dir."
-        cd ..
 	cd $TPKG_CURRENT
         exit 0
+fi
+
+if [ ! -f $archive ]; then
+        err "[fatal] Cannot find the test package: $archive. Abort"
+        cd $TPKG_CURRENT
+        exit 1
 fi
 
 ## EXTRACT
@@ -389,14 +395,50 @@ if [ $goal = "extract" ]; then
 
         trap cleanup_and_exit INT
 
-        if [ $goal = "extract" ]; then
-                # stop here
-                err "[log] extracted $archive to $dir."
-                rm $archive
-		cd $TPKG_CURRENT
-                exit 0
-        fi
+        # stop here
+        err "[log] extracted $archive to $dir."
+        rm $archive
+        cd $TPKG_CURRENT
+        exit 0
 fi
+
+## LIST
+if [ $goal = "list" ]; then
+        dir="${testname}.dir"
+        if [ -d $dir ]; then 
+                err "[fatal] Directory $dir already exists. Abort."
+		cd $TPKG_CURRENT
+                exit 1
+        fi
+        mkdir $dir
+        if [ ! -d $dir ]; then 
+                err "[fatal] Failure to create $dir directory. Abort."
+		cd $TPKG_CURRENT
+                exit 1
+        fi
+
+        err "[log] Listing..."
+        cp $archive $dir/
+        cd $dir
+        ${SHELL} ./$archive > /dev/null
+        if [ $? -ne 0 ]; then
+                err "[fatal] Could not unshar archive. Abort."
+		cd $TPKG_CURRENT
+                exit 1;
+        fi
+
+        trap cleanup_and_exit INT
+
+        # echo all files
+        rm $archive
+        cat *
+        cd $TPKG_CURRENT
+        # dir can go
+        rm -rf $dir
+        exit 0
+fi
+
+trap cleanup_and_exit INT
 
 # make a tmp dir during execution
 if [ "$goal" != "exe" ]; then

@@ -8,7 +8,7 @@ tpkg \- test package - manipulate tests
 .IR OPTIONS
 ]
 [
-.IR exe|create|extract|tmpl
+.IR exe|create|extract|tmpl|list
 ]
 [
 .IR report|clean
@@ -74,6 +74,9 @@ recreate the tpkg by running \fBtpkg create\fR.
 .TP
 \fBtmpl\fR
 Create new test template files. A \fIdsc\fR and \fItest\fR file are created.
+.TP
+\fBlist\fR
+Print the files in the test package to standard output.
 .TP
 \fBreport\fR
 Create a report by gathering information from the \fIresult\fR files.
