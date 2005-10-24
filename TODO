@@ -1,4 +1,5 @@
-use dirname to allow tests to be executed while sitting in another dir
+Fixed things for tests ala : --compare, which will compare 2 files
+or --diff?
 
 - empty -
  :-)

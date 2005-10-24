@@ -156,6 +156,13 @@ function report() {
                 runend=`head -2 $result | grep DateRunEnd | awk -F': ?' ' { print $2 }'`
                 runstart=`head -5 $result | grep DateRunStart | awk -F': ?' ' { print $2 }'`
 
+                if [ -z $runend ]; then
+                        runend=0
+                fi
+                if [ -z $runstart ]; then
+                        runstart=0
+                fi
+
                 ((period=$runend - $runstart))
 
                 case $passfailed in
@@ -371,7 +378,7 @@ fi
 
 ## EXTRACT
 if [ $goal = "extract" ]; then
-        dir="${testname}.dir"
+        dir="${testpath}/${testname}.dir"
         if [ -d $dir ]; then 
                 err "[fatal] Directory $dir already exists. Abort."
 		cd $TPKG_CURRENT
@@ -387,7 +394,7 @@ if [ $goal = "extract" ]; then
         err "[log] Extracting..."
         cp $archive $dir/
         cd $dir
-        ${SHELL} ./$archive > /dev/null
+        ${SHELL} ./$testname.tpkg > /dev/null
         if [ $? -ne 0 ]; then
                 err "[fatal] Could not unshar archive. Abort."
 		cd $TPKG_CURRENT
@@ -397,15 +404,16 @@ if [ $goal = "extract" ]; then
         trap cleanup_and_exit INT
 
         # stop here
-        err "[log] extracted $archive to $dir."
-        rm $archive
+        err "[log] extracted $testname.tpkg to $dir."
+        rm ./$testname.tpkg
         cd $TPKG_CURRENT
         exit 0
 fi
 
 ## LIST
 if [ $goal = "list" ]; then
-        dir="${testname}.dir"
+        # use the correct directory
+        dir="${testpath}/${testname}.dir"
         if [ -d $dir ]; then 
                 err "[fatal] Directory $dir already exists. Abort."
 		cd $TPKG_CURRENT
@@ -421,7 +429,7 @@ if [ $goal = "list" ]; then
         err "[log] Listing..."
         cp $archive $dir/
         cd $dir
-        ${SHELL} ./$archive > /dev/null
+        ${SHELL} ./$testname.tpkg > /dev/null
         if [ $? -ne 0 ]; then
                 err "[fatal] Could not unshar archive. Abort."
 		cd $TPKG_CURRENT
@@ -431,7 +439,7 @@ if [ $goal = "list" ]; then
         trap cleanup_and_exit INT
 
         # echo all files
-        rm $archive
+        rm ./$testname.tpkg
         cat *
         cd $TPKG_CURRENT
         # dir can go
@@ -448,7 +456,7 @@ if [ "$goal" != "exe" ]; then
         exit 1
 fi
 
-dir=`mktemp -d "./$testname.XXXXXX"`
+dir=`mktemp -d "${testpath}/${testname}.XXXXXX"`
 if [ ! -d $dir ]; then 
         err "[fatal] Failure to create a temporary working directory. Abort."
 	cd $TPKG_CURRENT
@@ -458,7 +466,7 @@ fi
 err "[log] Extracting..."
 cp $archive $dir/
 cd $dir
-${SHELL} ./$archive > /dev/null
+${SHELL} ${testpath}/${testname}.tpkg > /dev/null
 if [ $? -ne 0 ]; then
         err "[fatal] Could not unshar archive. Abort."
 	cd $TPKG_CURRENT
