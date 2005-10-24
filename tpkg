@@ -267,6 +267,7 @@ if [ -z $archive ]; then
 fi
 
 testname=`basename $archive .tpkg`
+testpath=`dirname $archive`
 dsc_file=$testname.dsc                  
 if  [ -z $testname ]; then
         err "[fatal] The test package should have a .tpkg extension. Abort"
