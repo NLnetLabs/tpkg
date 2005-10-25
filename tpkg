@@ -362,7 +362,7 @@ Passed:
 Failure:
 TMPL_EOF
         echo "# source the var file when it's there" > $testname.test
-        echo "[ -f ../$TPKG_VAR ] && source ../$TPKG_VAR" >> $testname.test 
+        echo "[ -f ../\$TPKG_VAR ] && source ../\$TPKG_VAR" >> $testname.test 
         echo "# svnserve resets the path, you may need to adjust it, like this:" >> $testname.test
         echo "#export PATH=\$PATH:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:." >> $testname.test
 
