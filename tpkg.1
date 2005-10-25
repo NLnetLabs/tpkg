@@ -56,13 +56,18 @@ like this:
         DateRunStart: 1000021
         --------------- Test Output ------------------
 
-TODO
 The first line indicates if a test was failed or passed (or unknown
-in some cases). The second line is the basename as given in de description file.
-The third line is the test's description, and the fourth line tells when
-the test was run.
+in some cases). The second line shows when the tests was finished
+in seconds since epoch. The third line is the basename as given in the 
+description file.
+The fourth line is the test's description, and the fifth line tells when
+the test was started in seconds after the epoch.
 Everything after "----- Test Output ----" is the captured output of the
 test script.
+.PP
+Note that a test is executed it runs in a temporary directory, so anything
+you reference with a relative path should have an extra '../' in front of
+it.
 
 .TP
 \fBcreate\fR
@@ -83,17 +88,21 @@ Create a report by gathering information from the \fIresult\fR files.
 Nothing is deleted when you run \fBtpkg report\fR.
 A typical example of a result. file is this:
         
-        ldns-splint: 5 s : ** PASSED ** : Run a make lint test on the libdns sources
+        ldns-splint: 5 s : ** PASSED ** : Run a make lint test on the ldns...
         svn-build: 15 s : ** PASSED ** : Check out and build libdns/trunk
 
         PASSED: 2 (100.00 %)     FAILED: 0 (0 %)    UNKNOWN: 0 (0 %)
 
+It shows the name of the test, the time it took while executing (in
+seconds), whether it passed, failed or was unknown and the description of
+the test.
+.PP
 Essentially \fBreport\fR takes a bunch a \fIresult.\fR files and creates a
 nice test report of it.
 
 .TP
 \fBclean\fR
-Clean up all auxilary files, that is remove: \fI.done*\fR, \fIresult*\fR and
+Clean up all auxiliary files, that is remove: \fI.done*\fR, \fIresult*\fR and
 the \fI.tpkg.var\fR file.
 
 .SS Second format
@@ -160,7 +169,7 @@ A short explanation of what this test is supposed to test.
  'tpkg report' uses this.
 .TP 
 \fBCreationDate \fR
-Automaticly set by 'tpkg tpml'. The original creation date
+Automatically set by 'tpkg tpml'. The original creation date
 for this test.
 .TP 
 \fBMaintainer\fR
@@ -173,8 +182,8 @@ This could something like: 'building', 'running', etc.
 .TP 
 \fBComponent\fR
 What software component are you testing, this could be
-the name of the executeable. User decides what to put
-here, but it should be consistend for all tests.
+the name of the executable. User decides what to put
+here, but it should be consisted for all tests.
 .TP 
 \fBDepends\fR
 On what other test does this test depend. The full
@@ -190,7 +199,7 @@ Name of a script that should be executed after the
 test has run. If the post-script fails the test fails.
 .TP 
 \fBTest\fR
-Name fo the main test script.
+Name of the main test script.
 .TP 
 \fBAuxfiles\fR
 Other files that are needed to run this test, i.e. to 
@@ -201,7 +210,7 @@ fileA, fileB, FileC, ...
 \fBPassed\fR
 A regular expression that is matched against the output
 of the main test script. If the expression matches the
-test is a succes.
+test is a success.
 .TP 
 \fBFailure\fR
 A regular expression that is matched against the output
@@ -246,7 +255,7 @@ Written by Miek Gieben, NLnet Labs.
 Report bugs to <miek@nlnetlabs.nl>
 
 .SH BUGS
-None sofar.
+None so far.
 
 .SH COPYRIGHT
 Copyright (C) 2005 NLnet Labs. This is free software. There is NO
