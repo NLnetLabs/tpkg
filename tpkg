@@ -91,7 +91,9 @@ function write_done() {
 
 function usage() {
         out "Usage:"
-        out "$0 [OPTIONS] [exe|create|extract|tmpl|list] [report|clean] test.tpkg"
+        out "$0 [OPTIONS] [exe|create|extract|tmpl|list] test.tpkg"
+        out "or:"
+        out "$0 [OPTIONS] [report|clean|list|desc] test.tpkg"
         out "or:"
         out "$0 [OPTIONS] clone test1.tpkg test2.tpkg"
         out
@@ -100,12 +102,13 @@ function usage() {
         out " create.:\tcreate a .tpkg out of the test.{pre, post, test} files"
         out " extract:\textract a .tpkg to tmp. dir"
         out " tmpl...:\tcreate empty template files for a new test"
-        out " list...:\tprint to files of the test to stdout"
         out
         out "Reporting/Cleanup"
         out " report.:\tcreate a nice report from all the result files"
         out " clean..:\tremove all the result files"
         out " clone..:\tclone test1.tpkg to test2.tkpg"
+        out " list...:\tprint the files of the test to stdout"
+        out " desc...:\tprint the test's description to stdout"
         out
         out " When multiple tests depend on a single other test, this"
         out " other test is only executed once."
@@ -410,8 +413,8 @@ if [ $goal = "extract" ]; then
         exit 0
 fi
 
-## LIST
-if [ $goal = "list" ]; then
+## LIST AND/OR DESC
+if [ $goal = "list" -o $goal = "desc" ]; then
         # use the correct directory
         dir="${testpath}/${testname}.dir"
         if [ -d $dir ]; then 
@@ -426,7 +429,6 @@ if [ $goal = "list" ]; then
                 exit 1
         fi
 
-        err "[log] Listing..."
         cp $archive $dir/
         cd $dir
         ${SHELL} ./$testname.tpkg > /dev/null
@@ -438,9 +440,15 @@ if [ $goal = "list" ]; then
 
         trap cleanup_and_exit INT
 
-        # echo all files
-        rm ./$testname.tpkg
-        cat *
+        if [ $goal = "list" ]; then
+                # echo all files
+                ./$testname.tpkg
+                cat *
+        else 
+                # desc
+                echo -n "$testname: "
+                cat $testname.dsc | awk -F': ?' '/^Description/ { print $2 }'
+        fi
         cd $TPKG_CURRENT
         # dir can go
         rm -rf $dir

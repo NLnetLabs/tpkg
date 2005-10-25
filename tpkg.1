@@ -8,10 +8,10 @@ tpkg \- test package - manipulate tests
 .IR OPTIONS
 ]
 [
-.IR exe|create|extract|tmpl|list
+.IR exe|create|extract|tmpl
 ]
 [
-.IR report|clean
+.IR report|clean|list|desc
 ]
 test.tpkg
 (1st format)
@@ -104,6 +104,10 @@ nice test report of it.
 \fBclean\fR
 Clean up all auxiliary files, that is remove: \fI.done*\fR, \fIresult*\fR and
 the \fI.tpkg.var\fR file.
+
+.TP
+\fBdesc\fR
+Print the description of the test to standard output.
 
 .SS Second format
 .TP
