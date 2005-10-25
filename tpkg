@@ -454,9 +454,9 @@ if [ $goal = "list" -o $goal = "desc" ]; then
 
         trap cleanup_and_exit INT
 
+        rm -f ./$testname.tpkg
         if [ $goal = "list" ]; then
                 # echo all files
-                ./$testname.tpkg
                 cat *
         else 
                 # desc
