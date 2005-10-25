@@ -564,8 +564,8 @@ if [ ! -f $dsc_test ]; then
 fi
 
 ### Actual executing of the scripts
+epoch  # run before pre()
 pre
-epoch
 
 err "[log] Executing test" 
 echo "BaseName: $dsc_basename" > result.$dsc_basename
@@ -574,7 +574,7 @@ echo "DateRunStart: $epoch " >> result.$dsc_basename
 echo "--------------- Test Output ------------------" >> result.$dsc_basename
 ( ${SHELL} $dsc_test ${TPKG_ARGS} 2>&1 ) >> result.$dsc_basename
 test_result=$?
-epoch
+epoch   # would like to run after post, but that is not possible :-(
 if [ $test_result -ne 0 ]; then
         err "[warning] Test executed with errors: $test_result." 
         echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
