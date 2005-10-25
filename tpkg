@@ -5,7 +5,7 @@
 # Licensed under GPL version 2
 
 export TPKG_VAR=".tpkg.var"
-export TPKG_VERSION="0.71";
+export TPKG_VERSION="0.79";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
@@ -89,9 +89,17 @@ function write_done() {
         > ../.done-${testname}
 }
 
+# write done file in current dir
+function write_fake_done() {
+        if [ -f ".done-${testname}" ]; then
+                err "[warning] Overwriting .done-${testname}"
+        fi
+        > .done-${testname}
+}
+
 function usage() {
         out "Usage:"
-        out "$0 [OPTIONS] [exe|create|extract|tmpl|list] test.tpkg"
+        out "$0 [OPTIONS] [exe|create|extract|tmpl|fake] test.tpkg"
         out "or:"
         out "$0 [OPTIONS] [report|clean|list|desc] test.tpkg"
         out "or:"
@@ -102,6 +110,7 @@ function usage() {
         out " create.:\tcreate a .tpkg out of the test.{pre, post, test} files"
         out " extract:\textract a .tpkg to tmp. dir"
         out " tmpl...:\tcreate empty template files for a new test"
+        out " fake...:\tfake the running of test, but do create a .done file"
         out
         out "Reporting/Cleanup"
         out " report.:\tcreate a nice report from all the result files"
@@ -257,7 +266,6 @@ if [ "${goal}" = "clean" ]; then
         cleanreport
         exit 0
 fi
-
 if [ "${goal}" = "clone" ]; then
         test1=`basename $2 .tpkg`
         test2=`basename $3 .tpkg`;
@@ -283,6 +291,12 @@ if  [ -z $testname ]; then
         err "[fatal] The test package should have a .tpkg extension. Abort"
 	cd $TPKG_CURRENT
         exit 1
+fi
+
+if [ "${goal}" = "fake" ]; then
+        err "[log] Writing .done-$testname file."
+        write_fake_done
+        exit 0
 fi
 
 if [ $goal = "create" ]; then

@@ -8,7 +8,7 @@ tpkg \- test package - manipulate tests
 .IR OPTIONS
 ]
 [
-.IR exe|create|extract|tmpl
+.IR exe|create|extract|tmpl|fake
 ]
 [
 .IR report|clean|list|desc
@@ -43,7 +43,7 @@ After the test the post-script is run.
 .PP
 All files created by \fBtpkg\fR are removed when \fBtpkg\fR \fIclean\fR is run.
 
-.SS First format
+.SS First Format
 .TP
 \fBexe\fR
 Execute a test. This will create a \fIresult.\fR file which looks
@@ -79,6 +79,12 @@ recreate the tpkg by running \fBtpkg create\fR.
 .TP
 \fBtmpl\fR
 Create new test template files. A \fIdsc\fR and \fItest\fR file are created.
+
+.TP
+\fBfake\fR
+Fake the test run, but do create a \fI.done\fR, usefull when writing 
+tests that depend on (lenghty) other tests.
+
 .TP
 \fBlist\fR
 Print the files in the test package to standard output.
@@ -109,7 +115,7 @@ the \fI.tpkg.var\fR file.
 \fBdesc\fR
 Print the description of the test to standard output.
 
-.SS Second format
+.SS Second Format
 .TP
 \fBclone\fR
 Clone \fItest1.tpkg\fR to \fItest2.tpkg\fR. Care is taken to also rename
