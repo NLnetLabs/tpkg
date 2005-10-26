@@ -1,3 +1,6 @@
+26 Oct 2005: Miek Gieben: 0.90
+	* Tagged this release
+
 26 Oct 2005: Miek Gieben: 0.82
 	* Made tpkg clone more robust
 	* Reversed the tpkg report order make PASSED/FAILED standout more
