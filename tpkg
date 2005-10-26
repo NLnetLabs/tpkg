@@ -5,11 +5,12 @@
 # Licensed under GPL version 2
 
 export TPKG_VAR=".tpkg.var"
-export TPKG_VERSION="0.80";
+export TPKG_VERSION="0.81";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
 TPKG_CURRENT=`pwd`
+TPKG_KEEP=0    # tpkg create doesn't remove dir/
 
 ### Helper functions
 function cleanup() {
@@ -125,6 +126,7 @@ function usage() {
 	out "OPTIONS"
 	out "-h\t\tshow this help"
 	out "-v\t\tshow version"
+        out "-k\t\tdon't remove test.dir when creating a tpkg package"
 	out "-b DIR\tuse DIR is a base directory in stead of ."
 	out "-a ARGS\tpass the string ARGS through to the test scripts"
         out 
@@ -227,14 +229,15 @@ function clone() {
 	cd $TPKG_CURRENT
 }
 
-### Main 
+### MAIN 
 # check the arguments
-while getopts ":vhb:a:" o
+while getopts ":vhb:a:k" o
 do case "$o" in
 	b) 	TPKG_BASE="$OPTARG";;
 	h) 	usage; exit 0;;
 	v) 	version; exit 0;;
 	a) 	TPKG_ARGS="$OPTARG";;
+        k)      TPKG_KEEP=1;;
 esac
 done
 shift $(($OPTIND - 1))
@@ -331,11 +334,13 @@ if [ $goal = "create" ]; then
                 exit 1
         fi
         shar $i > $testname.tpkg
-        err "[log] Removing member files"
         rm $i
         mv $testname.tpkg ../
         cd ../
-        rmdir $testname.dir
+        if [ $TPKG_KEEP -eq 0 ]; then
+                err "[log] Removing member files"
+                rmdir $testname.dir
+        fi
 	cd $TPKG_CURRENT
         exit 0
 fi

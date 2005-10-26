@@ -1,0 +1,3 @@
+26 Oct 2005: Miek Gieben: 0.81
+	* Added -k option for tpkg create, which doesn't remove the test.dir/
+	* Documentation updates
