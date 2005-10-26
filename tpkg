@@ -5,7 +5,7 @@
 # Licensed under GPL version 2
 
 export TPKG_VAR=".tpkg.var"
-export TPKG_VERSION="0.81";
+export TPKG_VERSION="0.82";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
@@ -206,6 +206,10 @@ function report() {
 # clone test1 to test2
 function clone() {
         $0 extract $test1.tpkg
+        if [ $? -ne 0 ]; then
+                err "[fatal] Extract of $test1.tpkg failed. Abort."
+                exit 1
+        fi
 
         if [ ! -d "$test1.dir" ]; then
                 err "[fatal] No $test1.dir directory? Abort."
@@ -226,6 +230,9 @@ function clone() {
         # rename the dir
         mv $test1.dir $test2.dir
         $0 create $test2.tpkg
+        if [ $? -ne 0 ]; then
+                err "[warning] Creating of $test2.tpkg failed."
+        fi
 	cd $TPKG_CURRENT
 }
 
@@ -291,7 +298,7 @@ testname=`basename $archive .tpkg`
 testpath=`dirname $archive`
 dsc_file=$testname.dsc                  
 if  [ -z $testname ]; then
-        err "[fatal] The test package should have a .tpkg extension. Abort"
+        err "[fatal] The test package should have a .tpkg extension. Abort."
 	cd $TPKG_CURRENT
         exit 1
 fi
@@ -309,7 +316,7 @@ if [ $goal = "create" ]; then
         # check for shar
         which shar >/dev/null
         if [ $? -ne 0 ]; then
-                err "[fatal] Shar command not found. Abort"
+                err "[fatal] Shar command not found. Abort."
                 cd $TPKG_CURRENT
                 exit 1
         fi
@@ -513,7 +520,7 @@ SHELL=`which bash`
 if [ -z ${SHELL} ]; then
        SHELL=/usr/local/bin/bash
        if [ ! -x $SHELL ]; then
-               err "[fatal] Can't find the bash shell. Abort"
+               err "[fatal] Can't find the bash shell. Abort."
          	cleanup
                exit 1
        fi

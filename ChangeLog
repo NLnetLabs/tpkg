@@ -1,3 +1,6 @@
+26 Oct 2005: Miek Gieben: 0.82
+	* Made tpkg clone more robust
+
 26 Oct 2005: Miek Gieben: 0.81
 	* Added -k option for tpkg create, which doesn't remove the test.dir/
 	* Documentation updates
