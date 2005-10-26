@@ -1,6 +1,7 @@
 26 Oct 2005: Miek Gieben: 0.82
 	* Made tpkg clone more robust
+	* Reversed the tpkg report order make PASSED/FAILED standout more
 
-26 Oct 2005: Miek Gieben: 0.81
+26 Oct 2005: Miek Gieben: 0.81 (not tagged)
 	* Added -k option for tpkg create, which doesn't remove the test.dir/
 	* Documentation updates

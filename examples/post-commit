@@ -3,9 +3,12 @@
 # set the path for our tests
 PATH=$PATH:/usr/local/bin:/usr/local/sbin:.
 
+# please edit these to suit your needs
 TPKG=/home/miekg/svn/tpkg/trunk/tpkg
 MAILTO="ldns-team@nlnetlabs.nl"
-REPOS="$1"
+REPOPATH="trunk"
+REPOS="$1"  # /svn/nsd or /svn/libdns
+TESTDIR="test"
 REV="$2"
 
 BUILD_DIR=`mktemp -d /tmp/XXXXXX`
@@ -14,25 +17,24 @@ if [ ! -d $BUILD_DIR ]; then
 fi
 MAIL_FILE=`mktemp /tmp/XXXXXXX`
 
-# checkout to $BUILD_DIR
-/usr/local/bin/svn co -r$REV file:///svn/libdns/trunk $BUILD_DIR
+# checkout to $BUILD_DIR, assume local checkout
+/usr/local/bin/svn co -r$REV file://$REPOS/$REPOPATH $BUILD_DIR
 ( cd $BUILD_DIR ; svn log -r$REV > $MAIL_FILE )
 
 # set the path for our sibling test scripts
-echo "PATH=$PATH" > $BUILD_DIR/test/.tpkg.var
+echo "PATH=$PATH" > $BUILD_DIR/$TESTDIR/.tpkg.var
 
 # RUN THE TESTS
-for tests in $BUILD_DIR/test/*.tpkg ; do
+for tests in $BUILD_DIR/$TESTDIR/*.tpkg ; do
         /usr/bin/nice /usr/local/bin/bash \
-        $TPKG -b $BUILD_DIR/test -a $BUILD_DIR exe `basename $tests`
+        $TPKG -b $BUILD_DIR/$TESTDIR -a $BUILD_DIR exe `basename $tests`
 done
 
-/usr/local/bin/bash $TPKG -b $BUILD_DIR/test report 2>&1 >> $MAIL_FILE
-/usr/local/bin/bash $TPKG -b $BUILD_DIR/test clean >> $MAIL_FILE
+/usr/local/bin/bash $TPKG -b $BUILD_DIR/$TESTDIR report 2>&1 >> $MAIL_FILE
+/usr/local/bin/bash $TPKG -b $BUILD_DIR/$TESTDIR clean >> $MAIL_FILE
 # END
 
 # SVN STUFF
-echo $REPOS >> $MAIL_FILE
 ( cd $BUILD_DIR ; svn diff -rPREV:$REV >> $MAIL_FILE )
 
 rm -rf $BUILD_DIR
