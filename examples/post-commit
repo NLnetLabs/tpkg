@@ -3,14 +3,15 @@
 # set the path for our tests
 PATH=$PATH:/usr/local/bin:/usr/local/sbin:.
 
+REPOS="$1"  # /svn/nsd or /svn/libdns
+REV="$2"
+
 # please edit these to suit your needs
 TPKG=/home/miekg/svn/tpkg/trunk/tpkg
 MAILTO="ldns-team@nlnetlabs.nl"
+MAILSUB="[svn: ldns] $REV status"
 REPOPATH="trunk"
-REPOS="$1"  # /svn/nsd or /svn/libdns
 TESTDIR="test"
-REV="$2"
-
 BUILD_DIR=`mktemp -d /tmp/XXXXXX`
 if [ ! -d $BUILD_DIR ]; then
         exit 0
@@ -39,6 +40,5 @@ done
 
 rm -rf $BUILD_DIR
 
-cat $MAIL_FILE | \
-mail -s "[svn: libdns] $REV status" $MAILTO
+cat $MAIL_FILE | mail -s "${MAILSUB}" $MAILTO
 rm -f $MAIL_FILE
