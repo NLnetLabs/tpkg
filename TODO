@@ -1,5 +1,2 @@
-Fixed things for tests ala : --compare, which will compare 2 files
-or --diff?
+- check consistency of dsc file
 
-- empty -
- :-)
