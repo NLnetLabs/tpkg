@@ -7,7 +7,7 @@ Test Package
 
         The most important file in each test is the description
         file, the one with the .dsc extension. The file is line based,
-        so options spanning multiple lines are not recognized are worse,
+        so options spanning multiple lines are not recognized or worse,
         make tpkg fail.
 
         A typical example looks like this:
