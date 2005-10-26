@@ -183,7 +183,7 @@ Reading Reports:
 Conventions
         In the toplevel test directory (where all the .tpkg files live) 
         different tests should communicate (exchanges variable contents) 
-        by appending to the file "tpkg.var"
+        by appending to the file ".tpkg.var"
         This is currently the only way to implement persistent variabeles.
 
         The location of this file is known in tpkg as $TPKG_VAR - which is 
@@ -231,9 +231,9 @@ Sample Output For NSD
         [rfc3597-bad]  [log] Cleaning up
 
         % tpkg report
-        nsd-compile: ** PASSED ** : Compile NSD
-        rfc3597-bad: ** PASSED ** : Compile a zone with unknown rr data (the zone is BAD)
-        rfc3597-good: ** PASSED ** : Compile a zone with unknown rr data (the zone is good)
+        nsd-compile: 1 s : ** PASSED ** : Compile NSD
+        rfc3597-bad: 3 s : ** PASSED ** : Compile a zone with unknown rr data (the zone is BAD)
+        rfc3597-good: 2 s : ** PASSED ** : Compile a zone with unknown rr data (the zone is good)
 
         PASSED: 3 (100.00 %)            FAILED: 0 (0 %)         UNKNOWN: 0 (0 %)
         

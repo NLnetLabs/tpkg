@@ -5,7 +5,7 @@
 # Licensed under GPL version 2
 
 export TPKG_VAR=".tpkg.var"
-export TPKG_VERSION="0.79";
+export TPKG_VERSION="0.80";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""

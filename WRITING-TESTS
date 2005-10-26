@@ -1,0 +1,136 @@
+WRITING TESTS WITH TPKG
+
+(c) NLnet Labs, 2005. Miek Gieben
+Licensed under the GPL version 2.
+
+Introduction
+        In itself tpkg doesn't make writing tests any easier, it is just a
+        container format. The following sections will over some guidelines
+        and guidance on creating new tests.
+
+        As always, looking at other tests will help you understand tpkg
+        better :-)
+
+Handy Commands 
+        tpkg list <testname.tpkg>       - list the contents of a test
+        tpkg fake <testname.tpkg>       - fake a testrun - this write a
+                                          .done file
+
+Writing a Test
+
+        First choose a language.  tpkg itself is writting in bash, and the
+        scripts are also assumed to be shell scripts, but nothing prevents
+        you from using the #!-syntax to fork another interpreter.
+
+        Next comes to actual scripting/writing.
+
+        Step 1
+                Execute a 'tpkg tmpl <testname>', where <testname>
+                is a descriptive name for you test. Assume our test
+                is called 'bug001'.
+                tpkg will create a subdirectory named bug001.dir and
+                will put the following files in there:
+                - bug001.dsc     - description file
+                - bug001.test    - main test script
+
+                The description file is line based, multiline entries
+                will not be parsed correctly. Also tpkg using the 
+                colon ':' as a delimeter, so that character cannot
+                be used in the for instance the "Description:" line.
+
+                All files that are used in a test MUST have the same
+                prefix. In this case that is 'bug001'.
+
+        Step 2
+                Fill out the bug001.dsc file, i.e. add a description
+                in there. You are now ready to create your test in
+                bug001.test. (Also check step 3, 4 and 5).
+
+        Step 3
+                Are there things that need to be done before the
+                test can be run, i.e. setting up some environment?
+                This can be done best in a .pre script. If you create
+                such a script you must also add that to bug001.dsc,
+                under 'Pre:'. If this script fails, the main test
+                script is not execeuted and the test is aborted.
+
+        Step 4
+                Anything that was setup with a pre script should be
+                taken down with a post script. Everything that applies
+                for the pre-script also applies for a post script, except
+                that a failure of the post script doesn't abort the test.
+
+        Step 5
+                Do you need any extra files? If yes, list them under
+                "AuxFiles:" in the description file.
+
+        Step 6
+                When you are happy about your test, and it works:
+                bash ./bug001.test executes correctly, you can create
+                your test package. Go up one directory: 
+                cd ..
+
+                And create your test:
+                tpkg create bug001.tpkg
+
+                This will get all files from the bug001.dir/ and will
+                create the shell archive named bug001.tpkg
+
+        Step 7
+                Test your test:
+                tpkg exe bug001.tpkg
+
+                This should create a .done-bug001 and a result-bug001
+                file. If the test failed you can re-examine the test
+                by unpacking it:
+                tpkg extract bug001.tpkg
+              
+                This will re-create the bug001.dir/ with all the files
+                in it.
+                        
+        Step 8
+                If everything is gone allright the test can be added
+                to the archive of the package that you are testing.
+
+Pittfalls
+        The following list are known pittfalls and how to avoid them:
+
+        * Path issues
+                When a test is executed from subversion, by using the 
+                post-commit hook, the $PATH is cleared for security
+                reasons. This also means that some utilities that might be
+                used in the test cannot be found.
+
+                It is prudent to (re)set the $PATH at the top of each
+                test script, or use absolute pathnames for /all/ external
+                commands in your test.
+
+        * Relative path issues
+                Each test is executed in a random subdirectory, there it
+                is also unpacked. So anything you reference with ../ will
+                need an extra ../ when the final test is ready. Almost
+                always this will not be an issue because the writing and
+                testing of the test also happens in a subdirectory. But
+                keep this in mind when a test doen't work as a final
+                package.
+
+Conventions
+
+        $TPKG_VAR
+                Sometimes you want to provide the main test script with information
+                only available in the pre script. Also some tests may need
+                information from other tests.
+                
+                There is no elegant way to convey this information, except by using
+                a file in which such items are stored as shell variables.
+
+                tpkg uses a files named ".tpkg.var" for this purpose. This file
+                is /not/ stored in the temporary directory where the test is
+                executed, because it must survive after the test has completed.
+
+                The $TPKG_VAR variable is exported from tpkg with the name
+                of this file, this should be always .tpkg.var. If you need 
+                to access this file you should use "../$TPKG_VAR" 
+
+                When writing to the file be sure to use >> in stead of > which 
+                destroys any previous content.
