@@ -5,7 +5,7 @@
 # Licensed under GPL version 2
 
 export TPKG_VAR=".tpkg.var"
-export TPKG_VERSION="0.90";
+export TPKG_VERSION="1.00";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
@@ -102,7 +102,7 @@ function usage() {
         out "Usage:"
         out "$0 [OPTIONS] [exe|create|extract|tmpl|fake] test.tpkg"
         out "or:"
-        out "$0 [OPTIONS] [report|clean|list|desc] test.tpkg"
+        out "$0 [OPTIONS] [report|clean|list|desc|help] test.tpkg"
         out "or:"
         out "$0 [OPTIONS] clone test1.tpkg test2.tpkg"
         out
@@ -119,6 +119,7 @@ function usage() {
         out " clone..:\tclone test1.tpkg to test2.tkpg"
         out " list...:\tprint the files of the test to stdout"
         out " desc...:\tprint the test's description to stdout"
+        out " help...:\tprint the help message for this test, if available"
         out
         out " When multiple tests depend on a single other test, this"
         out " other test is only executed once."
@@ -222,10 +223,19 @@ function clone() {
         # don't use sed -i, its a gnu-ism
         sed  "s/$test1/$test2/g" < $test2.dsc > $test2.dsc.$$
         mv $test2.dsc.$$ $test2.dsc
+
+        # update the date
+        sed "s/^CreationDate:.*/CreationDate: `date`/"  < $test2.dsc > $test2.dsc.$$
+        mv $test2.dsc.$$ $test2.dsc
+
         cd ..
         # rename the dir
         mv $test1.dir $test2.dir
-        $0 create $test2.tpkg
+        if [ $TPKG_KEEP -eq 0 ]; then
+                $0 create $test2.tpkg
+        else
+                $0 -k create $test2.tpkg
+        fi
         if [ $? -ne 0 ]; then
                 err "[warning] Creating of $test2.tpkg failed."
         fi
@@ -241,6 +251,7 @@ do case "$o" in
 	v) 	version; exit 0;;
 	a) 	TPKG_ARGS="$OPTARG";;
         k)      TPKG_KEEP=1;;
+        *)      err "[fatal] Unknown option. Abort."; exit 1;;
 esac
 done
 shift $(($OPTIND - 1))
@@ -337,7 +348,9 @@ if [ $goal = "create" ]; then
                 exit 1
         fi
         shar $i > $testname.tpkg
-        rm $i
+        if [ $TPKG_KEEP -eq 0 ]; then
+                rm $i
+        fi
         mv $testname.tpkg ../
         cd ../
         if [ $TPKG_KEEP -eq 0 ]; then
@@ -376,6 +389,7 @@ Maintainer: `grep $LOGNAME /etc/passwd | awk -F: ' { print $5 }' | sed s/,//g`
 Category: 
 Component:
 Depends: 
+Help: $testname.help
 Pre: 
 Post: 
 Test: $testname.test
@@ -383,13 +397,19 @@ AuxFiles:
 Passed:
 Failure:
 TMPL_EOF
+        # .help file
+        echo "Please describe how to use this test."  > $testname.help
+        echo "i.e. tpkg -a ARG exe testname:"  >> $testname.help
+        echo "   ARG is used to ..."  >> $testname.help
+
+        # .test file
         echo "# source the var file when it's there" > $testname.test
         echo "[ -f ../\$TPKG_VAR ] && source ../\$TPKG_VAR" >> $testname.test 
         echo "# svnserve resets the path, you may need to adjust it, like this:" >> $testname.test
         echo "#export PATH=\$PATH:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:." >> $testname.test
 
-        out "[log] created $testname.{dsc, test}"
-        out "[log] please create the test script(s) and then run: tpkg create $testname.tpkg"
+        out "[log] created $testname.{dsc, test, help}"
+        out "[log] please create the script(s) and then run: tpkg create $testname.tpkg"
         err "[log] created $testname in $dir."
 	cd $TPKG_CURRENT
         exit 0
@@ -435,8 +455,8 @@ if [ $goal = "extract" ]; then
         exit 0
 fi
 
-## LIST AND/OR DESC
-if [ $goal = "list" -o $goal = "desc" ]; then
+## LIST OR DESC OR HELP
+if [ $goal = "list" -o $goal = "desc" -o $goal = "help" ]; then
         # use the correct directory
         dir="${testpath}/${testname}.dir"
         if [ -d $dir ]; then 
@@ -463,14 +483,22 @@ if [ $goal = "list" -o $goal = "desc" ]; then
         trap cleanup_and_exit INT
 
         rm -f ./$testname.tpkg
-        if [ $goal = "list" ]; then
-                # echo all files
+        case $goal in
+        list*)
                 cat *
-        else 
-                # desc
+                ;;
+        desc*)
                 echo -n "$testname: "
                 cat $testname.dsc | awk -F': ?' '/^Description/ { print $2 }'
-        fi
+                ;;
+        help*)
+                if [ -f $testname.help ]; then
+                        cat $testname.help
+                else
+                        err "[warning] No help file found."
+                fi
+                ;;
+        esac
         cd $TPKG_CURRENT
         # dir can go
         rm -rf $dir
@@ -539,6 +567,7 @@ dsc_category=`IFS=: awk -F': ?' < $dsc_file '/^Category/ { print $2 }'`
 dsc_component=`IFS=: awk -F': ?' < $dsc_file '/^Component/ { print $2 }'`
 dsc_depends=`IFS=: awk -F': ?' < $dsc_file '/^Depends/ { print $2 }'`
 dsc_maintainer=`IFS=: awk -F': ?' < $dsc_file '/^Maintainer/ { print $2 }'`
+dsc_help=`IFS=: awk -F': ?' < $dsc_file '/^Help/ { print $2 }'`
 dsc_pre=`IFS=: awk -F': ?' < $dsc_file '/^Pre/ { print $2 }'`
 dsc_post=`IFS=: awk -F': ?' < $dsc_file '/^Post/ { print $2 }'`
 dsc_test=`IFS=: awk -F': ?' < $dsc_file '/^Test/ { print $2 }'`

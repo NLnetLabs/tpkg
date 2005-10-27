@@ -20,6 +20,7 @@ Test Package
                 Category: 
                 Component:
                 Depends: 
+                Help: test1.help
                 Pre: test1.pre
                 Post: test1.post
                 Test: test1.test
@@ -64,6 +65,10 @@ Test Package
                 package name should be given, with the .tpkg extension.
 
                 Currently this is limited to one test. 
+        
+        Help:
+               Name of a file that has a few lines of usefull information
+               to the user of the test. The file must have a .help suffix.
 
         Pre:
                 Name of a script that should be executed before the
@@ -175,8 +180,8 @@ Running Tests:
 Reading Reports:
         Typical example:
 
-        ldns-splint: ** PASSED ** : Run a make lint test on the libdns sources
-        svn-build: ** PASSED ** : Check out and build libdns/trunk
+        ** PASSED ** : 4 s : ldns-splint : Run a make lint test on the libdns sources
+        ** PASSED ** : 2 s : svn-build: : Check out and build libdns/trunk
 
         PASSED: 2 (100.00 %)            FAILED: 0 (0 %)         UNKNOWN: 0 (0 %)
 

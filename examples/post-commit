@@ -3,15 +3,15 @@
 # set the path for our tests
 PATH=$PATH:/usr/local/bin:/usr/local/sbin:.
 
-REPOS="$1"  # /svn/nsd or /svn/libdns
-REV="$2"
+REPOS="$1"  # /svn/nsd or /svn/libdns   # get these from svn
+REV="$2"                                # which revision number
 
 # please edit these to suit your needs
-TPKG=/home/miekg/svn/tpkg/trunk/tpkg
-MAILTO="ldns-team@nlnetlabs.nl"
-MAILSUB="[svn: ldns] $REV status"
-REPOPATH="trunk"
-TESTDIR="test"
+TPKG=/home/miekg/svn/tpkg/trunk/tpkg    # tpkg version to use
+MAILTO="ldns-team@nlnetlabs.nl"         # where to send the status email
+MAILSUB="[svn: ldns] $REV status"       # subject of status emails
+REPOPATH="trunk"                        # which part to check out
+TESTDIR="test"                          # dir where the tests live in the repo
 BUILD_DIR=`mktemp -d /tmp/XXXXXX`
 if [ ! -d $BUILD_DIR ]; then
         exit 0
@@ -25,6 +25,10 @@ MAIL_FILE=`mktemp /tmp/XXXXXXX`
 # set the path for our sibling test scripts
 echo "PATH=$PATH" > $BUILD_DIR/$TESTDIR/.tpkg.var
 
+###
+# This should be the only thing you need to tweak
+###
+
 # RUN THE TESTS
 for tests in $BUILD_DIR/$TESTDIR/*.tpkg ; do
         /usr/bin/nice /usr/local/bin/bash \
@@ -33,7 +37,9 @@ done
 
 /usr/local/bin/bash $TPKG -b $BUILD_DIR/$TESTDIR report 2>&1 >> $MAIL_FILE
 /usr/local/bin/bash $TPKG -b $BUILD_DIR/$TESTDIR clean >> $MAIL_FILE
-# END
+###
+# End of tweaking
+###
 
 # SVN STUFF
 ( cd $BUILD_DIR ; svn diff -rPREV:$REV >> $MAIL_FILE )

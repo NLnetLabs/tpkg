@@ -32,6 +32,7 @@ Writing a Test
                 will put the following files in there:
                 - bug001.dsc     - description file
                 - bug001.test    - main test script
+                - bug001.help    - help file for the user
 
                 The description file is line based, multiline entries
                 will not be parsed correctly. Also tpkg using the 
@@ -45,6 +46,10 @@ Writing a Test
                 Fill out the bug001.dsc file, i.e. add a description
                 in there. You are now ready to create your test in
                 bug001.test. (Also check step 3, 4 and 5).
+
+        Step 2a
+                Fill out the bug001.help file. Thing like special
+                arguments to the test can be put in this file.
 
         Step 3
                 Are there things that need to be done before the
@@ -120,7 +125,7 @@ Conventions
                 Sometimes you want to provide the main test script with information
                 only available in the pre script. Also some tests may need
                 information from other tests.
-                
+
                 There is no elegant way to convey this information, except by using
                 a file in which such items are stored as shell variables.
 

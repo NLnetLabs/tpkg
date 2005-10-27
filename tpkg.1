@@ -10,12 +10,17 @@ tpkg \- test package - manipulate tests
 [
 .IR exe|create|extract|tmpl|fake
 ]
+test.tpkg
+
+.B tpkg
 [
-.IR report|clean|list|desc
+.IR OPTIONS
+]
+[
+.IR report|clean|list|desc|help
 ]
 test.tpkg
-(1st format)
-.PP
+
 .B tpkg
 [
 .IR OPTIONS
@@ -23,7 +28,6 @@ test.tpkg
 .IR clone
 test1.tpkg
 test2.tpkg
-(2nd format)
 
 .SH DESCRIPTION
 \fBtpkg\fR is used to manipulate test packages. A test package
@@ -43,7 +47,6 @@ After the test the post-script is run.
 .PP
 All files created by \fBtpkg\fR are removed when \fBtpkg\fR \fIclean\fR is run.
 
-.SS First Format
 .TP
 \fBexe\fR
 Execute a test. This will create a \fIresult.\fR file which looks
@@ -115,7 +118,13 @@ the \fI.tpkg.var\fR file.
 \fBdesc\fR
 Print the description of the test to standard output.
 
-.SS Second Format
+.TP
+\fBhelp\fR
+If a .help file is found its contents are displayed. This file can be
+used to document some test specific things, like how to call it or 
+describe its arguments (if any). Together with the Description line this
+should fully document the test.
+
 .TP
 \fBclone\fR
 Clone \fItest1.tpkg\fR to \fItest2.tpkg\fR. Care is taken to also rename
@@ -161,6 +170,7 @@ A typical example looks like this:
         \fBCategory:\fR 
         \fBComponent:\fR
         \fBDepends:\fR
+        \fBHelp:\fR test1.help
         \fBPre:\fR test1.pre
         \fBPost:\fR test1.post
         \fBTest:\fR test1.test
@@ -206,6 +216,10 @@ here, but it should be consisted for all tests.
 On what other test does this test depend. The full
 package name should be given, with the .tpkg extension.
 Currently this is limited to one test. 
+.TP 
+\fBHelp\fR
+Name of a file that has a few lines of usefull information
+to the user of the test. The file must have a .help suffix.
 .TP 
 \fBPre\fR
 Name of a script that should be executed before the

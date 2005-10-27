@@ -1,3 +1,10 @@
+27 Okt 2005: Miek Gieben: 1.00
+	* Added help file and updated documentation
+	* When cloning update the date in the new test
+	* Consistency of the .dsc is checked
+	* -k now works, also when cloning
+	* Abort on unknown options
+
 26 Oct 2005: Miek Gieben: 0.90
 	* Tagged this release
 
