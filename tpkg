@@ -10,6 +10,7 @@ export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
 TPKG_CURRENT=`pwd`
+TPKG_QUIET=0
 TPKG_KEEP=0    # tpkg create doesn't remove dir/
 
 ### Helper functions
@@ -30,13 +31,20 @@ function cleanup_and_exit() {
 }
 
 function err() {
+        # don't write to /dev/stderr - you cannot redirect that output
+        if [ $TPKG_QUIET -eq 1 ]; then
+                return
+        fi
         if [ -z $testname ]; then
-                echo -e "  $1" > /dev/stderr
+                echo -e "  $1" >&2
         else
-                echo -e "[$testname]  $1" > /dev/stderr
+                echo -e "[$testname]  $1" >&2
         fi
 }
 function out() {
+        if [ $TPKG_QUIET -eq 1 ]; then
+                return
+        fi
         if [ -z $testname ]; then
                 echo -e "  $1"
         else
@@ -59,22 +67,22 @@ function epoch() {
 
 function post() {
         if [ -f "${dsc_post}" ]; then 
-                err "[log] Executing post script"
+                err "[log] Executing post script: ${dsc_post} ${TPKG_ARGS}"
                 ${SHELL} ${dsc_post} ${TPKG_ARGS}
-                if [ $? -ne 0 ]; then
-                        err "[fatal] Post-script executed with errors: $?. Abort"
-                        cleanup; exit 1
+                result=$?
+                if [ $result -ne 0 ]; then
+                        err "[warning] Post-script executed with errors: $result."
                 fi
         fi
 }
 
 function pre() {
         if [ -f "${dsc_pre}" ]; then 
-                err "[log] Executing pre-script"
+                err "[log] Executing pre script: ${dsc_pre} ${TPKG_ARGS}"
                 ${SHELL} ${dsc_pre} ${TPKG_ARGS}
-                if [ $? -ne 0 ]; then
-                        err "[fatal] Pre-script executed with errors: $?. Abort"
-                        cleanup; exit 1
+                result=$?
+                if [ $result -ne 0 ]; then
+                        err "[warning] Pre-script executed with errors: $result."
                 fi
         fi
 }
@@ -124,11 +132,12 @@ function usage() {
 	out "OPTIONS"
 	out " -h\t\tshow this help"
 	out " -v\t\tshow version"
+        out " -q\t\tdon't print anything to stderr/stdout"
         out " -k\t\tdon't remove test.dir when creating a tpkg package"
 	out " -b DIR\tuse DIR is a base directory in stead of ."
 	out " -a ARGS\tpass the string ARGS through to the test scripts"
         out 
-        out " (c) NLnetLabs, Miek Gieben. Licensed under the GPL version 2."
+        out " (C) NLnetLabs, Miek Gieben. Licensed under the GPL version 2."
 }
 
 function version() {
@@ -242,12 +251,13 @@ function clone() {
 
 ### MAIN 
 # check the arguments
-while getopts ":vhb:a:k" o
+while getopts ":vhkqb:a:" o
 do case "$o" in
 	b) 	TPKG_BASE="$OPTARG";;
 	h) 	usage; exit 0;;
 	v) 	version; exit 0;;
 	a) 	TPKG_ARGS="$OPTARG";;
+        q)      TPKG_QUIET=1;;
         k)      TPKG_KEEP=1;;
         *)      err "[fatal] Unknown option. Abort."; exit 1;;
 esac
