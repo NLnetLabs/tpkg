@@ -32,7 +32,8 @@ echo "PATH=$PATH" > $BUILD_DIR/$TESTDIR/.tpkg.var
 # RUN THE TESTS
 for tests in $BUILD_DIR/$TESTDIR/*.tpkg ; do
         /usr/bin/nice /usr/local/bin/bash \
-        $TPKG -b $BUILD_DIR/$TESTDIR -a $BUILD_DIR exe `basename $tests`
+        $TPKG -b $BUILD_DIR/$TESTDIR -a $BUILD_DIR exe `basename $tests` \\
+        2>&1 >> $MAIL_FILE      # show the errors
 done
 
 /usr/local/bin/bash $TPKG -b $BUILD_DIR/$TESTDIR report 2>&1 >> $MAIL_FILE
