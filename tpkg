@@ -177,14 +177,15 @@ function report() {
 
                 ((period=$runend - $runstart))
 
-                echo -e "!! $passfailed !! : $period s : $basename: $description"
-                # count it
                 case $passfailed in
                 "FAILED")
+                        echo -e "!! $passfailed !! : $period s : $basename: $description"
                         ((failed=$failed + 1)) ;;
                 "PASSED")
+                        echo -e "** $passfailed ** : $period s : $basename: $description"
                         ((passed=$passed + 1)) ;;
                 *) 
+                        echo -e "-- $passfailed -- : $period s : $basename: $description"
                         ((unknown=$unknown + 1)) ;;
                 esac
         done
