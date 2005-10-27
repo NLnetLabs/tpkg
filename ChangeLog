@@ -4,6 +4,7 @@
 	* Consistency of the .dsc is checked
 	* -k now works, also when cloning
 	* Abort on unknown options
+	* Some updates to the layout of the tpkg script
 
 26 Oct 2005: Miek Gieben: 0.90
 	* Tagged this release

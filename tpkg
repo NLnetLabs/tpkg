@@ -26,8 +26,7 @@ function cleanup() {
 }
 
 function cleanup_and_exit() {
-        cleanup
-        exit 1
+        cleanup; exit 1
 }
 
 function err() {
@@ -64,8 +63,7 @@ function post() {
                 ${SHELL} ${dsc_post} ${TPKG_ARGS}
                 if [ $? -ne 0 ]; then
                         err "[fatal] Post-script executed with errors: $?. Abort"
-                        cleanup
-                        exit 1
+                        cleanup; exit 1
                 fi
         fi
 }
@@ -76,8 +74,7 @@ function pre() {
                 ${SHELL} ${dsc_pre} ${TPKG_ARGS}
                 if [ $? -ne 0 ]; then
                         err "[fatal] Pre-script executed with errors: $?. Abort"
-                        cleanup
-                        exit 1
+                        cleanup; exit 1
                 fi
         fi
 }
@@ -125,11 +122,11 @@ function usage() {
         out " other test is only executed once."
 	out
 	out "OPTIONS"
-	out "-h\t\tshow this help"
-	out "-v\t\tshow version"
-        out "-k\t\tdon't remove test.dir when creating a tpkg package"
-	out "-b DIR\tuse DIR is a base directory in stead of ."
-	out "-a ARGS\tpass the string ARGS through to the test scripts"
+	out " -h\t\tshow this help"
+	out " -v\t\tshow version"
+        out " -k\t\tdon't remove test.dir when creating a tpkg package"
+	out " -b DIR\tuse DIR is a base directory in stead of ."
+	out " -a ARGS\tpass the string ARGS through to the test scripts"
         out 
         out " (c) NLnetLabs, Miek Gieben. Licensed under the GPL version 2."
 }
@@ -269,36 +266,28 @@ goal=$1
 archive=$2
 if [ -z "${goal}" ]; then
         usage
-	cd $TPKG_CURRENT
-        exit 0
+	cd $TPKG_CURRENT; exit 0
 fi
 
 ### REPORT ###
 # no extra args required
 if [ "${goal}" = "report" ]; then
-        report
-        exit 0
+        report; exit 0
 fi
 if [ "${goal}" = "clean" ]; then
-        cleanreport
-        exit 0
+        cleanreport; exit 0
 fi
 if [ "${goal}" = "clone" ]; then
         test1=`basename $2 .tpkg`
         test2=`basename $3 .tpkg`;
         if [ -z "$test1" -o -z "$test2" ]; then
-                usage
-		cd $TPKG_CURRENT
-                exit 0
+                usage; cd $TPKG_CURRENT; exit 0
         fi
-        clone
-        exit 0
+        clone; exit 0
 fi
 
 if [ -z $archive ]; then
-        usage
-	cd $TPKG_CURRENT
-        exit 0
+        usage; cd $TPKG_CURRENT; exit 0
 fi
 
 testname=`basename $archive .tpkg`
@@ -306,14 +295,12 @@ testpath=`dirname $archive`
 dsc_file=$testname.dsc                  
 if  [ -z $testname ]; then
         err "[fatal] The test package should have a .tpkg extension. Abort."
-	cd $TPKG_CURRENT
-        exit 1
+	cd $TPKG_CURRENT; exit 1
 fi
 
 if [ "${goal}" = "fake" ]; then
         err "[log] Writing .done-$testname file."
-        write_fake_done
-        exit 0
+        write_fake_done; exit 0
 fi
 
 if [ $goal = "create" ]; then
@@ -324,28 +311,24 @@ if [ $goal = "create" ]; then
         which shar >/dev/null
         if [ $? -ne 0 ]; then
                 err "[fatal] Shar command not found. Abort."
-                cd $TPKG_CURRENT
-                exit 1
+                cd $TPKG_CURRENT; exit 1
         fi
 
         # assume there is a dir named $testname.dir
         if [ ! -d "${testname}.dir" ]; then
                 err "[fatal] No $testname.dir directory found. Abort."
-        	cd $TPKG_CURRENT
-                exit 1
+        	cd $TPKG_CURRENT; exit 1
         fi
         cd $testname.dir
-        
+
         if [ -f $testname.tpkg ]; then
                 err "[fatal] Not overwriting existing $testname.tpkg. Abort."
-		cd $TPKG_CURRENT
-                exit 1
+		cd $TPKG_CURRENT; exit 1
         fi
         i=$( ls $testname.* 2>/dev/null )
         if [ -z "${i}" ]; then
                 err "[fatal] No $testname.* files found. Abort."
-		cd $TPKG_CURRENT
-                exit 1
+		cd $TPKG_CURRENT; exit 1
         fi
         shar $i > $testname.tpkg
         if [ $TPKG_KEEP -eq 0 ]; then
@@ -357,8 +340,7 @@ if [ $goal = "create" ]; then
                 err "[log] Removing member files"
                 rmdir $testname.dir
         fi
-	cd $TPKG_CURRENT
-        exit 0
+	cd $TPKG_CURRENT; exit 0
 fi
 
 ### TMPL ####
@@ -366,8 +348,7 @@ fi
 if [ $goal = "tmpl" ]; then
         if [ -f $testname.dsc ]; then
                 err "[fatal] $testname.dsc already exists. Abort."
-		cd $TPKG_CURRENT
-                exit 1
+		cd $TPKG_CURRENT; exit 1
         fi
         
         # make tmp dir
@@ -375,8 +356,7 @@ if [ $goal = "tmpl" ]; then
         mkdir $dir
         if [ ! -d $dir ]; then 
                 err "[fatal] Failure to create a temporary working directory. Abort."
-		cd $TPKG_CURRENT
-                exit 1
+		cd $TPKG_CURRENT; exit 1
         fi
         cd $dir
         
@@ -411,14 +391,12 @@ TMPL_EOF
         out "[log] created $testname.{dsc, test, help}"
         out "[log] please create the script(s) and then run: tpkg create $testname.tpkg"
         err "[log] created $testname in $dir."
-	cd $TPKG_CURRENT
-        exit 0
+	cd $TPKG_CURRENT; exit 0
 fi
 
 if [ ! -f $archive ]; then
         err "[fatal] Cannot find the test package: $archive. Abort"
-        cd $TPKG_CURRENT
-        exit 1
+        cd $TPKG_CURRENT; exit 1
 fi
 
 ## EXTRACT
@@ -426,14 +404,12 @@ if [ $goal = "extract" ]; then
         dir="${testpath}/${testname}.dir"
         if [ -d $dir ]; then 
                 err "[fatal] Directory $dir already exists. Abort."
-		cd $TPKG_CURRENT
-                exit 1
+		cd $TPKG_CURRENT; exit 1
         fi
         mkdir $dir
         if [ ! -d $dir ]; then 
                 err "[fatal] Failure to create $dir directory. Abort."
-		cd $TPKG_CURRENT
-                exit 1
+		cd $TPKG_CURRENT; exit 1
         fi
 
         err "[log] Extracting..."
@@ -442,8 +418,7 @@ if [ $goal = "extract" ]; then
         ${SHELL} ./$testname.tpkg > /dev/null
         if [ $? -ne 0 ]; then
                 err "[fatal] Could not unshar archive. Abort."
-		cd $TPKG_CURRENT
-                exit 1;
+		cd $TPKG_CURRENT; exit 1
         fi
 
         trap cleanup_and_exit INT
@@ -451,8 +426,7 @@ if [ $goal = "extract" ]; then
         # stop here
         err "[log] extracted $testname.tpkg to $dir."
         rm ./$testname.tpkg
-        cd $TPKG_CURRENT
-        exit 0
+        cd $TPKG_CURRENT; exit 0
 fi
 
 ## LIST OR DESC OR HELP
@@ -461,14 +435,12 @@ if [ $goal = "list" -o $goal = "desc" -o $goal = "help" ]; then
         dir="${testpath}/${testname}.dir"
         if [ -d $dir ]; then 
                 err "[fatal] Directory $dir already exists. Abort."
-		cd $TPKG_CURRENT
-                exit 1
+		cd $TPKG_CURRENT; exit 1
         fi
         mkdir $dir
         if [ ! -d $dir ]; then 
                 err "[fatal] Failure to create $dir directory. Abort."
-		cd $TPKG_CURRENT
-                exit 1
+		cd $TPKG_CURRENT; exit 1
         fi
 
         cp $archive $dir/
@@ -476,8 +448,7 @@ if [ $goal = "list" -o $goal = "desc" -o $goal = "help" ]; then
         ${SHELL} ./$testname.tpkg > /dev/null
         if [ $? -ne 0 ]; then
                 err "[fatal] Could not unshar archive. Abort."
-		cd $TPKG_CURRENT
-                exit 1;
+		cd $TPKG_CURRENT; exit 1
         fi
 
         trap cleanup_and_exit INT
@@ -501,8 +472,7 @@ if [ $goal = "list" -o $goal = "desc" -o $goal = "help" ]; then
         esac
         cd $TPKG_CURRENT
         # dir can go
-        rm -rf $dir
-        exit 0
+        rm -rf $dir; exit 0
 fi
 
 trap cleanup_and_exit INT
@@ -510,34 +480,29 @@ trap cleanup_and_exit INT
 # make a tmp dir during execution
 if [ "$goal" != "exe" ]; then
         err "[fatal] What do you mean with $goal?. Abort"
-	cd $TPKG_CURRENT
-        exit 1
+	cd $TPKG_CURRENT; exit 1
 fi
 
 dir=`mktemp -d "${testpath}/${testname}.XXXXXX"`
 if [ ! -d $dir ]; then 
         err "[fatal] Failure to create a temporary working directory. Abort."
-	cd $TPKG_CURRENT
-        exit 1
+	cd $TPKG_CURRENT; exit 1
 fi
 ## EXTRACT
 err "[log] Extracting..."
 cp $archive $dir/
 cd $dir
-${SHELL} ${testpath}/${testname}.tpkg > /dev/null
+${SHELL} ${testname}.tpkg > /dev/null
 if [ $? -ne 0 ]; then
         err "[fatal] Could not unshar archive. Abort."
-	cd $TPKG_CURRENT
-        exit 1;
+	cd $TPKG_CURRENT; exit 1
 fi
-
 
 ### EXE ###
 # extract the information out of the *.dsc files
 if [ ! -f $dsc_file ]; then
         err "[fatal] Can't locate the description file: $dsc_file. Abort."
-        cleanup
-        exit 1
+        cleanup; exit 1
 fi
 
 SHELL=`which bash`
@@ -545,16 +510,14 @@ if [ -z ${SHELL} ]; then
        SHELL=/usr/local/bin/bash
        if [ ! -x $SHELL ]; then
                err "[fatal] Can't find the bash shell. Abort."
-         	cleanup
-               exit 1
+               cleanup; exit 1
        fi
 fi
 
 # check for a .done file
 if [ -f "../.done-${testname}" ]; then
         err "[log] Found .done-${testname}. Not executing this test."
-        cleanup
-        exit 0
+        cleanup; exit 0
 fi
 
 # this is the template for .dsc files
@@ -575,6 +538,16 @@ dsc_aux=`IFS=: awk -F': ?' < $dsc_file '/^AuxFiles/ { print $2 }'`
 dsc_passed=`IFS=: awk -F': ?' < $dsc_file '/^Passed/ { print $2 }'`
 dsc_failure=`IFS=: awk -F': ?' < $dsc_file '/^Failure/ { print $2 }'`
 
+# consistency check the lot
+for i in $dsc_pre $dsc_post $dsc_test $dsc_help; do
+        if [ ! -z ${i} ]; then
+                if [ ! -f "${i}" ]; then
+                        err "[fatal] File defined, but ${i} cannot be found. Abort."
+                        cleanup; exit 1
+                fi
+        fi
+done
+
 # if we depend on another test to that one first and then return
 if [ -f "../${dsc_depends}" ]; then
         cd ..  # go up one dir
@@ -584,8 +557,7 @@ if [ -f "../${dsc_depends}" ]; then
         cd - > /dev/null  # back where we belong
         if [ $test_result -ne 0 ]; then
                 err "[fatal] Test depends on $dsc_depends which failed.  Abort."
-                cleanup
-                exit 1;
+                cleanup; exit 1
         fi
 fi
 
@@ -603,15 +575,13 @@ dsc_aux_files_total=${#dsc_aux_files[*]}
 for i in ${dsc_aux_files[*]}; do
         if [ ! -f $i ]; then
                 err "[fatal] Aux. file $i must be in the archive. Abort"
-                cleanup
-                exit 1
+                cleanup; exit 1
         fi
 done
 
 if [ ! -f $dsc_test ]; then
         err "[fatal] Can't locate the test script: $dsc_test. Abort"
-        cleanup
-        exit 1
+        cleanup; exit 1
 fi
 
 ### Actual executing of the scripts
@@ -633,9 +603,7 @@ if [ $test_result -ne 0 ]; then
         err "[log] !! FAILED !!"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
-        post
-        cleanup
-        exit 1
+        post; cleanup; exit 1
 fi
  
 cp -f result.$dsc_basename result.$dsc_basename.$$
