@@ -1,4 +1,4 @@
-#!/usr/local/bin/bash
+#!/bin/sh
 
 # set the path for our tests
 PATH=$PATH:/usr/local/bin:/usr/local/sbin:.
@@ -19,7 +19,7 @@ fi
 MAIL_FILE=`mktemp /tmp/XXXXXXX`
 
 # checkout to $BUILD_DIR, assume local checkout
-/usr/local/bin/svn co -r$REV file://$REPOS/$REPOPATH $BUILD_DIR
+svn co -r$REV file://$REPOS/$REPOPATH $BUILD_DIR
 ( cd $BUILD_DIR ; svn log -r$REV > $MAIL_FILE )
 
 # set the path for our sibling test scripts
@@ -31,13 +31,13 @@ echo "PATH=$PATH" > $BUILD_DIR/$TESTDIR/.tpkg.var
 
 # RUN THE TESTS
 for tests in $BUILD_DIR/$TESTDIR/*.tpkg ; do
-        /usr/bin/nice /usr/local/bin/bash \
-        $TPKG -b $BUILD_DIR/$TESTDIR -a $BUILD_DIR exe `basename $tests` \\
+        /usr/bin/nice$ $TPKG \
+        -b $BUILD_DIR/$TESTDIR -a $BUILD_DIR exe `basename $tests` \\
         2>&1 >> $MAIL_FILE      # show the errors
 done
 
-/usr/local/bin/bash $TPKG -b $BUILD_DIR/$TESTDIR report 2>&1 >> $MAIL_FILE
-/usr/local/bin/bash $TPKG -b $BUILD_DIR/$TESTDIR clean >> $MAIL_FILE
+$TPKG -b $BUILD_DIR/$TESTDIR report 2>&1 >> $MAIL_FILE
+$TPKG -b $BUILD_DIR/$TESTDIR clean >> $MAIL_FILE
 ###
 # End of tweaking
 ###

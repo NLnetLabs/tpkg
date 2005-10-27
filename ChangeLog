@@ -1,3 +1,10 @@
+27 Okt 2005: Miek Gieben: 1.01
+	* Added -q flag
+	* Don't abort when a pre/post script fails, but
+	  continue the test and hope it writes a result file
+ 	* Updated the manual and docs
+	* Updated the post-commit hook script
+
 27 Okt 2005: Miek Gieben: 1.00
 	* Added help file and updated documentation
 	* When cloning update the date in the new test
