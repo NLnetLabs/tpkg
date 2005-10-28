@@ -1,3 +1,6 @@
+xx Okt 2005: Miek Gieben: 1.03
+	* Added status line for tpkg report
+
 28 Okt 2005: Miek Gieben: 1.02
 	* svnserve doesn't set USERNAME nor LOGNAME, add this
 	  to the post-commit script

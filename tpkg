@@ -6,7 +6,7 @@
 
 export TPKG_VAR_MASTER="../.tpkg.var.master"
 export TPKG_VAR_TEST=".tpkg.var.test"
-export TPKG_VERSION="1.02";
+export TPKG_VERSION="1.03";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
@@ -167,6 +167,8 @@ function report() {
         failed=0
         unknown=0
 
+        echo "   STATUS    : TIME : TESTNAME : TESTDESCRIPTION"
+
         for result in `ls result.*`; do 
                 passfailed=`head -1 $result | awk ' { print $2 }'`
                 basename=`head -3 $result | grep BaseName | awk -F': ?' ' { print $2 }'`
@@ -185,13 +187,13 @@ function report() {
 
                 case $passfailed in
                 "FAILED")
-                        echo -e "!! $passfailed !! : $period s : $basename: $description"
+                        echo -e "!! $passfailed !! : $period s : $basename : $description"
                         ((failed=$failed + 1)) ;;
                 "PASSED")
-                        echo -e "** $passfailed ** : $period s : $basename: $description"
+                        echo -e "** $passfailed ** : $period s : $basename : $description"
                         ((passed=$passed + 1)) ;;
                 *) 
-                        echo -e "-- $passfailed -- : $period s : $basename: $description"
+                        echo -e "-- $passfailed -- : $period s : $basename : $description"
                         ((unknown=$unknown + 1)) ;;
                 esac
         done
