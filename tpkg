@@ -4,13 +4,14 @@
 # Created by Miek Gieben, NLnetLabs, (c) 2005
 # Licensed under GPL version 2
 
-export TPKG_VAR=".tpkg.var"
+export TPKG_VAR_MASTER="../.tpkg.var.master"
+export TPKG_VAR_TEST=".tpkg.var.test"
 export TPKG_VERSION="1.02";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
 TPKG_CURRENT=`pwd`
-TPKG_QUIET=0
+TPKG_QUIET=0   # only output err() msgs
 TPKG_KEEP=0    # tpkg create doesn't remove dir/
 
 ### Helper functions
@@ -153,8 +154,8 @@ function cleanreport() {
                 rm $result
         done
         # rm any .var files
-        err "[log] rm $TPKG_VAR"
-        rm -f $TPKG_VAR
+        err "[log] rm `basename $TPKG_VAR_MASTER`"
+        rm -f `basename $TPKG_VAR_MASTER`
         err "[log] rm .done files"
         rm -f .done*
 	cd $TPKG_CURRENT
@@ -377,8 +378,8 @@ Category:
 Component:
 Depends: 
 Help: $testname.help
-Pre: 
-Post: 
+Pre: $testname.pre
+Post: $testname.post
 Test: $testname.test
 AuxFiles: 
 Passed:
@@ -390,29 +391,32 @@ TMPL_EOF
         echo "   ARG is used to ..."  >> $testname.help
 
         # .test file
-        echo "# source the var file when it's there" > $testname.test
-        echo "[ -f ../\$TPKG_VAR ] && source ../\$TPKG_VAR" >> $testname.test 
+        echo "# #-- $testname.test --#" > $testname.test
+        echo "# source the master var file when it's there" >> $testname.test
+        echo "[ -f \$TPKG_VAR_MASTER ] && source \$TPKG_VAR_MASTER" >> $testname.test 
+        echo "# use \$TPKG_VAR_TEST for in test variable passing" >> $testname.test
+        echo "[ -f \$TPKG_VAR_TEST ] && source \$TPKG_VAR_TEST" >> $testname.test
         echo "# svnserve resets the path, you may need to adjust it, like this:" >> $testname.test
         echo "#PATH=\$PATH:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:." >> $testname.test
         # .post file
-        echo "# source the var file when it's there" > $testname.post
-        echo "[ -f ../\$TPKG_VAR ] && source ../\$TPKG_VAR" >> $testname.post 
+        echo "# #-- $testname.post --#" > $testname.post
+        echo "# source the master var file when it's there" >> $testname.post
+        echo "[ -f \$TPKG_VAR_MASTER ] && source \$TPKG_VAR_MASTER" >> $testname.post 
+        echo "# source the test var file when it's there" >> $testname.post
+        echo "[ -f \$TPKG_VAR_TEST ] && source \$TPKG_VAR_TEST" >> $testname.post 
         echo "# svnserve resets the path, you may need to adjust it, like this:" >> $testname.post
+        echo "#PATH=\$PATH:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:." >> $testname.post
         echo "#" >> $testname.post 
-        echo "#" >> $testname.post
         echo "# do your teardown here" >> $testname.post
-        echo "#" >> $testname.post 
-        echo "#" >> $testname.post
-        echo "# reset the tpkg.var file" >> $testname.post
-        echo "echo \"export PATH=\$PATH >> ../\$TPKG_VAR\"" >> $testname.post
-        echo "echo \"export LOGNAME=\$LOGNAME >> ../\$TPKG_VAR\"" >> $testname.post
-        echo "echo \"export USERNAME=\$USERNAME >> ../\$TPKG_VAR\"" >> $testname.post
 
         # .pre file
-        echo "# source the var file when it's there" > $testname.pre
-        echo "[ -f ../\$TPKG_VAR ] && source ../\$TPKG_VAR" >> $testname.pre
+        echo "# #-- $testname.pre--#" > $testname.pre
+        echo "# source the master var file when it's there" >> $testname.pre
+        echo "[ -f \$TPKG_VAR_MASTER ] && source \$TPKG_VAR_MASTER" >> $testname.pre
+        echo "# use \$TPKG_VAR_TEST for in test variable passing" >> $testname.pre
+        echo "[ -f \$TPKG_VAR_TEST ] && source \$TPKG_VAR_TEST" >> $testname.pre
         echo "# svnserve resets the path, you may need to adjust it, like this:" >> $testname.pre
-        echo "#echo \"export PATH=\$PATH:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:.\"" >> $testname.pre
+        echo "#export PATH=\$PATH:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:." >> $testname.pre
 
         out "[log] created $testname.{dsc, test, help, pre, post}"
         out "[log] please create the script(s) and then run: tpkg create $testname.tpkg"

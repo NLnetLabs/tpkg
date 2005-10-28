@@ -30,10 +30,10 @@ MAIL_FILE=`mktemp /tmp/XXXXXXX`
 svn co -r$REV $REPOPROT$REPOS/$REPOPATH $BUILD_DIR
 ( cd $BUILD_DIR ; svn log -r$REV > $MAIL_FILE )
 
-# set the path for our sibling test scripts
-echo "export PATH=$PATH" > $BUILD_DIR/$TESTDIR/.tpkg.var
-echo "export LOGNAME=$LOGNAME" >> $BUILD_DIR/tpkg/.tpkg.var
-echo "export USERNAME=$USERNAME" >> $BUILD_DIR/tpkg/.tpkg.var
+# set the path and other stuff for our sibling test scripts
+echo "export PATH=$PATH" > $BUILD_DIR/$TESTDIR/.tpkg.var.master
+echo "export LOGNAME=$LOGNAME" >> $BUILD_DIR/tpkg/.tpkg.var.master
+echo "export USERNAME=$USERNAME" >> $BUILD_DIR/tpkg/.tpkg.var.master
 
 ###
 # This should be the only thing you need to tweak
@@ -45,8 +45,8 @@ for tests in $BUILD_DIR/$TESTDIR/*.tpkg ; do
         exe `basename $tests` >> $MAIL_FILE    
 done
 
-$TPKG -b $BUILD_DIR/$TESTDIR report 2>&1 >> $MAIL_FILE
-$TPKG -b $BUILD_DIR/$TESTDIR clean >> $MAIL_FILE
+$TPKG -b $BUILD_DIR/$TESTDIR report >> $MAIL_FILE
+$TPKG -b $BUILD_DIR/$TESTDIR clean 
 ###
 # End of tweaking
 ###

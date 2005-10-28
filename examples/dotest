@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# setup the master file
+echo "HALLO=\"biet\"" > .tpkg.var.master
+# the test will pick this up
+tpkg exe test2.tpkg

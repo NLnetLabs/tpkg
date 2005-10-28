@@ -1,10 +1,10 @@
 make the .tpkg.var a PER TEST thingy
-
 we have a test wide master file .tpkg.var.master
 that is read by all tests
-
 next tests will have a per test var file which they
 use to convey info from pre to test to post, this
 lives in the test-dir and gets deleted afterwards
-
-- empty :-)
+---
+update the documentation to reflect to new setup
+---
+check reverse consistency, file there, but not defined

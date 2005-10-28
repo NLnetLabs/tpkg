@@ -4,6 +4,10 @@
 	* create post and pre file when target is tmpl - 
 	  stuff them with stuff handy when running from svn(serve)
 	* -q now only prints the errors
+	* Use a new system to convey information between the tests
+	  and scripts; .tpkg.var.master sets up stuff each test
+	  must know. Tests use a .tpkg.var.test file in their
+	  local directory to pass info from .pre to .test to .post
 
 27 Okt 2005: Miek Gieben: 1.01
 	* Added -q flag
