@@ -109,19 +109,19 @@ function usage() {
         out "$0 [OPTIONS] clone test1.tpkg test2.tpkg"
         out
         out "Testing"
-        out " exe....:\texecute a test, safe the result result.testname"
-        out " create.:\tcreate a .tpkg out of the test.{pre, post, test} files"
-        out " extract:\textract a .tpkg to tmp. dir"
-        out " tmpl...:\tcreate empty template files for a new test"
-        out " fake...:\tfake the running of test, but do create a .done file"
+        out " exe.........:\texecute a test, safe the result result.testname"
+        out " c | create..:\tcreate a .tpkg out of the test.{pre, post, test} files"
+        out " e | extract.:\textract a .tpkg to tmp. dir"
+        out " t | tmpl....:\tcreate empty template files for a new test"
+        out " f | fake....:\tfake the running of test, but do create a .done file"
         out
         out "Reporting/Cleanup"
-        out " report.:\tcreate a nice report from all the result files"
-        out " clean..:\tremove all the result files"
-        out " clone..:\tclone test1.tpkg to test2.tkpg"
-        out " list...:\tprint the files of the test to stdout"
-        out " desc...:\tprint the test's description to stdout"
-        out " help...:\tprint the help message for this test, if available"
+        out " clean.......:\tremove all the result files"
+        out " r  | report.:\tcreate a nice report from all the result files"
+        out " cl | clone..:\tclone test1.tpkg to test2.tkpg"
+        out " l  | list...:\tprint the files of the test to stdout"
+        out " d  | desc...:\tprint the test's description to stdout"
+        out " h  | help...:\tprint the help message for this test, if available"
         out
         out " When multiple tests depend on a single other test, this"
         out " other test is only executed once."
@@ -276,6 +276,22 @@ if [ -z "${goal}" ]; then
         usage
 	cd $TPKG_CURRENT; exit 0
 fi
+
+# allow short goals
+case $goal in
+        # none for exe - short enough
+        c)      goal="create";;
+        e)      goal="extract";;
+        t)      goal="tmpl";;
+        f)      goal="fake";;
+
+        r)      goal="report";;
+        # none for clean
+        cl)     goal="clone";;
+        l)      goal="list";;
+        d)      goal="desc";;
+        h)      goal="help";;
+esac
 
 ### REPORT ###
 # no extra args required

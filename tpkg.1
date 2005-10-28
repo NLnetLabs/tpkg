@@ -8,6 +8,9 @@ tpkg \- test package - manipulate tests
 .IR OPTIONS
 ]
 [
+.IR exe|c|e|t|f
+]
+[
 .IR exe|create|extract|tmpl|fake
 ]
 test.tpkg
@@ -15,6 +18,9 @@ test.tpkg
 .B tpkg
 [
 .IR OPTIONS
+]
+[
+.IR clean|r|l|d|h
 ]
 [
 .IR report|clean|list|desc|help
@@ -48,7 +54,7 @@ After the test the post-script is run.
 All files created by \fBtpkg\fR are removed when \fBtpkg\fR \fIclean\fR is run.
 
 .TP
-\fBexe\fR
+\fBexe\fR -- \fBexe\fR
 Execute a test. This will create a \fIresult.\fR file which looks
 like this:
 
@@ -73,26 +79,26 @@ you reference with a relative path should have an extra '../' in front of
 it.
 
 .TP
-\fBcreate\fR
+\fBcreate\fR -- \fBc\fR
 Create a tpkg file out of the test files.
 .TP
-\fBextract\fR
+\fBextract\fR -- \fBe\fR
 Extract a tpkg file. A user can then edit these files and
 recreate the tpkg by running \fBtpkg create\fR.
 .TP
-\fBtmpl\fR
+\fBtmpl\fR -- \fBt\fR
 Create new test template files. A \fIdsc\fR and \fItest\fR file are created.
 
 .TP
-\fBfake\fR
+\fBfake\fR -- \fBf\fR
 Fake the test run, but do create a \fI.done\fR, usefull when writing 
 tests that depend on (lenghty) other tests.
 
 .TP
-\fBlist\fR
+\fBlist\fR -- \fBl\fR
 Print the files in the test package to standard output.
 .TP
-\fBreport\fR
+\fBreport\fR -- \fBr\fR
 Create a report by gathering information from the \fIresult\fR files.
 Nothing is deleted when you run \fBtpkg report\fR.
 A typical example of a result. file is this:
@@ -110,23 +116,23 @@ Essentially \fBreport\fR takes a bunch a \fIresult.\fR files and creates a
 nice test report of it.
 
 .TP
-\fBclean\fR
+\fBclean\fR -- \fBclean\fR
 Clean up all auxiliary files, that is remove: \fI.done*\fR, \fIresult*\fR and
 the \fI.tpkg.var\fR file.
 
 .TP
-\fBdesc\fR
+\fBdesc\fR -- \fBd\fR
 Print the description of the test to standard output.
 
 .TP
-\fBhelp\fR
+\fBhelp\fR -- \fBh\fR
 If a .help file is found its contents are displayed. This file can be
 used to document some test specific things, like how to call it or 
 describe its arguments (if any). Together with the Description line this
 should fully document the test.
 
 .TP
-\fBclone\fR
+\fBclone\fR -- \fBcl\fR
 Clone \fItest1.tpkg\fR to \fItest2.tpkg\fR. Care is taken to also rename
 the member files and to update the \fIdsc\fR file. You should always check
 the new test.

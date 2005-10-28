@@ -8,6 +8,7 @@
 	  and scripts; .tpkg.var.master sets up stuff each test
 	  must know. Tests use a .tpkg.var.test file in their
 	  local directory to pass info from .pre to .test to .post
+	* Allow shorter targets -> exe -> e, extract -> ext, etc.
 
 27 Okt 2005: Miek Gieben: 1.01
 	* Added -q flag
