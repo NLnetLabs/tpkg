@@ -6,12 +6,20 @@ PATH=$PATH:/usr/local/bin:/usr/local/sbin:.
 REPOS="$1"  # /svn/nsd or /svn/libdns   # get these from svn
 REV="$2"                                # which revision number
 
+# our environment is extremely limited we don't even
+# get a LOGNAME here... this makes all the pre script
+# fail in the test. We do get a pwd from svnserve
+LOGNAME=`basename $PWD`
+USERNAME=$LOGNAME
+
 # please edit these to suit your needs
 TPKG=/home/miekg/svn/tpkg/trunk/tpkg    # tpkg version to use
 MAILTO="ldns-team@nlnetlabs.nl"         # where to send the status email
 MAILSUB="[svn: ldns] $REV status"       # subject of status emails
 REPOPATH="trunk"                        # which part to check out
+REPOPROT="file://"                      # local or remove (svn+ssh://)
 TESTDIR="test"                          # dir where the tests live in the repo
+
 BUILD_DIR=`mktemp -d /tmp/XXXXXX`
 if [ ! -d $BUILD_DIR ]; then
         exit 0
@@ -19,11 +27,13 @@ fi
 MAIL_FILE=`mktemp /tmp/XXXXXXX`
 
 # checkout to $BUILD_DIR, assume local checkout
-svn co -r$REV file://$REPOS/$REPOPATH $BUILD_DIR
+svn co -r$REV $REPOPROT$REPOS/$REPOPATH $BUILD_DIR
 ( cd $BUILD_DIR ; svn log -r$REV > $MAIL_FILE )
 
 # set the path for our sibling test scripts
-echo "PATH=$PATH" > $BUILD_DIR/$TESTDIR/.tpkg.var
+echo "export PATH=$PATH" > $BUILD_DIR/$TESTDIR/.tpkg.var
+echo "export LOGNAME=$LOGNAME" >> $BUILD_DIR/tpkg/.tpkg.var
+echo "export USERNAME=$USERNAME" >> $BUILD_DIR/tpkg/.tpkg.var
 
 ###
 # This should be the only thing you need to tweak
@@ -31,9 +41,8 @@ echo "PATH=$PATH" > $BUILD_DIR/$TESTDIR/.tpkg.var
 
 # RUN THE TESTS
 for tests in $BUILD_DIR/$TESTDIR/*.tpkg ; do
-        /usr/bin/nice$ $TPKG \
-        -b $BUILD_DIR/$TESTDIR -a $BUILD_DIR exe `basename $tests` \\
-        2>&1 >> $MAIL_FILE      # show the errors
+        nice $TPKG  -b $BUILD_DIR/$TESTDIR -a $BUILD_DIR \
+        exe `basename $tests` >> $MAIL_FILE    
 done
 
 $TPKG -b $BUILD_DIR/$TESTDIR report 2>&1 >> $MAIL_FILE

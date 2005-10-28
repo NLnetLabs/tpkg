@@ -1,3 +1,10 @@
+28 Okt 2005: Miek Gieben: 1.02
+	* svnserve doesn't set USERNAME nor LOGNAME, add this
+	  to the post-commit script
+	* create post and pre file when target is tmpl - 
+	  stuff them with stuff handy when running from svn(serve)
+	* -q now only prints the errors
+
 27 Okt 2005: Miek Gieben: 1.01
 	* Added -q flag
 	* Don't abort when a pre/post script fails, but

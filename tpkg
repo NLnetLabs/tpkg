@@ -5,7 +5,7 @@
 # Licensed under GPL version 2
 
 export TPKG_VAR=".tpkg.var"
-export TPKG_VERSION="1.01";
+export TPKG_VERSION="1.02";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
@@ -31,10 +31,6 @@ function cleanup_and_exit() {
 }
 
 function err() {
-        # don't write to /dev/stderr - you cannot redirect that output
-        if [ $TPKG_QUIET -eq 1 ]; then
-                return
-        fi
         if [ -z $testname ]; then
                 echo -e "  $1" >&2
         else
@@ -132,7 +128,7 @@ function usage() {
 	out "OPTIONS"
 	out " -h\t\tshow this help"
 	out " -v\t\tshow version"
-        out " -q\t\tdon't print anything to stderr/stdout"
+        out " -q\t\tonly print errors to stdout"
         out " -k\t\tdon't remove test.dir when creating a tpkg package"
 	out " -b DIR\tuse DIR is a base directory in stead of ."
 	out " -a ARGS\tpass the string ARGS through to the test scripts"
@@ -397,9 +393,28 @@ TMPL_EOF
         echo "# source the var file when it's there" > $testname.test
         echo "[ -f ../\$TPKG_VAR ] && source ../\$TPKG_VAR" >> $testname.test 
         echo "# svnserve resets the path, you may need to adjust it, like this:" >> $testname.test
-        echo "#export PATH=\$PATH:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:." >> $testname.test
+        echo "#PATH=\$PATH:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:." >> $testname.test
+        # .post file
+        echo "# source the var file when it's there" > $testname.post
+        echo "[ -f ../\$TPKG_VAR ] && source ../\$TPKG_VAR" >> $testname.post 
+        echo "# svnserve resets the path, you may need to adjust it, like this:" >> $testname.post
+        echo "#" >> $testname.post 
+        echo "#" >> $testname.post
+        echo "# do your teardown here" >> $testname.post
+        echo "#" >> $testname.post 
+        echo "#" >> $testname.post
+        echo "# reset the tpkg.var file" >> $testname.post
+        echo "echo \"export PATH=\$PATH >> ../\$TPKG_VAR\"" >> $testname.post
+        echo "echo \"export LOGNAME=\$LOGNAME >> ../\$TPKG_VAR\"" >> $testname.post
+        echo "echo \"export USERNAME=\$USERNAME >> ../\$TPKG_VAR\"" >> $testname.post
 
-        out "[log] created $testname.{dsc, test, help}"
+        # .pre file
+        echo "# source the var file when it's there" > $testname.pre
+        echo "[ -f ../\$TPKG_VAR ] && source ../\$TPKG_VAR" >> $testname.pre
+        echo "# svnserve resets the path, you may need to adjust it, like this:" >> $testname.pre
+        echo "#echo \"export PATH=\$PATH:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:.\"" >> $testname.pre
+
+        out "[log] created $testname.{dsc, test, help, pre, post}"
         out "[log] please create the script(s) and then run: tpkg create $testname.tpkg"
         err "[log] created $testname in $dir."
 	cd $TPKG_CURRENT; exit 0
