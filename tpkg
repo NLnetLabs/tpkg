@@ -210,9 +210,9 @@ function report() {
         # $i is basename
         echo
         for i in $failed_tests; do 
-                echo --------------- Output: $i ------------------
+                echo --------------- Start Output: $i ------------------
                 cat result.$i | tail +7  # is this portable?
-                echo --------------- Output: $i ------------------
+                echo ---------------   End Output: $i ------------------
         done
 	cd $TPKG_CURRENT
 }
