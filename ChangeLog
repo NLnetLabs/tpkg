@@ -1,7 +1,9 @@
-xx Okt 2005: Miek Gieben: 1.03
+31 Oct 2005: Miek Gieben: 1.03
 	* Added status line for tpkg report
+	* Cleanup documentation to match .tkpg.var.master
+	  and .tpkg.var.test
 
-28 Okt 2005: Miek Gieben: 1.02
+28 Oct 2005: Miek Gieben: 1.02
 	* svnserve doesn't set USERNAME nor LOGNAME, add this
 	  to the post-commit script
 	* create post and pre file when target is tmpl - 
@@ -13,14 +15,14 @@ xx Okt 2005: Miek Gieben: 1.03
 	  local directory to pass info from .pre to .test to .post
 	* Allow shorter targets -> exe -> e, extract -> ext, etc.
 
-27 Okt 2005: Miek Gieben: 1.01
+27 Oct 2005: Miek Gieben: 1.01
 	* Added -q flag
 	* Don't abort when a pre/post script fails, but
 	  continue the test and hope it writes a result file
  	* Updated the manual and docs
 	* Updated the post-commit hook script
 
-27 Okt 2005: Miek Gieben: 1.00
+27 Oct 2005: Miek Gieben: 1.00
 	* Added help file and updated documentation
 	* When cloning update the date in the new test
 	* Consistency of the .dsc is checked

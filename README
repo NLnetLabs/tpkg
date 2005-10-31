@@ -126,18 +126,20 @@ When is a Test Successfull and When Not
                 
 Writting Test Packages
 
-
         .test file
-                Start each test with a source of the $TPKG_VAR, like
+                Start each test with a source of the .tpkg.var.master, like
                 this:
 
-                [ -f ../$TPKG_VAR ] && source ../$TPKG_VAR
+                [ -f ../.tpkg.var.master ] && source ../.tpkg.var.master
 
                 This is automaticly added when =tpkg tmpl TEST=
                 is called.
 
 		We use '../' here cause '.' is cleaned up after
 		the test is run
+
+        It might also be prudent to source the .tpkg.var.test file for test
+        specific enviroment variables.
 
         Each test is executed in a temporary directory, keep this
         in mind when using relative pathnames. ../exe must become
@@ -184,33 +186,6 @@ Reading Reports:
         ** PASSED ** : 2 s : svn-build: : Check out and build libdns/trunk
 
         PASSED: 2 (100.00 %)            FAILED: 0 (0 %)         UNKNOWN: 0 (0 %)
-
-Conventions
-        In the toplevel test directory (where all the .tpkg files live) 
-        different tests should communicate (exchanges variable contents) 
-        by appending to the file ".tpkg.var"
-        This is currently the only way to implement persistent variabeles.
-
-        The location of this file is known in tpkg as $TPKG_VAR - which is 
-        exported when tpkg is run.
-
-        It is also wise to name all variables with a "TPKG_" prefix, for
-        instance when some test builds the code in a directory, it could
-        use a TPKG_BUILD variable that points to that dir.
-        The test-script itself should write this var to to the $TPKG_VAR
-        file. Like this:
-
-        echo "export TPKG_BUILD=$TPKG_BUILD" >> $TPKG_VAR
-
-        Not the use of '>>' here.
-
-        For each test a .done.TESTNAME file is created when a test is
-        performed. When such a .done file is found and matches the
-        current test - the test is aborted. This way a test that
-        is referenced multiple times via a "Depends"-directive is
-        only execute once.
-
-        tpkg cleanup, will remove all these files too.
 
 Sample Output For NSD
         I've written a few tests for unit testing NSD, running these tests

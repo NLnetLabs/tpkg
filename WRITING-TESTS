@@ -121,21 +121,30 @@ Pittfalls
 
 Conventions
 
-        $TPKG_VAR
+        .tpkg.var.master
                 Sometimes you want to provide the main test script with information
                 only available in the pre script. Also some tests may need
                 information from other tests.
 
-                There is no elegant way to convey this information, except by using
-                a file in which such items are stored as shell variables.
-
-                tpkg uses a files named ".tpkg.var" for this purpose. This file
+                tpkg uses a files named ".tpkg.var.master" for this purpose. This file
                 is /not/ stored in the temporary directory where the test is
                 executed, because it must survive after the test has completed.
-
-                The $TPKG_VAR variable is exported from tpkg with the name
-                of this file, this should be always .tpkg.var. If you need 
-                to access this file you should use "../$TPKG_VAR" 
+                Things like usernames, paths or other environment variables
+                might be stored in this file.
 
                 When writing to the file be sure to use >> in stead of > which 
                 destroys any previous content.
+
+                .tpkg.var.master lives for the duration of all the tests.
+                It is deleted when 'tpkg clean' runs
+
+        .tpkg.var.test
+                During the run of a test one might want to exchange
+                information from a .pre script to the main test. For
+                instance when the pre script sets up a server it may want
+                to communicate the port number to the test script.
+                "tpkg.var.test" is meant for these local exchanges. 
+
+                The file lives in the temporary subdirectory where the
+                test is executed. This also means it is removed after
+                the test has run.

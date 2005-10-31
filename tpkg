@@ -595,6 +595,14 @@ for i in $dsc_pre $dsc_post $dsc_test $dsc_help; do
                 fi
         fi
 done
+for i in $dsc_pre $dsc_post $dsc_test $dsc_help; do
+        if [ -z ${i} ]; then
+                if [ -f "${i}" ]; then
+                        err "[fatal] File not defined, but ${i} is included in the package. Abort."
+                        cleanup; exit 1
+                fi
+        fi
+done
 
 # if we depend on another test to that one first and then return
 if [ -f "../${dsc_depends}" ]; then

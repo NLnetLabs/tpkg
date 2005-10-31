@@ -8,7 +8,7 @@ tpkg \- test package - manipulate tests
 .IR OPTIONS
 ]
 [
-.IR exe|c|e|t|f
+.IR c|e|t|f
 ]
 [
 .IR exe|create|extract|tmpl|fake
@@ -20,7 +20,7 @@ test.tpkg
 .IR OPTIONS
 ]
 [
-.IR clean|r|l|d|h
+.IR r|l|d|h
 ]
 [
 .IR report|clean|list|desc|help
@@ -295,8 +295,8 @@ Written by Miek Gieben, NLnet Labs.
 Report bugs to <miek@nlnetlabs.nl>
 
 .SH BUGS
-The description (.dsc) is not checked for inconstencies. This will be fixed
-before a 1.0 release is done.
+As of version 1.03 the internal consistency of a package is tested whenever
+a test is executed.
 
 .SH COPYRIGHT
 Copyright (C) 2005 NLnet Labs. This is free software. There is NO
