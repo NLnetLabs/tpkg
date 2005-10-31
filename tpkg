@@ -33,9 +33,9 @@ function cleanup_and_exit() {
 
 function err() {
         if [ -z $testname ]; then
-                echo -e "  $1" >&2
+                echo -e "  $1" 
         else
-                echo -e "[$testname]  $1" >&2
+                echo -e "[$testname]  $1" 
         fi
 }
 function out() {
