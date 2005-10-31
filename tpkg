@@ -6,7 +6,7 @@
 
 export TPKG_VAR_MASTER="../.tpkg.var.master"
 export TPKG_VAR_TEST=".tpkg.var.test"
-export TPKG_VERSION="1.03";
+export TPKG_VERSION="1.04";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
@@ -188,7 +188,9 @@ function report() {
                 case $passfailed in
                 "FAILED")
                         echo -e "!! $passfailed !! : $period s : $basename : $description"
-                        ((failed=$failed + 1)) ;;
+                        ((failed=$failed + 1)) 
+                        failed_tests="$failed_tests $basename"
+                        ;;
                 "PASSED")
                         echo -e "** $passfailed ** : $period s : $basename : $description"
                         ((passed=$passed + 1)) ;;
@@ -203,6 +205,15 @@ function report() {
         uper=`echo -e "scale=2\n$unknown/$total*100" | bc`
         echo
         echo -e "PASSED: $passed ($pper %)\tFAILED: $failed ($fper %)\tUNKNOWN: $unknown ($uper %)"
+
+        # for each failed test include the complete result file
+        # $i is basename
+        echo
+        for i in $failed_tests; do 
+                echo --------------- Output: $i ------------------
+                cat result.$i | tail +7  # is this portable?
+                echo --------------- Output: $i ------------------
+        done
 	cd $TPKG_CURRENT
 }
 

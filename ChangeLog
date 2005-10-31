@@ -1,3 +1,6 @@
+31 Oct 2005: Miek Gieben: 1.04
+	* When a test fails show the result log in "tpkg report"
+
 31 Oct 2005: Miek Gieben: 1.03
 	* Added status line for tpkg report
 	* Cleanup documentation to match .tkpg.var.master
