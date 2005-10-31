@@ -196,7 +196,9 @@ function report() {
                         ((passed=$passed + 1)) ;;
                 *) 
                         echo -e "-- $passfailed -- : $period s : $basename : $description"
-                        ((unknown=$unknown + 1)) ;;
+                        ((unknown=$unknown + 1)) 
+                        failed_tests="$failed_tests $basename"
+                        ;;
                 esac
         done
         ((total=$passed + $failed + $unknown))
