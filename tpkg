@@ -156,6 +156,7 @@ function cleanreport() {
         # rm any .var files
         err "[log] rm `basename $TPKG_VAR_MASTER`"
         rm -f `basename $TPKG_VAR_MASTER`
+        rm -f $TPKG_VAR_TEST
         err "[log] rm .done files"
         rm -f .done*
 	cd $TPKG_CURRENT
