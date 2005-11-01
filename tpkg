@@ -16,7 +16,7 @@ TPKG_KEEP=0    # tpkg create doesn't remove dir/
 
 ### Helper functions
 function cleanup() {
-        err "[log] Cleaning up" 
+        out "[log] Cleaning up" 
         [ -f result.$dsc_basename ] && cp result.$dsc_basename ../
         cd ..
 	if [ ! -z "$dir" ]; then
@@ -154,10 +154,10 @@ function cleanreport() {
                 rm $result
         done
         # rm any .var files
-        err "[log] rm `basename $TPKG_VAR_MASTER`"
+        out "[log] rm `basename $TPKG_VAR_MASTER`"
         rm -f `basename $TPKG_VAR_MASTER`
         rm -f $TPKG_VAR_TEST
-        err "[log] rm .done files"
+        out "[log] rm .done files"
         rm -f .done*
 	cd $TPKG_CURRENT
 }
@@ -341,7 +341,7 @@ if  [ -z $testname ]; then
 fi
 
 if [ "${goal}" = "fake" ]; then
-        err "[log] Writing .done-$testname file."
+        out "[log] Writing .done-$testname file."
         write_fake_done; exit 0
 fi
 
@@ -379,7 +379,7 @@ if [ $goal = "create" ]; then
         mv $testname.tpkg ../
         cd ../
         if [ $TPKG_KEEP -eq 0 ]; then
-                err "[log] Removing member files"
+                out "[log] Removing member files"
                 rmdir $testname.dir
         fi
 	cd $TPKG_CURRENT; exit 0
@@ -454,7 +454,7 @@ TMPL_EOF
 
         out "[log] created $testname.{dsc, test, help, pre, post}"
         out "[log] please create the script(s) and then run: tpkg create $testname.tpkg"
-        err "[log] created $testname in $dir."
+        out "[log] created $testname in $dir."
 	cd $TPKG_CURRENT; exit 0
 fi
 
@@ -476,7 +476,7 @@ if [ $goal = "extract" ]; then
 		cd $TPKG_CURRENT; exit 1
         fi
 
-        err "[log] Extracting..."
+        out "[log] Extracting..."
         cp $archive $dir/
         cd $dir
         ${SHELL} ./$testname.tpkg > /dev/null
@@ -488,7 +488,7 @@ if [ $goal = "extract" ]; then
         trap cleanup_and_exit INT
 
         # stop here
-        err "[log] extracted $testname.tpkg to $dir."
+        out "[log] extracted $testname.tpkg to $dir."
         rm ./$testname.tpkg
         cd $TPKG_CURRENT; exit 0
 fi
@@ -553,7 +553,7 @@ if [ ! -d $dir ]; then
 	cd $TPKG_CURRENT; exit 1
 fi
 ## EXTRACT
-err "[log] Extracting..."
+out "[log] Extracting..."
 cp $archive $dir/
 cd $dir
 ${SHELL} ${testname}.tpkg > /dev/null
@@ -580,7 +580,7 @@ fi
 
 # check for a .done file
 if [ -f "../.done-${testname}" ]; then
-        err "[log] Found .done-${testname}. Not executing this test."
+        out "[log] Found .done-${testname}. Not executing this test."
         cleanup; exit 0
 fi
 
@@ -623,7 +623,7 @@ done
 # if we depend on another test to that one first and then return
 if [ -f "../${dsc_depends}" ]; then
         cd ..  # go up one dir
-        err "[log] executing dependency test: $dsc_depends"
+        out "[log] executing dependency test: $dsc_depends"
         ${SHELL} $0 "-b ${TPKG_BASE}" exe $dsc_depends
         test_result=$?
         cd - > /dev/null  # back where we belong
@@ -660,7 +660,7 @@ fi
 epoch  # run before pre()
 pre
 
-err "[log] Executing test" 
+out "[log] Executing test" 
 echo "BaseName: $dsc_basename" > result.$dsc_basename
 echo "Description: $dsc_description" >> result.$dsc_basename
 echo "DateRunStart: $epoch " >> result.$dsc_basename
