@@ -6,7 +6,7 @@
 
 export TPKG_VAR_MASTER="../.tpkg.var.master"
 export TPKG_VAR_TEST=".tpkg.var.test"
-export TPKG_VERSION="1.04";
+export TPKG_VERSION="1.05";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
@@ -169,7 +169,6 @@ function report() {
         unknown=0
 
         echo "   STATUS    : TIME : TESTNAME : TESTDESCRIPTION"
-
         for result in `ls result.*`; do 
                 passfailed=`head -1 $result | awk ' { print $2 }'`
                 basename=`head -3 $result | grep BaseName | awk -F': ?' ' { print $2 }'`
