@@ -205,9 +205,9 @@ function report() {
                 esac
         done
         ((total=$passed + $failed + $unknown))
-        fper=`echo -e "scale=2\n$failed/$total*100" | bc`
-        pper=`echo -e "scale=2\n$passed/$total*100" | bc`
-        uper=`echo -e "scale=2\n$unknown/$total*100" | bc`
+        fper=`echo -e "scale=4\n$failed/$total*100" | bc`
+        pper=`echo -e "scale=4\n$passed/$total*100" | bc`
+        uper=`echo -e "scale=4\n$unknown/$total*100" | bc`
         echo
         echo -e "PASSED: $passed ($pper %)\tFAILED: $failed ($fper %)\tUNKNOWN: $unknown ($uper %)"
 
