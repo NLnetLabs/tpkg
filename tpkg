@@ -168,7 +168,7 @@ function report() {
         failed=0
         unknown=0
 
-        echo "   STATUS    : TIME : TESTNAME : TESTDESCRIPTION"
+        echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
         for result in `ls result.*`; do 
                 passfailed=`head -1 $result | awk ' { print $2 }'`
                 basename=`head -3 $result | grep BaseName | awk -F': ?' ' { print $2 }'`
