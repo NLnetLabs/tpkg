@@ -378,6 +378,11 @@ if [ $goal = "create" ]; then
                 err "[fatal] Not overwriting existing $testname.tpkg. Abort."
 		cd $TPKG_CURRENT; exit 1
         fi
+
+        # rm unwanted files
+        cleanreport # this cd's to $TPKG_CURRENT
+        cd - >/dev/null # jump back
+
         i=$( ls $testname.* 2>/dev/null )
         if [ -z "${i}" ]; then
                 err "[fatal] No $testname.* files found. Abort."
