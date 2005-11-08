@@ -14,6 +14,8 @@ TPKG_CURRENT=`pwd`
 TPKG_QUIET=0   # only output err() msgs
 TPKG_KEEP=0    # tpkg create doesn't remove dir/
 
+_DESC_WIDTH=55
+
 ### Helper functions
 function cleanup() {
         out "[log] Cleaning up" 
@@ -167,14 +169,20 @@ function report() {
         passed=0
         failed=0
         unknown=0
+        first=0
 
-        echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
         for result in `ls result.*`; do 
                 passfailed=`head -1 $result | awk ' { print $2 }'`
                 basename=`head -3 $result | grep BaseName | awk -F': ?' ' { print $2 }'`
                 description=`head -4 $result | grep Description | awk -F': ?' ' { print $2 }'`
                 runend=`head -2 $result | grep DateRunEnd | awk -F': ?' ' { print $2 }'`
                 runstart=`head -5 $result | grep DateRunStart | awk -F': ?' ' { print $2 }'`
+
+                # truncate the description to 35 chars
+                if [ ${#description} -gt $_DESC_WIDTH ]; then
+                        description=${description:0:$_DESC_WIDTH}
+                        description=$description"..."
+                fi
 
                 if [ -z $runend ]; then
                         runend=0
@@ -184,12 +192,20 @@ function report() {
                 fi
 
                 ((period=$runend - $runstart))
+                # prefix period if < 9
+                if [ $period -lt 10 ]; then
+                        period="0$period"
+                fi
 
                 case $passfailed in
                 "FAILED")
+                        if [ $first -eq 0 ]; then
+                                echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
+                        fi
                         echo -e "!! $passfailed !! : $period s : $basename : $description"
                         ((failed=$failed + 1)) 
                         failed_tests="$failed_tests $basename"
+                        first=1
                         ;;
                 "PASSED")
                         if [ $TPKG_QUIET -eq 0 ]; then
@@ -197,9 +213,13 @@ function report() {
                         fi
                         ((passed=$passed + 1)) ;;
                 *) 
+                        if [ $first -eq 0 ]; then
+                                echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
+                        fi
                         echo -e "-- $passfailed -- : $period s : $basename : $description"
                         ((unknown=$unknown + 1)) 
                         failed_tests="$failed_tests $basename"
+                        first=1
                         ;;
                 esac
         done
@@ -366,6 +386,11 @@ if [ $goal = "create" ]; then
                 err "[fatal] Not overwriting existing $testname.tpkg. Abort."
 		cd $TPKG_CURRENT; exit 1
         fi
+
+        # rm unwanted files
+        cleanreport # this cd's to $TPKG_CURRENT
+        cd - >/dev/null # jump back
+
         i=$( ls $testname.* 2>/dev/null )
         if [ -z "${i}" ]; then
                 err "[fatal] No $testname.* files found. Abort."
