@@ -14,6 +14,8 @@ TPKG_CURRENT=`pwd`
 TPKG_QUIET=0   # only output err() msgs
 TPKG_KEEP=0    # tpkg create doesn't remove dir/
 
+_DESC_WIDTH=55
+
 ### Helper functions
 function cleanup() {
         out "[log] Cleaning up" 
@@ -176,6 +178,12 @@ function report() {
                 runend=`head -2 $result | grep DateRunEnd | awk -F': ?' ' { print $2 }'`
                 runstart=`head -5 $result | grep DateRunStart | awk -F': ?' ' { print $2 }'`
 
+                # truncate the description to 35 chars
+                if [ ${#description} -gt $_DESC_WIDTH ]; then
+                        description=${description:0:$_DESC_WIDTH}
+                        description=$description"..."
+                fi
+
                 if [ -z $runend ]; then
                         runend=0
                 fi
@@ -184,6 +192,10 @@ function report() {
                 fi
 
                 ((period=$runend - $runstart))
+                # prefix period if < 9
+                if [ $period -lt 10 ]; then
+                        period="0$period"
+                fi
 
                 case $passfailed in
                 "FAILED")
