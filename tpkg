@@ -201,13 +201,17 @@ function report() {
                 "FAILED")
                         if [ $first -eq 0 ]; then
                                 echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
+                                first=1
                         fi
                         echo -e "!! $passfailed !! : $period s : $basename : $description"
                         ((failed=$failed + 1)) 
                         failed_tests="$failed_tests $basename"
-                        first=1
                         ;;
                 "PASSED")
+                        if [ $first -eq 0  -a $TPKG_QUIET -eq 0 ]; then
+                                echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
+                                first=1
+                        fi
                         if [ $TPKG_QUIET -eq 0 ]; then
                                 echo -e "** $passfailed ** : $period s : $basename : $description"
                         fi
@@ -215,11 +219,11 @@ function report() {
                 *) 
                         if [ $first -eq 0 ]; then
                                 echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
+                                first=1
                         fi
                         echo -e "-- $passfailed -- : $period s : $basename : $description"
                         ((unknown=$unknown + 1)) 
                         failed_tests="$failed_tests $basename"
-                        first=1
                         ;;
                 esac
         done
