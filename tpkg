@@ -169,8 +169,8 @@ function report() {
         passed=0
         failed=0
         unknown=0
+        first=0
 
-        echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
         for result in `ls result.*`; do 
                 passfailed=`head -1 $result | awk ' { print $2 }'`
                 basename=`head -3 $result | grep BaseName | awk -F': ?' ' { print $2 }'`
@@ -199,9 +199,13 @@ function report() {
 
                 case $passfailed in
                 "FAILED")
+                        if [ $first -eq 0 ]; then
+                                echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
+                        fi
                         echo -e "!! $passfailed !! : $period s : $basename : $description"
                         ((failed=$failed + 1)) 
                         failed_tests="$failed_tests $basename"
+                        first=1
                         ;;
                 "PASSED")
                         if [ $TPKG_QUIET -eq 0 ]; then
@@ -209,9 +213,13 @@ function report() {
                         fi
                         ((passed=$passed + 1)) ;;
                 *) 
+                        if [ $first -eq 0 ]; then
+                                echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
+                        fi
                         echo -e "-- $passfailed -- : $period s : $basename : $description"
                         ((unknown=$unknown + 1)) 
                         failed_tests="$failed_tests $basename"
+                        first=1
                         ;;
                 esac
         done
