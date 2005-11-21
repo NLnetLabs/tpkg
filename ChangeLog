@@ -1,3 +1,7 @@
+	   : Miek Gieben: 1.06
+	* Added: CmdDepends: [cmd], [cmd]
+
+
 08 Nov 2005: Miek Gieben: 1.05
 	* Various little update that make 'tpkg' complete
 

@@ -179,6 +179,7 @@ A typical example looks like this:
         \fBMaintainer:\fR Miek Gieben
         \fBCategory:\fR 
         \fBComponent:\fR
+        \fBCmdDepends:\fR
         \fBDepends:\fR
         \fBHelp:\fR test1.help
         \fBPre:\fR test1.pre
@@ -221,6 +222,11 @@ This could something like: 'building', 'running', etc.
 What software component are you testing, this could be
 the name of the executable. User decides what to put
 here, but it should be consisted for all tests.
+.TP 
+\fBCmdDepends\fR
+Depend on these commands. If the command cannot be found ($PATH
+is search), the test is aborted. Usefull to check to the environment of a
+test.
 .TP 
 \fBDepends\fR
 On what other test does this test depend. The full

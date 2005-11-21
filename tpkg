@@ -6,7 +6,7 @@
 
 export TPKG_VAR_MASTER="../.tpkg.var.master"
 export TPKG_VAR_TEST=".tpkg.var.test"
-export TPKG_VERSION="1.05";
+export TPKG_VERSION="1.06";
 export SHELL="/bin/sh"
 TPKG_BASE="."
 TPKG_ARGS=""
@@ -14,7 +14,7 @@ TPKG_CURRENT=`pwd`
 TPKG_QUIET=0   # only output err() msgs
 TPKG_KEEP=0    # tpkg create doesn't remove dir/
 
-_DESC_WIDTH=55
+_DESC_WIDTH=${COLUMNS:-55}
 
 ### Helper functions
 function cleanup() {
@@ -287,6 +287,15 @@ function clone() {
 	cd $TPKG_CURRENT
 }
 
+# try to find the specific cmd
+function find_cmd {
+        which "${i}" >/dev/null
+        if [ $? -ne 0 ]; then                
+                err "[fatal] CmdDepend \"$i\" could not be satisfied: not found. Abort."
+                cleanup; exit 1  
+        fi
+}
+
 ### MAIN 
 # check the arguments
 while getopts ":vhkqb:a:" o
@@ -438,6 +447,7 @@ CreationDate: `date`
 Maintainer: `grep $LOGNAME /etc/passwd | awk -F: ' { print $5 }' | sed s/,//g`
 Category: 
 Component:
+CmdDepends: 
 Depends: 
 Help: $testname.help
 Pre: $testname.pre
@@ -487,7 +497,7 @@ TMPL_EOF
 fi
 
 if [ ! -f $archive ]; then
-        err "[fatal] Cannot find the test package: $archive. Abort"
+        err "[fatal] Cannot find the test package: $archive. Abort."
         cd $TPKG_CURRENT; exit 1
 fi
 
@@ -571,7 +581,7 @@ trap cleanup_and_exit INT
 
 # make a tmp dir during execution
 if [ "$goal" != "exe" ]; then
-        err "[fatal] What do you mean with $goal?. Abort"
+        err "[fatal] What do you mean with $goal?. Abort."
 	cd $TPKG_CURRENT; exit 1
 fi
 
@@ -620,6 +630,7 @@ dsc_description=`IFS=: awk -F': ?' < $dsc_file '/^Description/ { print $2 }'`
 dsc_creationdate=`IFS=: awk -F': ?' < $dsc_file '/^CreationDate/ { print $2 }'`
 dsc_category=`IFS=: awk -F': ?' < $dsc_file '/^Category/ { print $2 }'`
 dsc_component=`IFS=: awk -F': ?' < $dsc_file '/^Component/ { print $2 }'`
+dsc_cmddepends=`IFS=: awk -F': ?' < $dsc_file '/^CmdDepends/ { print $2 }'`
 dsc_depends=`IFS=: awk -F': ?' < $dsc_file '/^Depends/ { print $2 }'`
 dsc_maintainer=`IFS=: awk -F': ?' < $dsc_file '/^Maintainer/ { print $2 }'`
 dsc_help=`IFS=: awk -F': ?' < $dsc_file '/^Help/ { print $2 }'`
@@ -668,19 +679,28 @@ i=$( echo $dsc_aux | awk -F', ?' '{ print $1 "\n" $2 "\n" $3 "\n" $4 "\n" \
 $5 "\n" $6 "\n" $7 "\n" $8 }' )
 dsc_aux_files=($i)
 dsc_aux_files_total=${#dsc_aux_files[*]}
+# cmd depends
+i=$( echo $dsc_cmddepends | awk -F', ?' '{ print $1 "\n" $2 "\n" $3 "\n" $4 "\n" \
+$5 "\n" $6 "\n" $7 "\n" $8 }' )
+dsc_cmddepends_files=($i)
+dsc_cmddepends_files_total=${#dsc_cmddepends_files[*]}
+
+for i in ${dsc_cmddepends_files[*]}; do
+        find_cmd $i
+done
 # depends can also be a comma seperated list of package
-# TODO
+# TODO 
 
 # check is the aux files are also really in the shar
 for i in ${dsc_aux_files[*]}; do
         if [ ! -f $i ]; then
-                err "[fatal] Aux. file $i must be in the archive. Abort"
+                err "[fatal] Aux. file $i must be in the archive. Abort."
                 cleanup; exit 1
         fi
 done
 
 if [ ! -f $dsc_test ]; then
-        err "[fatal] Can't locate the test script: $dsc_test. Abort"
+        err "[fatal] Can't locate the test script: $dsc_test. Abort."
         cleanup; exit 1
 fi
 
