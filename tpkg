@@ -603,7 +603,6 @@ fi
 
 #dir=`mktemp -d "${testpath}/${testname}.XXXXXX"`
 mktempdir "${testpath}/${testname}.XXXXXX"
-echo $dir
 if [ ! -d $dir ]; then 
         err "[fatal] Failure to create a temporary working directory. Abort."
 	cd $TPKG_CURRENT; exit 1
