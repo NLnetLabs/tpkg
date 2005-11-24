@@ -102,6 +102,24 @@ function write_fake_done() {
         > .done-${testname}
 }
 
+function mktempdir() {
+        # check if mktemp is there, if not use plain mkdir with $$
+        # as a side effect set $dir
+        dir=
+        case $OSTYPE in
+                solaris*)
+                # use mkdir
+                dir="$1.$$"
+                mkdir "$dir"
+                return
+                ;;
+                *)
+                dir=`mktemp -d "$1"`
+                return
+                ;;
+        esac
+}
+
 function usage() {
         out "Usage:"
         out "$0 [OPTIONS] [exe|create|extract|tmpl|fake] test.tpkg"
@@ -585,7 +603,9 @@ if [ "$goal" != "exe" ]; then
 	cd $TPKG_CURRENT; exit 1
 fi
 
-dir=`mktemp -d "${testpath}/${testname}.XXXXXX"`
+#dir=`mktemp -d "${testpath}/${testname}.XXXXXX"`
+mktempdir "${testpath}/${testname}.XXXXXX"
+echo $dir
 if [ ! -d $dir ]; then 
         err "[fatal] Failure to create a temporary working directory. Abort."
 	cd $TPKG_CURRENT; exit 1
