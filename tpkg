@@ -22,9 +22,7 @@ function cleanup() {
         [ -f result.$dsc_basename ] && cp result.$dsc_basename ../
         cd ..
 	if [ ! -z "$dir" ]; then
-		if [ -d "$dir" ]; then
-			rm -rf $dir
-		fi
+		rm -rf `basename $dir`
 	fi
 	cd $TPKG_CURRENT
 }
