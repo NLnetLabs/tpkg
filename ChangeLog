@@ -1,5 +1,6 @@
 	   : Miek Gieben: 1.06
 	* Added: CmdDepends: [cmd], [cmd]
+	* Some Solaris support was added
 
 
 08 Nov 2005: Miek Gieben: 1.05
