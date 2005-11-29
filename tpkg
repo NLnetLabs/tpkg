@@ -213,6 +213,9 @@ function report() {
                         period="0$period"
                 fi
 
+                tp="passed"
+                tf="failed"
+                tu="unknown"
                 case $passfailed in
                 "FAILED")
                         if [ $first -eq 0 ]; then
@@ -222,6 +225,7 @@ function report() {
                         echo -e "!! $passfailed !! : $period s : $basename : $description"
                         ((failed=$failed + 1)) 
                         failed_tests="$failed_tests $basename"
+                        tf="FAILED"
                         ;;
                 "PASSED")
                         if [ $first -eq 0  -a $TPKG_QUIET -eq 0 ]; then
@@ -231,7 +235,9 @@ function report() {
                         if [ $TPKG_QUIET -eq 0 ]; then
                                 echo -e "** $passfailed ** : $period s : $basename : $description"
                         fi
-                        ((passed=$passed + 1)) ;;
+                        ((passed=$passed + 1)) 
+                        tp="PASSED"
+                        ;;
                 *) 
                         if [ $first -eq 0 ]; then
                                 echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
@@ -240,6 +246,7 @@ function report() {
                         echo -e "-- $passfailed -- : $period s : $basename : $description"
                         ((unknown=$unknown + 1)) 
                         failed_tests="$failed_tests $basename"
+                        tu="UNKNOWN"
                         ;;
                 esac
         done
@@ -248,19 +255,7 @@ function report() {
         pper=`echo -e "scale=4\n$passed/$total*100" | bc | sed 's/00$//'`
         uper=`echo -e "scale=4\n$unknown/$total*100" | bc | sed 's/00$//'`
         echo
-        tp="PASSED"; 
-        if [ $pper -eq 0 ]; then 
-                tp="passed" 
-        fi
-        tf="FAILED"
-        if [ $fper -eq 0 ]; then 
-                tf="failed" 
-        fi
-        tu="UNKNOWN"
-        if [ $uper -eq 0 ]; then 
-                tu="unknown" 
-        fi
-        echo -e "$tp: $passed ($pper %)\t$tf: $failed ($fper %)\tUNKNOWN: $tu ($uper %)"
+        echo -e "$tp: $passed ($pper %)\t$tf: $failed ($fper %)\t$tu: $unknown ($uper %)"
 
         # for each failed test include the complete result file
         # $i is basename
