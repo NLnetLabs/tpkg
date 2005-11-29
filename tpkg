@@ -248,7 +248,19 @@ function report() {
         pper=`echo -e "scale=4\n$passed/$total*100" | bc | sed 's/00$//'`
         uper=`echo -e "scale=4\n$unknown/$total*100" | bc | sed 's/00$//'`
         echo
-        echo -e "PASSED: $passed ($pper %)\tFAILED: $failed ($fper %)\tUNKNOWN: $unknown ($uper %)"
+        tp="PASSED"; 
+        if [ $pper -eq 0 ]; then 
+                tp="passed" 
+        fi
+        tf="FAILED"
+        if [ $fper -eq 0 ]; then 
+                tf="failed" 
+        fi
+        tu="UNKNOWN"
+        if [ $uper -eq 0 ]; then 
+                tu="unknown" 
+        fi
+        echo -e "$tp: $passed ($pper %)\t$tf: $failed ($fper %)\tUNKNOWN: $tu ($uper %)"
 
         # for each failed test include the complete result file
         # $i is basename
