@@ -187,6 +187,9 @@ function report() {
         unknown=0
         first=0
 
+        tp="passed"
+        tf="failed"
+        tu="unknown"
         for result in `ls result.*`; do 
                 passfailed=`head -1 $result | awk ' { print $2 }'`
                 basename=`head -3 $result | grep BaseName | awk -F': ?' ' { print $2 }'`
@@ -213,9 +216,6 @@ function report() {
                         period="0$period"
                 fi
 
-                tp="passed"
-                tf="failed"
-                tu="unknown"
                 case $passfailed in
                 "FAILED")
                         if [ $first -eq 0 ]; then
