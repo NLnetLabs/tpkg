@@ -16,9 +16,14 @@ USERNAME=$LOGNAME
 TPKG=/home/miekg/svn/tpkg/trunk/tpkg    # tpkg version to use
 MAILTO="ldns-team@nlnetlabs.nl"         # where to send the status email
 MAILSUB="[svn: ldns] $REV status"       # subject of status emails
-REPOPATH="trunk"                        # which part to check out
 REPOPROT="file://"                      # local or remove (svn+ssh://)
 TESTDIR="test"                          # dir where the tests live in the repo
+
+
+# get the branch name
+DIRNAME=`/usr/bin/svnlook changed -r$REV $REPOS | /usr/bin/awk '{ print $2 }'`
+REPOPATH=`/usr/bin/dirname $DIRNAME`
+
 
 BUILD_DIR=`mktemp -d /tmp/XXXXXX`
 if [ ! -d $BUILD_DIR ]; then
