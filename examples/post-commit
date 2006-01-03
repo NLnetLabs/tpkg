@@ -21,9 +21,16 @@ TESTDIR="test"                          # dir where the tests live in the repo
 
 
 # get the branch name
-DIRNAME=`/usr/bin/svnlook changed -r$REV $REPOS | /usr/bin/awk '{ print $2 }'`
-REPOPATH=`/usr/bin/dirname $DIRNAME`
-
+LOOK=`/usr/bin/svnlook changed -r$REV $REPOS | /usr/bin/awk '{ print $2 }'`
+if [[ $LOOK =~ '^trunk' ]]; then
+        REPOPATH="trunk"
+fi
+if [[ $LOOK =~ '^branches' ]]; then
+        REPOPATH=`echo $LOOK | cut -f1,2 -d /`
+fi
+if [[ $LOOK =~ '^tags' ]]; then
+        REPOPATH=`echo $LOOK | cut -f1,2 -d /`
+fi
 
 BUILD_DIR=`mktemp -d /tmp/XXXXXX`
 if [ ! -d $BUILD_DIR ]; then
