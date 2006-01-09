@@ -22,9 +22,9 @@ fi
 ### Helper functions
 function cleanup() {
         out "[log] Cleaning up" 
-        [ -f result.$dsc_basename ] && cp result.$dsc_basename ../
+        [[ -f result.$dsc_basename ]] && cp result.$dsc_basename ../
         cd ..
-	if [ ! -z "$dir" ]; then
+	if [[ ! -z "$dir" ]]; then
 		rm -rf `basename $dir`
 	fi
 	cd $TPKG_CURRENT
@@ -35,17 +35,17 @@ function cleanup_and_exit() {
 }
 
 function err() {
-        if [ -z $testname ]; then
+        if [[ -z $testname ]]; then
                 echo -e "  $1" 
         else
                 echo -e "[$testname]  $1" 
         fi
 }
 function out() {
-        if [ $TPKG_QUIET -eq 1 ]; then
+        if [[ $TPKG_QUIET -eq 1 ]]; then
                 return
         fi
-        if [ -z $testname ]; then
+        if [[ -z $testname ]]; then
                 echo -e "  $1"
         else
                 echo -e "[$testname]  $1"
