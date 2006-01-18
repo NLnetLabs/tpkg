@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # a utlity to run a shar test archive (aka tpkg)
-# Created by Miek Gieben, NLnetLabs, (c) 2005
+# Created by Miek Gieben, NLnetLabs, (c) 2005, 2006
 # Licensed under GPL version 2
 
 export TPKG_VAR_MASTER="../.tpkg.var.master"
@@ -162,7 +162,7 @@ function version() {
 	out "tpkg (test package), version $TPKG_VERSION"
 	out "Written by Miek Gieben, NLnet Labs"
 	out
-	out "Copyright (C) 2005 NLnet Labs"
+	out "Copyright (C) 2005, 2006 NLnet Labs"
 	out
 	out "This is free software; see the source for copying conditions. There is no"
 	out "warranty; even not for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE"
