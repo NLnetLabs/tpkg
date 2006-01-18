@@ -750,7 +750,9 @@ if [ $test_result -ne 0 ]; then
         err "[log] !! FAILED !!"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
-        post; cleanup; exit 1
+        post; 
+        [[ $TPKG_KEEP -eq 0 ]] && cleanup
+        exit 1
 fi
  
 cp -f result.$dsc_basename result.$dsc_basename.$$
@@ -800,5 +802,5 @@ if [ $failed -eq -1 ]; then
 fi
         
 post
-cleanup
+[[ $TPKG_KEEP -eq 0 ]] && cleanup
 exit $failed

@@ -1,6 +1,7 @@
 	   : Miek Gieben: 1.06
 	* Added: CmdDepends: [cmd], [cmd]
 	* Solaris support was added/tested
+	* -k now also works for execute: don't delete the tmp. directory.
 
 08 Nov 2005: Miek Gieben: 1.05
 	* Various little update that make 'tpkg' complete
