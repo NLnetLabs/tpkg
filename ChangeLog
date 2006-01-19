@@ -4,10 +4,10 @@ xx Jan 2006: Miek Gieben: 1.06
 	* -k now also works for execute: don't delete the tmp. directory.
 	* post-commit handles branches/tags and trunk, although prob. 
 	  not combined.
-	* Added -n PER switch, to influence tpkg report's exit code
+	* Added -n NUM switch, to influence tpkg report's exit code
 
 08 Nov 2005: Miek Gieben: 1.05
-	* Various little update that make 'tpkg' complete
+	* Various little updates that make 'tpkg' complete
 
 31 Oct 2005: Miek Gieben: 1.04
 	* When a test fails show the result log in "tpkg report"

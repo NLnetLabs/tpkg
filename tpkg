@@ -153,7 +153,7 @@ function usage() {
 	out " -v\t\tshow version"
         out " -q\t\tonly print errors"
         out " -k\t\tdon't remove test.dir when creating/executing a tpkg package"
-        out " -n PER\tif less than PER percent of the tests are passed exit with 1"
+        out " -n NUM\tif less than NUM of the tests are passed exit with 1"
         out " \t\tOtherwise exit with 0. Only valid when running tpkg report"
 	out " -b DIR\tuse DIR is a base directory in stead of ."
 	out " -a ARGS\tpass the string ARGS through to the test scripts"
@@ -196,7 +196,7 @@ function report() {
         tp="passed"
         tf="failed"
         tu="unknown"
-        for result in `ls result.*`; do 
+        for result in `ls result.* 2>/dev/null` ; do 
                 passfailed=`head -1 $result | awk ' { print $2 }'`
                 basename=`head -3 $result | grep BaseName | awk -F': ?' ' { print $2 }'`
                 description=`head -4 $result | grep Description | awk -F': ?' ' { print $2 }'`
@@ -257,9 +257,15 @@ function report() {
                 esac
         done
         ((total=$passed + $failed + $unknown))
-        fper=`echo -e "scale=4\n$failed/$total*100" | bc | sed 's/00$//'`
-        pper=`echo -e "scale=4\n$passed/$total*100" | bc | sed 's/00$//'`
-        uper=`echo -e "scale=4\n$unknown/$total*100" | bc | sed 's/00$//'`
+        if [[ $total -eq 0 ]]; then
+                fper=0
+                pper=0
+                uper=0
+        else
+                fper=`echo -e "scale=4\n$failed/$total*100" | bc | sed 's/00$//'`
+                pper=`echo -e "scale=4\n$passed/$total*100" | bc | sed 's/00$//'`
+                uper=`echo -e "scale=4\n$unknown/$total*100" | bc | sed 's/00$//'`
+        fi
         echo
         echo -e "$tp: $passed ($pper %)\t$tf: $failed ($fper %)\t$tu: $unknown ($uper %)"
 
@@ -273,12 +279,11 @@ function report() {
         done
 	cd $NT
         if [[ $TPKG_PASS -gt 0 ]]; then
-                if [[ $pper -lt $TPKG_PASS ]]; then
+                if [[ $passed -lt $TPKG_PASS ]]; then
                         exit 1
-                else
-                        exit 0
                 fi
         fi
+        exit 0
 }
 
 # clone test1 to test2
@@ -334,7 +339,7 @@ function find_cmd {
 
 ### MAIN 
 # check the arguments
-while getopts ":vhkqb:a:" o
+while getopts ":vhkqb:a:n:" o
 do case "$o" in
 	b) 	TPKG_BASE="$OPTARG";;
 	h) 	usage; exit 0;;
@@ -342,6 +347,12 @@ do case "$o" in
 	a) 	TPKG_ARGS="$OPTARG";;
         q)      TPKG_QUIET=1;;
         k)      TPKG_KEEP=1;;
+        n)      TPKG_PASS=$OPTARG
+                if [ $TPKG_PASS -eq 0 ]; then
+                        err "[fatal] A null or non numerical value is not valid. Abort."
+                        exit 1
+                fi
+                ;;
         *)      err "[fatal] Unknown option. Abort."; exit 1;;
 esac
 done
