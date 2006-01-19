@@ -234,7 +234,7 @@ function report() {
                         tf="FAILED"
                         ;;
                 "PASSED")
-                        if [ $first -eq 0  -a $TPKG_QUIET -eq 0 ]; then
+                        if [ $first -eq 0 ]; then
                                 echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
                                 first=1
                         fi
