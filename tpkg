@@ -13,6 +13,7 @@ TPKG_ARGS=""
 TPKG_CURRENT=`pwd`
 TPKG_QUIET=0   # only output err() msgs
 TPKG_KEEP=0    # tpkg create doesn't remove dir/
+TPKG_PASS=0    # how much must succeed
 
 _DESC_WIDTH=${COLUMNS:-55}
 if [ $_DESC_WIDTH -ge 70 ]; then
@@ -151,7 +152,9 @@ function usage() {
 	out " -h\t\tshow this help"
 	out " -v\t\tshow version"
         out " -q\t\tonly print errors"
-        out " -k\t\tdon't remove test.dir when creating a tpkg package"
+        out " -k\t\tdon't remove test.dir when creating/executing a tpkg package"
+        out " -n PER\tif less than PER percent of the tests are passed exit with 1"
+        out " \t\tOtherwise exit with 0. Only valid when running tpkg report"
 	out " -b DIR\tuse DIR is a base directory in stead of ."
 	out " -a ARGS\tpass the string ARGS through to the test scripts"
         out 
@@ -268,7 +271,14 @@ function report() {
                 cat result.$i | tail +7  # is this portable?
                 echo ---------------   End Output: $i ------------------
         done
-	cd $TPKG_CURRENT
+	cd $NT
+        if [[ $TPKG_PASS -gt 0 ]]; then
+                if [[ $pper -lt $TPKG_PASS ]]; then
+                        exit 1
+                else
+                        exit 0
+                fi
+        fi
 }
 
 # clone test1 to test2
@@ -372,7 +382,7 @@ esac
 ### REPORT ###
 # no extra args required
 if [ "${goal}" = "report" ]; then
-        report; exit 0
+        report;
 fi
 if [ "${goal}" = "clean" ]; then
         cleanreport; exit 0

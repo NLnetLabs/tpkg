@@ -1,9 +1,10 @@
-	   : Miek Gieben: 1.06
+xx Jan 2006: Miek Gieben: 1.06
 	* Added: CmdDepends: [cmd], [cmd]
 	* Solaris support was added/tested
 	* -k now also works for execute: don't delete the tmp. directory.
 	* post-commit handles branches/tags and trunk, although prob. 
 	  not combined.
+	* Added -n PER switch, to influence tpkg report's exit code
 
 08 Nov 2005: Miek Gieben: 1.05
 	* Various little update that make 'tpkg' complete
