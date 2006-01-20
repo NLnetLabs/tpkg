@@ -152,7 +152,7 @@ function usage() {
 	out " -h\t\tshow this help"
 	out " -v\t\tshow version"
         out " -q\t\tonly print errors"
-        out " -k\t\tdon't remove test.dir when creating/executing a tpkg package"
+        out " -k\t\tdon't remove test directory when creating/executing a tpkg package"
         out " -n NUM\tif less than NUM of the tests are passed exit with 1"
         out " \t\tOtherwise exit with 0. Only valid when running tpkg report"
 	out " -b DIR\tuse DIR is a base directory in stead of ."
