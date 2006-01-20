@@ -5,6 +5,7 @@ xx Jan 2006: Miek Gieben: 1.06
 	* post-commit handles branches/tags and trunk, although prob. 
 	  not combined.
 	* Added -n NUM switch, to influence tpkg report's exit code
+	* When cloning rename the testfiles mentioned in the files too
 
 08 Nov 2005: Miek Gieben: 1.05
 	* Various little updates that make 'tpkg' complete

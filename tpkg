@@ -302,13 +302,17 @@ function clone() {
         for i in $test1.* ; do 
                 ext=`echo $i | sed s/$test1//`
                 if [ ! -z "$ext" ]; then
+                        # rename the content of the files too
+                        sed  "s/$test1/$test2/g" < $i > $i.$$
+                        mv $i.$$ $i
+                        # rename
                         mv $i $test2$ext
                 fi
         done
         # edit the dsc file too
         # don't use sed -i, its a gnu-ism
-        sed  "s/$test1/$test2/g" < $test2.dsc > $test2.dsc.$$
-        mv $test2.dsc.$$ $test2.dsc
+     #   sed  "s/$test1/$test2/g" < $test2.dsc > $test2.dsc.$$
+     #   mv $test2.dsc.$$ $test2.dsc
 
         # update the date
         sed "s/^CreationDate:.*/CreationDate: `date`/"  < $test2.dsc > $test2.dsc.$$
