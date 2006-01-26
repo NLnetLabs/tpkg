@@ -6,6 +6,8 @@ PATH=$PATH:/usr/local/bin:/usr/local/sbin:.
 REPOS="$1"  # /svn/nsd or /svn/libdns   # get these from svn
 REV="$2"                                # which revision number
 
+SVN_BAR="------------------------------------------------------------------------"
+
 # our environment is extremely limited we don't even
 # get a LOGNAME here... this makes all the pre script
 # fail in the test. We do get a pwd from svnserve
@@ -41,6 +43,8 @@ MAIL_FILE=`mktemp /tmp/XXXXXXX`
 # checkout to $BUILD_DIR, assume local checkout
 svn co -r$REV $REPOPROT$REPOS/$REPOPATH $BUILD_DIR
 ( cd $BUILD_DIR ; svn log -r$REV > $MAIL_FILE )
+svnlook changed -r$REV $REPOS >> $MAIL_FILE
+echo $SVN_BAR >> $MAIL_FILE
 
 # set the path and other stuff for our sibling test scripts
 echo "export PATH=$PATH" > $BUILD_DIR/$TESTDIR/.tpkg.var.master
