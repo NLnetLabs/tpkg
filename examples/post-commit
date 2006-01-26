@@ -17,10 +17,10 @@ USERNAME=$LOGNAME
 # please edit these to suit your needs
 TPKG=/home/miekg/svn/tpkg/trunk/tpkg    # tpkg version to use
 MAILTO="ldns-team@nlnetlabs.nl"         # where to send the status email
-MAILSUB="[svn: ldns] $REV status"       # subject of status emails
+NAME="ldns"                             # name of the project
+MAILSUB="[svn: $NAME|$BRANCH] $REV status"       # subject of status emails
 REPOPROT="file://"                      # local or remove (svn+ssh://)
 TESTDIR="test"                          # dir where the tests live in the repo
-
 
 # get the branch name
 LOOK=`/usr/bin/svnlook changed -r$REV $REPOS | /usr/bin/awk '{ print $2 }'`
