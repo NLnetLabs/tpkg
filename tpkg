@@ -772,7 +772,7 @@ if [ ! -f $dsc_test ]; then
 fi
 
 ### Actual executing of the scripts
-logger "Starting test \'$dsc_basename\'"
+logger "Starting test: '$dsc_basename'"
 
 epoch  # run before pre()
 echo "BaseName: $dsc_basename" > result.$dsc_basename
