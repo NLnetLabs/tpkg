@@ -6,7 +6,7 @@
 
 export TPKG_VAR_MASTER="../.tpkg.var.master"
 export TPKG_VAR_TEST=".tpkg.var.test"
-export TPKG_VERSION="1.06";
+export TPKG_VERSION="1.07";
 export SHELL="/bin/sh"
 TPKG_LOGGER=/usr/bin/logger
 TPKG_BASE="."
@@ -16,6 +16,7 @@ TPKG_QUIET=0   # only output err() msgs
 TPKG_KEEP=0    # tpkg create doesn't remove dir/
 TPKG_PASS=0    # how much must succeed
 TPKG_LOG=0     # don't log
+TPKG_PRI=""    # log facility
 
 _DESC_WIDTH=${COLUMNS:-55}
 if [ $_DESC_WIDTH -ge 70 ]; then
@@ -51,7 +52,11 @@ function log() {
         fi
         
         if [[ -e $TPKG_LOGGER ]]; then
-                $TPKG_LOGGER "$1"
+                if [[ -z $TPKG_PRI ]]; then
+                        $TPKG_LOGGER "$1"
+                else
+                        $TPKG_LOGGER -p "$TPKG_PRI" "$1"
+                fi
         fi
 }
 
@@ -169,7 +174,8 @@ function usage() {
 	out " -h\t\tshow this help"
 	out " -v\t\tshow version"
         out " -q\t\tonly print errors"
-        out " -l MESG\t log MESG to syslog when starting the test (using logger)"
+        out " -l MESG\tlog MESG to syslog when starting the test (using logger)"
+        out " -p PRI\tlog using PRI as facility"
         out " -k\t\tdon't remove test directory when creating/executing a tpkg package"
         out " -n NUM\tif less than NUM of the tests are passed exit with 1"
         out " \t\tOtherwise exit with 0. Only valid when running tpkg report"
@@ -363,6 +369,7 @@ do case "$o" in
 	h) 	usage; exit 0;;
 	v) 	version; exit 0;;
         l)      TPKG_LOG=1;;
+        f)      TPKG_FAC="$OPTARG";;
 	a) 	TPKG_ARGS="$OPTARG";;
         q)      TPKG_QUIET=1;;
         k)      TPKG_KEEP=1;;
