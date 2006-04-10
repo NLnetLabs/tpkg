@@ -1,5 +1,6 @@
 05 Apr 2006: Miek Gieben: 1.07
 	* Added -p priorty for the logging
+	* always add return code to result file
 
 04 Apr 2006: Miek Gieben: 1.06
 	* Added: CmdDepends: [cmd], [cmd]

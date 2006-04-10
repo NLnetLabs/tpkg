@@ -800,6 +800,7 @@ if [ $test_result -ne 0 ]; then
         echo "DateRunEnd: $epoch" >> result.$dsc_basename.tmp
         err "[log] !! FAILED !!"
         cat result.$dsc_basename >> result.$dsc_basename.tmp
+        echo "exit code: $test_result" >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         post; 
         [[ $TPKG_KEEP -eq 0 ]] && cleanup
@@ -816,6 +817,7 @@ if [ $? -eq 0 ]; then
         echo "** PASSED **     ** PASSED **" > result.$dsc_basename.tmp
         echo "DateRunEnd: $epoch" >> result.$dsc_basename.tmp
         cat result.$dsc_basename >> result.$dsc_basename.tmp
+        echo "exit code: $test_result" >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         write_done
         failed=0
@@ -828,6 +830,7 @@ if [ $? -eq 0 ]; then
         echo "!! FAILED !!     !! FAILED !!" > result.$dsc_basename.tmp
         echo "DateRunEnd: $epoch" >> result.$dsc_basename.tmp
         cat result.$dsc_basename >> result.$dsc_basename.tmp
+        echo "exit code: $test_result" >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         failed=1
 else
@@ -835,6 +838,7 @@ else
         echo "** PASSED **     ** PASSED **" > result.$dsc_basename.tmp
         echo "DateRunEnd: $epoch" >> result.$dsc_basename.tmp
         cat result.$dsc_basename >> result.$dsc_basename.tmp
+        echo "exit code: $test_result" >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         write_done
         failed=0
@@ -847,6 +851,7 @@ if [ $failed -eq -1 ]; then
         echo "-- UNKNOWN --     -- UNKNOWN --" > result.$dsc_basename.tmp
         echo "DateRunEnd: $epoch" >> result.$dsc_basename.tmp
         cat result.$dsc_basename >> result.$dsc_basename.tmp
+        echo "exit code: $test_result" >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         write_done
         failed=1 # not passed
