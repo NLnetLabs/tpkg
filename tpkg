@@ -6,7 +6,7 @@
 
 export TPKG_VAR_MASTER="../.tpkg.var.master"
 export TPKG_VAR_TEST=".tpkg.var.test"
-export TPKG_VERSION="1.07";
+export TPKG_VERSION="1.08";
 export SHELL="/bin/sh"
 TPKG_LOGGER=/usr/bin/logger
 TPKG_BASE="."
@@ -158,6 +158,8 @@ function usage() {
         out " e | extract.:\textract a .tpkg to tmp. dir"
         out " t | tmpl....:\tcreate empty template files for a new test"
         out " f | fake....:\tfake the running of test, but do create a .done file"
+        out 
+        out "When no action is given a test is executed"
         out
         out "Reporting/Cleanup"
         out " clean.......:\tremove all the result files"
@@ -397,7 +399,13 @@ goal=$1
 archive=$2
 if [ -z "${goal}" ]; then
         usage
-	cd $TPKG_CURRENT; exit 0
+        cd $TPKG_CURRENT; exit 0
+fi
+# only 1 arg given, default to exe, test is in goal
+if [ -z "${archive}" ]; then
+        out "[log] Defaulting to \`execute'"
+        archive=$1
+        goal="exe"
 fi
 
 # allow short goals

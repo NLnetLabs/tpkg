@@ -1,6 +1,11 @@
+xx yyy zzzz: Miek Gieben: 1.08
+	*
+
+
 05 Apr 2006: Miek Gieben: 1.07
 	* Added -p priorty for the logging
-	* always add return code to result file
+	* Always add return code to result file
+	* Add default action: exe when none is given
 
 04 Apr 2006: Miek Gieben: 1.06
 	* Added: CmdDepends: [cmd], [cmd]
