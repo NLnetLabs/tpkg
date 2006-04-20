@@ -38,6 +38,7 @@ BUILD_DIR=`mktemp -d /tmp/XXXXXX`
 if [ ! -d $BUILD_DIR ]; then
         exit 0
 fi
+
 MAIL_FILE=`mktemp /tmp/XXXXXXX`
 
 # checkout to $BUILD_DIR, assume local checkout
