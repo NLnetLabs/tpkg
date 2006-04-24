@@ -6,7 +6,7 @@
 
 export TPKG_VAR_MASTER="../.tpkg.var.master"
 export TPKG_VAR_TEST=".tpkg.var.test"
-export TPKG_VERSION="1.08";
+export TPKG_VERSION="1.10";
 export SHELL="/bin/sh"
 TPKG_LOGGER=/usr/bin/logger
 TPKG_BASE="."
@@ -463,9 +463,9 @@ if [ $goal = "create" ]; then
 # get all files with the same basename except those that ends in .tpkg
 
         # check for shar
-        which shar >/dev/null
+        which tar >/dev/null
         if [ $? -ne 0 ]; then
-                err "[fatal] Shar command not found. Abort."
+                err "[fatal] Tar command not found. Abort."
                 cd $TPKG_CURRENT; exit 1
         fi
 
@@ -476,11 +476,6 @@ if [ $goal = "create" ]; then
         fi
         cd $testname.dir
 
-        if [ -f $testname.tpkg ]; then
-                err "[fatal] Not overwriting existing $testname.tpkg. Abort."
-		cd $TPKG_CURRENT; exit 1
-        fi
-
         # rm unwanted files
         cleanreport # this cd's to $TPKG_CURRENT
         cd - >/dev/null # jump back
@@ -490,12 +485,14 @@ if [ $goal = "create" ]; then
                 err "[fatal] No $testname.* files found. Abort."
 		cd $TPKG_CURRENT; exit 1
         fi
-        shar $i > $testname.tpkg
+
+        # tar is smart enough to handle this
+        cd ../
+
+        tar --create --file $testname.tpkg --gzip ${testname}.dir
         if [ $TPKG_KEEP -eq 0 ]; then
                 rm $i
         fi
-        mv $testname.tpkg ../
-        cd ../
         if [ $TPKG_KEEP -eq 0 ]; then
                 out "[log] Removing member files"
                 rmdir $testname.dir
@@ -596,19 +593,17 @@ if [ $goal = "extract" ]; then
         fi
 
         out "[log] Extracting..."
-        cp $archive $dir/
-        cd $dir
-        ${SHELL} ./$testname.tpkg > /dev/null
+        tar xfz ${testname}.tpkg --strip-components 1 -C $dir
         if [ $? -ne 0 ]; then
-                err "[fatal] Could not unshar archive. Abort."
+                err "[fatal] Could not untar archive. Abort."
 		cd $TPKG_CURRENT; exit 1
         fi
+        cd $dir
 
         trap cleanup_and_exit INT
 
         # stop here
         out "[log] extracted $testname.tpkg to $dir."
-        rm ./$testname.tpkg
         cd $TPKG_CURRENT; exit 0
 fi
 
@@ -666,7 +661,6 @@ if [ "$goal" != "exe" ]; then
 	cd $TPKG_CURRENT; exit 1
 fi
 
-#dir=`mktemp -d "${testpath}/${testname}.XXXXXX"`
 mktempdir "${testpath}/${testname}.XXXXXX"
 if [ ! -d $dir ]; then 
         err "[fatal] Failure to create a temporary working directory. Abort."
@@ -674,13 +668,12 @@ if [ ! -d $dir ]; then
 fi
 ## EXTRACT
 out "[log] Extracting..."
-cp $archive $dir/
-cd $dir
-${SHELL} ${testname}.tpkg > /dev/null
+tar xfz ${testname}.tpkg --strip-components 1 -C $dir
 if [ $? -ne 0 ]; then
-        err "[fatal] Could not unshar archive. Abort."
+        err "[fatal] Could not untar archive. Abort."
 	cd $TPKG_CURRENT; exit 1
 fi
+cd $dir
 
 ### EXE ###
 # extract the information out of the *.dsc files

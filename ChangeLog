@@ -1,6 +1,6 @@
-xx yyy zzzz: Miek Gieben: 1.08
+25 Apr 2006: Miek Gieben: 1.10
 	* allow tpkg report to work again
-
+	* base all operations on tar (for speed)
 
 05 Apr 2006: Miek Gieben: 1.07
 	* Added -p priorty for the logging
