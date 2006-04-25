@@ -65,6 +65,10 @@ if [[ -d $BUILD_DIR/$TESTDIR ]]; then
                 exe `basename $tests` >> $MAIL_FILE
         done
 
+        END=`date +%s`
+        echo ELAPSED: $((END - START)) s >> $MAIL_FILE
+        echo $SVN_BAR >> $MAIL_FILE
+
         # add -q to /not/ show PASSED tests
         $TPKG -b $BUILD_DIR/$TESTDIR report >> $MAIL_FILE
         $TPKG -b $BUILD_DIR/$TESTDIR clean 
@@ -72,9 +76,6 @@ if [[ -d $BUILD_DIR/$TESTDIR ]]; then
         # End of tweaking
         ###
 fi
-END=`date +%s`
-
-echo ELAPSED: $((END - START)) s
 
 # SVN STUFF
 ( cd $BUILD_DIR ; svn diff -rPREV:$REV >> $MAIL_FILE )
