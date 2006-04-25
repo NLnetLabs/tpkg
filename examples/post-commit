@@ -21,6 +21,7 @@ NAME="ldns"                             # name of the project
 MAILSUB="[svn: $NAME|$BRANCH] $REV status"       # subject of status emails
 REPOPROT="file://"                      # local or remove (svn+ssh://)
 TESTDIR="test"                          # dir where the tests live in the repo
+start=`date +%s`
 
 # get the branch name
 LOOK=`/usr/bin/svnlook changed -r$REV $REPOS | /usr/bin/awk '{ print $2 }'`
