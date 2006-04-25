@@ -1,4 +1,4 @@
-s#!/bin/bash
+#!/bin/bash
 
 # a utlity to run a shar test archive (aka tpkg)
 # Created by Miek Gieben, NLnetLabs, (c) 2005, 2006
