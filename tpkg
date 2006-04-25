@@ -606,7 +606,7 @@ if [ $goal = "extract" ]; then
         fi
 
         out "[log] Extracting..."
-        tar xfz ${testname}.tpkg --strip-components 1 -C $dir
+        tar xfz ${testname}.tpkg --strip-components 1 -C $dir 2>/dev/null
         ret=$?
         # tar errors with 1 on the open
         case $OSTYPE in
@@ -682,7 +682,7 @@ fi
 ## EXTRACT
 
 out "[log] Extracting..."
-tar xfz ${testname}.tpkg --strip-components 1 -C $dir
+tar xfz ${testname}.tpkg --strip-components 1 -C $dir 2>/dev/null
 ret=$?
 # tar errors with 1 on the open
 case $OSTYPE in
