@@ -39,6 +39,7 @@ if [ ! -d $BUILD_DIR ]; then
         exit 0
 fi
 
+START=`date +%s`
 MAIL_FILE=`mktemp /tmp/XXXXXXX`
 
 # checkout to $BUILD_DIR, assume local checkout
@@ -71,6 +72,9 @@ if [[ -d $BUILD_DIR/$TESTDIR ]]; then
         # End of tweaking
         ###
 fi
+END=`date +%s`
+
+echo ELAPSED: $((END - START))
 
 # SVN STUFF
 ( cd $BUILD_DIR ; svn diff -rPREV:$REV >> $MAIL_FILE )
