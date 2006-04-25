@@ -480,21 +480,22 @@ if [ $goal = "create" ]; then
         cleanreport # this cd's to $TPKG_CURRENT
         cd - >/dev/null # jump back
 
-        i=$( ls $testname.* 2>/dev/null )
+        # tar is smart enough to handle this
+        cd ../
+        i=$( ls ${testname}.dir/$testname.* 2>/dev/null )
         if [ -z "${i}" ]; then
                 err "[fatal] No $testname.* files found. Abort."
 		cd $TPKG_CURRENT; exit 1
         fi
 
-        # tar is smart enough to handle this
-        cd ../
 
         tar --create --file $testname.tpkg --gzip ${testname}.dir
         if [ $TPKG_KEEP -eq 0 ]; then
+                out "[log] Removing member files"
                 rm $i
         fi
         if [ $TPKG_KEEP -eq 0 ]; then
-                out "[log] Removing member files"
+                out "[log] Removing directory"
                 rmdir $testname.dir
         fi
 	cd $TPKG_CURRENT; exit 0
