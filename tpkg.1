@@ -23,7 +23,7 @@ test.tpkg
 .IR r|l|d|h|n
 ]
 [
-.IR report|clean|list|desc|help
+.IR report|clean|cleandir|list|desc|help
 ]
 test.tpkg
 
@@ -90,7 +90,6 @@ recreate the tpkg by running \fBtpkg create\fR.
 .TP
 \fBtmpl\fR -- \fBt\fR
 Create new test template files. A \fIdsc\fR and \fItest\fR file are created.
-
 .TP
 \fBfake\fR -- \fBf\fR
 Fake the test run, but do create a \fI.done\fR, usefull when writing 
@@ -122,6 +121,10 @@ shown.
 \fBclean\fR -- \fBclean\fR
 Clean up all auxiliary files, that is remove: \fI.done*\fR, \fIresult*\fR and
 the \fI.tpkg.var\fR file.
+
+.TP
+\fBcleandir\fR -- \fBcd\fR
+Clean up all testname.\fBdir\fR directories.
 
 .TP
 \fBdesc\fR -- \fBd\fR

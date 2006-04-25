@@ -1,4 +1,4 @@
-#!/bin/bash
+s#!/bin/bash
 
 # a utlity to run a shar test archive (aka tpkg)
 # Created by Miek Gieben, NLnetLabs, (c) 2005, 2006
@@ -163,7 +163,7 @@ function usage() {
         out
         out "Reporting/Cleanup"
         out " clean........:\tremove all the result files"
-        out " cd | cleandir:\tremove all temp. and .dir directories"
+        out " cd | cleandir:\tremove all .dir directories"
         out " r  | report..:\tcreate a nice report from all the result files"
         out " cl | clone...:\tclone test1.tpkg to test2.tkpg"
         out " l  | list....:\tprint the files of the test to stdout"
@@ -211,6 +211,13 @@ function cleanreport() {
         out "[log] rm .done files"
         rm -f .done*
 	cd $TPKG_CURRENT
+}
+
+function cleandirs() {
+        for result in `ls -d *.dir > /dev/null`; do
+                err "[log] rm -rf $result"
+                rm -rf $result
+        done
 }
 
 function report() {
@@ -427,6 +434,9 @@ if [ "${goal}" = "report" ]; then
 fi
 if [ "${goal}" = "clean" ]; then
         cleanreport; exit 0
+fi
+if [ "${goal}" = "cleandir" ]; then
+        cleandirs; exit 0
 fi
 if [ "${goal}" = "clone" ]; then
         test1=`basename $2 .tpkg`
