@@ -74,7 +74,7 @@ if [[ -d $BUILD_DIR/$TESTDIR ]]; then
 fi
 END=`date +%s`
 
-echo ELAPSED: $((END - START))
+echo ELAPSED: $((END - START)) s
 
 # SVN STUFF
 ( cd $BUILD_DIR ; svn diff -rPREV:$REV >> $MAIL_FILE )
