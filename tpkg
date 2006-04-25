@@ -162,12 +162,13 @@ function usage() {
         out "When no action is given a test is executed"
         out
         out "Reporting/Cleanup"
-        out " clean.......:\tremove all the result files"
-        out " r  | report.:\tcreate a nice report from all the result files"
-        out " cl | clone..:\tclone test1.tpkg to test2.tkpg"
-        out " l  | list...:\tprint the files of the test to stdout"
-        out " d  | desc...:\tprint the test's description to stdout"
-        out " h  | help...:\tprint the help message for this test, if available"
+        out " clean........:\tremove all the result files"
+        out " cd | cleandir:\tremove all temp. and .dir directories"
+        out " r  | report..:\tcreate a nice report from all the result files"
+        out " cl | clone...:\tclone test1.tpkg to test2.tkpg"
+        out " l  | list....:\tprint the files of the test to stdout"
+        out " d  | desc....:\tprint the test's description to stdout"
+        out " h  | help....:\tprint the help message for this test, if available"
         out
         out " When multiple tests depend on a single other test, this"
         out " other test is only executed once."
@@ -409,6 +410,7 @@ case $goal in
         e)      goal="extract";;
         t)      goal="tmpl";;
         f)      goal="fake";;
+        cd)     goal="cleandir";;
 
         r)      goal="report";;
         # none for clean
@@ -626,29 +628,13 @@ fi
 
 ## LIST OR DESC OR HELP
 if [ $goal = "list" -o $goal = "desc" -o $goal = "help" ]; then
-        # use the correct directory
-        dir="${testpath}/${testname}.dir"
-        if [ -d $dir ]; then 
-                err "[fatal] Directory $dir already exists. Abort."
-		cd $TPKG_CURRENT; exit 1
-        fi
-        mkdir $dir
-        if [ ! -d $dir ]; then 
-                err "[fatal] Failure to create $dir directory. Abort."
-		cd $TPKG_CURRENT; exit 1
-        fi
-
-        cp $archive $dir/
-        cd $dir
-        ${SHELL} ./$testname.tpkg > /dev/null
+        $0 extract ${testname}.tpkg
         if [ $? -ne 0 ]; then
-                err "[fatal] Could not unshar archive. Abort."
-		cd $TPKG_CURRENT; exit 1
+                cd $TPKG_CURRENT; exit 1
         fi
 
-        trap cleanup_and_exit INT
-
-        rm -f ./$testname.tpkg
+        cd ${testname}.dir/
+        
         case $goal in
         list*)
                 cat *
@@ -667,7 +653,7 @@ if [ $goal = "list" -o $goal = "desc" -o $goal = "help" ]; then
         esac
         cd $TPKG_CURRENT
         # dir can go
-        rm -rf $dir; exit 0
+        rm -rf ${testname}.dir; exit 0
 fi
 
 trap cleanup_and_exit INT
@@ -684,12 +670,29 @@ if [ ! -d $dir ]; then
 	cd $TPKG_CURRENT; exit 1
 fi
 ## EXTRACT
+
 out "[log] Extracting..."
 tar xfz ${testname}.tpkg --strip-components 1 -C $dir
-if [ $? -ne 0 ]; then
-        err "[fatal] Could not untar archive. Abort."
-	cd $TPKG_CURRENT; exit 1
-fi
+ret=$?
+# tar errors with 1 on the open
+case $OSTYPE in
+        freebsd*)
+        if [ $ret -eq 1 ]; then
+                # ignore
+                :      
+        else
+                if [ $ret -ne 0 ]; then
+                        err "[fatal] Could not untar archive. Abort."
+                        cd $TPKG_CURRENT; exit 1
+                fi
+        fi
+        ;;
+        linux*)
+        if [ $ret -ne 0 ]; then
+                err "[fatal] Could not untar archive. Abort."
+                cd $TPKG_CURRENT; exit 1
+        fi
+esac
 cd $dir
 
 ### EXE ###

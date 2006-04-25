@@ -2,6 +2,7 @@
 	* Allow tpkg report to work again
 	* Base all operations on tar (for speed)
 	* Make tar work on the open
+	* list/extract/etc work again. they call tpkg extract now
 
 05 Apr 2006: Miek Gieben: 1.07
 	* Added -p priorty for the logging
