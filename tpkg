@@ -595,12 +595,28 @@ if [ $goal = "extract" ]; then
 
         out "[log] Extracting..."
         tar xfz ${testname}.tpkg --strip-components 1 -C $dir
-        if [ $? -ne 0 ]; then
-                err "[fatal] Could not untar archive. Abort."
-		cd $TPKG_CURRENT; exit 1
-        fi
-        cd $dir
+        ret=$?
+        # tar errors with 1 on the open
+        case $OSTYPE in
+                freebsd*)
+                if [ $ret -eq 1 ]; then
+                        # ignore
+                        :      
+                else
+                        if [ $ret -ne 0 ]; then
+                                err "[fatal] Could not untar archive. Abort."
+                                cd $TPKG_CURRENT; exit 1
+                        fi
+                fi
+                ;;
+                linux*)
+                if [ $ret -ne 0 ]; then
+                        err "[fatal] Could not untar archive. Abort."
+                        cd $TPKG_CURRENT; exit 1
+                fi
+        esac
 
+        cd $dir
         trap cleanup_and_exit INT
 
         # stop here

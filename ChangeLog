@@ -1,6 +1,7 @@
 25 Apr 2006: Miek Gieben: 1.10
 	* Allow tpkg report to work again
 	* Base all operations on tar (for speed)
+	* Make tar work on the open
 
 05 Apr 2006: Miek Gieben: 1.07
 	* Added -p priorty for the logging
