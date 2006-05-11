@@ -14,6 +14,12 @@ SVN_BAR="-----------------------------------------------------------------------
 LOGNAME=`basename $PWD`
 USERNAME=$LOGNAME
 
+id $USERNAME
+if [[ $1 -eq 1 ]]; then
+        # no legal username
+        exit 0
+fi
+
 # please edit these to suit your needs
 TPKG=/home/miekg/svn/tpkg/trunk/tpkg    # tpkg version to use
 MAILTO="ldns-team@nlnetlabs.nl"         # where to send the status email
