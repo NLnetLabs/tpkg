@@ -6,7 +6,7 @@
 
 export TPKG_VAR_MASTER="../.tpkg.var.master"
 export TPKG_VAR_TEST=".tpkg.var.test"
-export TPKG_VERSION="1.10";
+export TPKG_VERSION="1.11";
 export SHELL="/bin/sh"
 TPKG_LOGGER=/usr/bin/logger
 TPKG_BASE="."
