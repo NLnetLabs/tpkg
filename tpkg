@@ -371,6 +371,39 @@ function find_cmd {
         fi
 }
 
+# extract a tpkg to the given dir. The dir must exist already.
+function extract_tpkg_to { # <dir>
+        out "[log] Extracting..."
+        tar xfz ${testname}.tpkg -C $1 2>/dev/null
+	if [ $? -ne 0 ]; then
+		err "[fatal] Could not untar archive. Abort."
+		cd $TPKG_CURRENT; exit 1
+	fi
+        ret=$?
+        # tar errors with 1 on the open
+        case $OSTYPE in
+                freebsd*)
+                if [ $ret -eq 1 ]; then
+                        # ignore
+                        :      
+                else
+                        if [ $ret -ne 0 ]; then
+                                err "[fatal] Could not untar archive. Abort."
+                                cd $TPKG_CURRENT; exit 1
+                        fi
+                fi
+                ;;
+                *)
+                if [ $ret -ne 0 ]; then
+                        err "[fatal] Could not untar archive. Abort."
+                        cd $TPKG_CURRENT; exit 1
+                fi
+        esac
+	# now stuff is in: $1/testname.dir/...
+	mv $1/${testname}.dir $1/$testname}.dir.tmp$$
+	mv $1/${testname}.dir.tmp$$/* $1/.
+}
+
 ### MAIN 
 # check the arguments
 while getopts ":vhkqb:a:n:lp:" o
@@ -502,6 +535,10 @@ if [ $goal = "create" ]; then
 
 
         tar --create --file $testname.tpkg --gzip ${testname}.dir
+	if [ $? -ne 0 ]; then
+		err "[fatal] Tar create error. Abort."
+		cd $TPKG_CURRENT; exit 1
+	fi
         if [ $TPKG_KEEP -eq 0 ]; then
                 out "[log] Removing member files"
                 rm $i
@@ -605,29 +642,7 @@ if [ $goal = "extract" ]; then
 		cd $TPKG_CURRENT; exit 1
         fi
 
-        out "[log] Extracting..."
-        tar xfz ${testname}.tpkg --strip-components 1 -C $dir 2>/dev/null
-        ret=$?
-        # tar errors with 1 on the open
-        case $OSTYPE in
-                freebsd*)
-                if [ $ret -eq 1 ]; then
-                        # ignore
-                        :      
-                else
-                        if [ $ret -ne 0 ]; then
-                                err "[fatal] Could not untar archive. Abort."
-                                cd $TPKG_CURRENT; exit 1
-                        fi
-                fi
-                ;;
-                linux*)
-                if [ $ret -ne 0 ]; then
-                        err "[fatal] Could not untar archive. Abort."
-                        cd $TPKG_CURRENT; exit 1
-                fi
-        esac
-
+	extract_tpkg_to $dir
         cd $dir
         trap cleanup_and_exit INT
 
@@ -680,29 +695,7 @@ if [ ! -d $dir ]; then
 	cd $TPKG_CURRENT; exit 1
 fi
 ## EXTRACT
-
-out "[log] Extracting..."
-tar xfz ${testname}.tpkg --strip-components 1 -C $dir 2>/dev/null
-ret=$?
-# tar errors with 1 on the open
-case $OSTYPE in
-        freebsd*)
-        if [ $ret -eq 1 ]; then
-                # ignore
-                :      
-        else
-                if [ $ret -ne 0 ]; then
-                        err "[fatal] Could not untar archive. Abort."
-                        cd $TPKG_CURRENT; exit 1
-                fi
-        fi
-        ;;
-        linux*)
-        if [ $ret -ne 0 ]; then
-                err "[fatal] Could not untar archive. Abort."
-                cd $TPKG_CURRENT; exit 1
-        fi
-esac
+extract_tpkg_to $dir
 cd $dir
 
 ### EXE ###
