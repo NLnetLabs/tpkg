@@ -379,26 +379,6 @@ function extract_tpkg_to { # <dir>
 		err "[fatal] Could not untar archive. Abort."
 		cd $TPKG_CURRENT; exit 1
 	fi
-        ret=$?
-        # tar errors with 1 on the open
-        case $OSTYPE in
-                freebsd*)
-                if [ $ret -eq 1 ]; then
-                        # ignore
-                        :      
-                else
-                        if [ $ret -ne 0 ]; then
-                                err "[fatal] Could not untar archive. Abort."
-                                cd $TPKG_CURRENT; exit 1
-                        fi
-                fi
-                ;;
-                *)
-                if [ $ret -ne 0 ]; then
-                        err "[fatal] Could not untar archive. Abort."
-                        cd $TPKG_CURRENT; exit 1
-                fi
-        esac
 	# now stuff is in: $1/testname.dir/...
 	mv $1/${testname}.dir $1/${testname}.dir.tmp$$
 	mv $1/${testname}.dir.tmp$$/* $1/.
