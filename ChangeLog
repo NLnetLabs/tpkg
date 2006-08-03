@@ -1,3 +1,6 @@
+3 August 2006: Wouter Wijngaards: 1.11
+	* tar usage more portable.
+
 25 Apr 2006: Miek Gieben: 1.10
 	* Allow tpkg report to work again
 	* Base all operations on tar (for speed)
