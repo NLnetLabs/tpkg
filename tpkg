@@ -400,7 +400,7 @@ function extract_tpkg_to { # <dir>
                 fi
         esac
 	# now stuff is in: $1/testname.dir/...
-	mv $1/${testname}.dir $1/$testname}.dir.tmp$$
+	mv $1/${testname}.dir $1/${testname}.dir.tmp$$
 	mv $1/${testname}.dir.tmp$$/* $1/.
 }
 
