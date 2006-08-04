@@ -734,17 +734,17 @@ for i in $dsc_pre $dsc_post $dsc_test $dsc_help; do
 done
 
 # if we depend on another test to that one first and then return
-if [ -f "../${dsc_depends}" ]; then
-        cd ..  # go up one dir
-        out "[log] executing dependency test: $dsc_depends"
-        ${SHELL} $0 "-b ${TPKG_BASE}" exe $dsc_depends
+for deptest in ${dsc_depends}; do
+	cd ..  # go up one dir
+        out "[log] executing dependency test: $deptest"
+        ${SHELL} $0 "-b ${TPKG_BASE}" exe $deptest
         test_result=$?
         cd - > /dev/null  # back where we belong
         if [ $test_result -ne 0 ]; then
-                err "[fatal] Test depends on $dsc_depends which failed.  Abort."
+                err "[fatal] Test depends on $deptest which failed.  Abort."
                 cleanup; exit 1
         fi
-fi
+done
 
 # this enhances the template from above
 ## Post Processing of some of these variables
