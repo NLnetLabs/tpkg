@@ -308,7 +308,7 @@ function report() {
         echo
         for i in $failed_tests; do 
                 echo --------------- Start Output: $i ------------------
-                cat result.$i | tail +7  # is this portable?
+                cat result.$i
                 echo ---------------   End Output: $i   ------------------
         done
 	cd $NT
