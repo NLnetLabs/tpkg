@@ -374,7 +374,8 @@ function find_cmd {
 # extract a tpkg to the given dir. The dir must exist already.
 function extract_tpkg_to { # <dir>
         out "[log] Extracting..."
-        tar xfz ${testname}.tpkg -C $1 2>/dev/null
+        # tar xfz ${testname}.tpkg -C $1 2>/dev/null
+	gzip -cd ${testname}.tpkg | (cd $1; tar xf -) 2>/dev/null
 	if [ $? -ne 0 ]; then
 		err "[fatal] Could not untar archive. Abort."
 		cd $TPKG_CURRENT; exit 1
@@ -515,7 +516,8 @@ if [ $goal = "create" ]; then
         fi
 
 
-        tar --create --file $testname.tpkg --gzip ${testname}.dir
+        # tar --create --file $testname.tpkg --gzip ${testname}.dir
+	tar -cf - ${testname}.dir | gzip - > $testname.tpkg
 	if [ $? -ne 0 ]; then
 		err "[fatal] Tar create error. Abort."
 		cd $TPKG_CURRENT; exit 1
@@ -708,9 +710,9 @@ dsc_cmddepends=`IFS=: awk -F': ?' < $dsc_file '/^CmdDepends/ { print $2 }'`
 dsc_depends=`IFS=: awk -F': ?' < $dsc_file '/^Depends/ { print $2 }'`
 dsc_maintainer=`IFS=: awk -F': ?' < $dsc_file '/^Maintainer/ { print $2 }'`
 dsc_help=`IFS=: awk -F': ?' < $dsc_file '/^Help/ { print $2 }'`
-dsc_pre=`IFS=: awk -F': ?' < $dsc_file '/^Pre/ { print $2 }'`
-dsc_post=`IFS=: awk -F': ?' < $dsc_file '/^Post/ { print $2 }'`
-dsc_test=`IFS=: awk -F': ?' < $dsc_file '/^Test/ { print $2 }'`
+dsc_pre=`IFS=: awk -F' : ?' < $dsc_file '/^Pre/ { print $2 }'`
+dsc_post=`IFS=: awk -F' : ?' < $dsc_file '/^Post/ { print $2 }'`
+dsc_test=`IFS=: awk -F' : ?' < $dsc_file '/^Test/ { print $2 }'`
 dsc_aux=`IFS=: awk -F': ?' < $dsc_file '/^AuxFiles/ { print $2 }'`
 dsc_passed=`IFS=: awk -F': ?' < $dsc_file '/^Passed/ { print $2 }'`
 dsc_failure=`IFS=: awk -F': ?' < $dsc_file '/^Failure/ { print $2 }'`
