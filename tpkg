@@ -710,9 +710,9 @@ dsc_cmddepends=`IFS=: awk -F': ?' < $dsc_file '/^CmdDepends/ { print $2 }'`
 dsc_depends=`IFS=: awk -F': ?' < $dsc_file '/^Depends/ { print $2 }'`
 dsc_maintainer=`IFS=: awk -F': ?' < $dsc_file '/^Maintainer/ { print $2 }'`
 dsc_help=`IFS=: awk -F': ?' < $dsc_file '/^Help/ { print $2 }'`
-dsc_pre=`IFS=: awk -F' : ?' < $dsc_file '/^Pre/ { print $2 }'`
-dsc_post=`IFS=: awk -F' : ?' < $dsc_file '/^Post/ { print $2 }'`
-dsc_test=`IFS=: awk -F' : ?' < $dsc_file '/^Test/ { print $2 }'`
+dsc_pre=`IFS=: awk -F': ?' < $dsc_file '/^Pre/ { print $2 }'`
+dsc_post=`IFS=: awk -F': ?' < $dsc_file '/^Post/ { print $2 }'`
+dsc_test=`IFS=: awk -F': ?' < $dsc_file '/^Test/ { print $2 }'`
 dsc_aux=`IFS=: awk -F': ?' < $dsc_file '/^AuxFiles/ { print $2 }'`
 dsc_passed=`IFS=: awk -F': ?' < $dsc_file '/^Passed/ { print $2 }'`
 dsc_failure=`IFS=: awk -F': ?' < $dsc_file '/^Failure/ { print $2 }'`
