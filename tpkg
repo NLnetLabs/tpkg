@@ -383,7 +383,7 @@ function extract_tpkg_to { # <dir>
 	# now stuff is in: $1/testname.dir/...
 	mv $1/${testname}.dir $1/${testname}.dir.tmp$$
 	mv $1/${testname}.dir.tmp$$/* $1/.
-	rmdir $1/${testname}.dir.tmp$$
+	rm -rf $1/${testname}.dir.tmp$$
 }
 
 ### MAIN 
