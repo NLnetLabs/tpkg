@@ -701,21 +701,25 @@ fi
 # this is the template for .dsc files
 # we need to check if all these files also exist TODO
 dsc_basename=$testname
-dsc_version=`IFS=: awk -F': ?' < $dsc_file '/^Version/ { print $2 }'`
-dsc_description=`IFS=: awk -F': ?' < $dsc_file '/^Description/ { print $2 }'`
-dsc_creationdate=`IFS=: awk -F': ?' < $dsc_file '/^CreationDate/ { print $2 }'`
-dsc_category=`IFS=: awk -F': ?' < $dsc_file '/^Category/ { print $2 }'`
-dsc_component=`IFS=: awk -F': ?' < $dsc_file '/^Component/ { print $2 }'`
-dsc_cmddepends=`IFS=: awk -F': ?' < $dsc_file '/^CmdDepends/ { print $2 }'`
-dsc_depends=`IFS=: awk -F': ?' < $dsc_file '/^Depends/ { print $2 }'`
-dsc_maintainer=`IFS=: awk -F': ?' < $dsc_file '/^Maintainer/ { print $2 }'`
-dsc_help=`IFS=: awk -F': ?' < $dsc_file '/^Help/ { print $2 }'`
-dsc_pre=`IFS=: awk -F': ?' < $dsc_file '/^Pre/ { print $2 }'`
-dsc_post=`IFS=: awk -F': ?' < $dsc_file '/^Post/ { print $2 }'`
-dsc_test=`IFS=: awk -F': ?' < $dsc_file '/^Test/ { print $2 }'`
-dsc_aux=`IFS=: awk -F': ?' < $dsc_file '/^AuxFiles/ { print $2 }'`
-dsc_passed=`IFS=: awk -F': ?' < $dsc_file '/^Passed/ { print $2 }'`
-dsc_failure=`IFS=: awk -F': ?' < $dsc_file '/^Failure/ { print $2 }'`
+function get_field_from_dsc() # fieldname
+{
+	grep "^$1: " $dsc_file | sed -e "s/^$1:[ 	]*//" -e "s/[ 	]*$//"
+}
+dsc_version=`get_field_from_dsc Version`
+dsc_description=`get_field_from_dsc Description`
+dsc_creationdate=`get_field_from_dsc CreationDate`
+dsc_category=`get_field_from_dsc Category`
+dsc_component=`get_field_from_dsc Component`
+dsc_cmddepends=`get_field_from_dsc CmdDepends`
+dsc_depends=`get_field_from_dsc Depends`
+dsc_maintainer=`get_field_from_dsc Maintainer`
+dsc_help=`get_field_from_dsc Help`
+dsc_pre=`get_field_from_dsc Pre`
+dsc_post=`get_field_from_dsc Post`
+dsc_test=`get_field_from_dsc Test`
+dsc_aux=`get_field_from_dsc AuxFiles`
+dsc_passed=`get_field_from_dsc Passed`
+dsc_failure=`get_field_from_dsc Failure`
 
 # consistency check the lot
 for i in $dsc_pre $dsc_post $dsc_test $dsc_help; do
