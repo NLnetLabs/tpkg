@@ -809,7 +809,12 @@ if [ $test_result -ne 0 ]; then
         echo "exit code: $test_result" >> result.$dsc_basename.tmp
         mv result.$dsc_basename.tmp result.$dsc_basename
         post; 
-        [[ $TPKG_KEEP -eq 0 ]] && cleanup
+        if [ $TPKG_KEEP -eq 0 ]; then
+                out "[log] Removing temp directory $dir"
+                cleanup
+        else
+        	out "[log] Keeping temp directory $dir"
+        fi
         exit 1
 fi
  
@@ -864,5 +869,10 @@ if [ $failed -eq -1 ]; then
 fi
         
 post
-[[ $TPKG_KEEP -eq 0 ]] && cleanup
+if [ $TPKG_KEEP -eq 0 ]; then
+        out "[log] Removing temp directory $dir"
+        cleanup
+else
+	out "[log] Keeping temp directory $dir"
+fi
 exit $failed
