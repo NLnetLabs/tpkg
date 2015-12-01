@@ -375,7 +375,12 @@ function find_cmd {
 function extract_tpkg_to { # <dir>
         out "[log] Extracting..."
         # tar xfz ${testname}.tpkg -C $1 2>/dev/null
-	gzip -cd ${testname}.tpkg | (cd $1; tar xf -) 2>/dev/null
+	if [ -d ${testname}.tpkg ]
+	then
+		cp -pr ${testname}.tpkg $1/${testname}.dir
+	else
+		gzip -cd ${testname}.tpkg | (cd $1; tar xf -) 2>/dev/null
+	fi
 	if [ $? -ne 0 ]; then
 		err "[fatal] Could not untar archive. Abort."
 		cd $TPKG_CURRENT; exit 1
