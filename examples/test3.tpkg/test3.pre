@@ -1,0 +1,3 @@
+#!/bin/sh
+
+echo "Dit script word vooraf uitgevoerd"

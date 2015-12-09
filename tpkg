@@ -6,17 +6,19 @@
 
 export TPKG_VAR_MASTER="../.tpkg.var.master"
 export TPKG_VAR_TEST=".tpkg.var.test"
-export TPKG_VERSION="1.11";
+export TPKG_VERSION="1.12";
 export SHELL="/bin/sh"
 TPKG_LOGGER=/usr/bin/logger
 TPKG_BASE="."
 TPKG_ARGS=""
 TPKG_CURRENT=`pwd`
-TPKG_QUIET=0   # only output err() msgs
-TPKG_KEEP=0    # tpkg create doesn't remove dir/
-TPKG_PASS=0    # how much must succeed
-TPKG_LOG=0     # don't log
-TPKG_PRI=""    # log facility
+TPKG_QUIET=0		# only output err() msgs
+TPKG_KEEP=0		# tpkg create doesn't remove dir/
+TPKG_PASS=0		# how much must succeed
+TPKG_LOG=0		# don't log
+TPKG_PRI=""		# log facility
+TPKG_FORMAT="targz"	# format of underlying tpkg files
+TPKG_FORCE=0		# execute tests even when .done file is found
 
 _DESC_WIDTH=${COLUMNS:-55}
 if [ $_DESC_WIDTH -ge 70 ]; then
@@ -112,7 +114,7 @@ function pre() {
  
 function write_done() {
         # we are executing in a subdir
-        if [ -f "../.done-${testname}" ]; then
+        if [ -f "../.done-${testname}" -a $TPKG_FORCE -ne 1 ]; then
                 err "[warning] Overwriting .done-${testname}"
         fi
         > ../.done-${testname}
@@ -120,7 +122,7 @@ function write_done() {
 
 # write done file in current dir
 function write_fake_done() {
-        if [ -f ".done-${testname}" ]; then
+        if [ -f ".done-${testname}" -a $TPKG_FORCE -ne 1 ]; then
                 err "[warning] Overwriting .done-${testname}"
         fi
         > .done-${testname}
@@ -184,6 +186,7 @@ function usage() {
         out " \t\tOtherwise exit with 0. Only valid when running tpkg report"
 	out " -b DIR\tuse DIR is a base directory in stead of ."
 	out " -a ARGS\tpass the string ARGS through to the test scripts"
+	out " -d\t\tUse directories instead of tar.gz for tpkg archive format"
         out 
         out " (C) NLnetLabs, Miek Gieben. Licensed under the GPL version 2."
 }
@@ -393,7 +396,7 @@ function extract_tpkg_to { # <dir>
 
 ### MAIN 
 # check the arguments
-while getopts ":vhkqb:a:n:lp:" o
+while getopts ":vhkqb:a:n:lp:df" o
 do case "$o" in
 	b) 	TPKG_BASE="$OPTARG";;
 	h) 	usage; exit 0;;
@@ -409,6 +412,8 @@ do case "$o" in
                         exit 1
                 fi
                 ;;
+	d) 	TPKG_FORMAT="dir";;
+	f) 	TPKG_FORCE=1;;
         *)      err "[fatal] Unknown option. Abort."; exit 1;;
 esac
 done
@@ -522,9 +527,30 @@ if [ $goal = "create" ]; then
 
 
         # tar --create --file $testname.tpkg --gzip ${testname}.dir
-	tar -cf - ${testname}.dir | gzip - > $testname.tpkg
+	(
+		if [ -d "${testname}.tpkg" ]
+		then
+			TPKG_FORMAT="dir"
+		fi
+		if [ $TPKG_FORMAT = "dir" ]
+		then
+			if [ -e "${testname}.tpkg" ]
+			then
+				rm -fr "${testname}.tpkg"
+			fi
+			cp -pr "${testname}.dir" "${testname}.tpkg" \
+			|| cp -pr "${testname}.dir" "${testname}.tpkg" \
+			|| (   mkdir "${testname}.tpkg" \
+			   && ( ( cd "${testname}.dir" ; tar cf - . ) \
+			      | ( cd "${testname}.tpkg"; tar xf -)
+			      )
+			   )
+		else
+			tar -cf - ${testname}.dir | gzip - > $testname.tpkg
+		fi
+	)
 	if [ $? -ne 0 ]; then
-		err "[fatal] Tar create error. Abort."
+		err "[fatal] Archive create error. Abort."
 		cd $TPKG_CURRENT; exit 1
 	fi
         if [ $TPKG_KEEP -eq 0 ]; then
@@ -607,7 +633,7 @@ TMPL_EOF
 	cd $TPKG_CURRENT; exit 0
 fi
 
-if [ ! -f $archive ]; then
+if [ ! -e $archive ]; then
         err "[fatal] Cannot find the test package: $archive. Abort."
         cd $TPKG_CURRENT; exit 1
 fi
@@ -698,7 +724,7 @@ if [ -z ${SHELL} ]; then
 fi
 
 # check for a .done file
-if [ -f "../.done-${testname}" ]; then
+if [ -f "../.done-${testname}" -a $TPKG_FORCE -ne 1 ]; then
         out "[log] Found .done-${testname}. Not executing this test."
         cleanup; exit 0
 fi
