@@ -13,6 +13,7 @@ TPKG_BASE="."
 TPKG_ARGS=""
 TPKG_CURRENT=`pwd`
 TPKG_QUIET=0		# only output err() msgs
+TPKG_VERBOSE=0          # Show live output of test execution
 TPKG_KEEP=0		# tpkg create doesn't remove dir/
 TPKG_PASS=0		# how much must succeed
 TPKG_LOG=0		# don't log
@@ -73,8 +74,16 @@ function out() {
         fi
 }
 
+function write_result() {
+	if [[ $TPKG_VERBOSE -gt 0 ]]; then
+		tee -a $1
+	else
+		cat >> $1
+	fi
+}
+
 function epoch() {
-        # make this sorta portable allthough not needed now
+        # make this sorta portable although not needed now
         epoch=0
         case $OSTYPE in
                 linux*)
@@ -89,9 +98,9 @@ function epoch() {
 function post() {
         if [ -f "${dsc_post}" ]; then 
                 err "[log] Executing post script: ${dsc_post} ${TPKG_ARGS}"
-                echo "--------- Start Post Output ------------------ " >> result.$dsc_basename
-                ${SHELL} ${dsc_post} ${TPKG_ARGS} >> result.$dsc_basename
-                echo "----------- End Post Output ------------------ " >> result.$dsc_basename
+                echo "--------- Start Post Output ------------------ " | write_result result.$dsc_basename
+                ${SHELL} ${dsc_post} ${TPKG_ARGS} | write_result result.$dsc_basename
+                echo "----------- End Post Output ------------------ " | write_result result.$dsc_basename
                 result=$?
                 if [ $result -ne 0 ]; then
                         err "[warning] Post-script executed with errors: $result."
@@ -102,9 +111,9 @@ function post() {
 function pre() {
         if [ -f "${dsc_pre}" ]; then 
                 err "[log] Executing pre script: ${dsc_pre} ${TPKG_ARGS}"
-                echo "--------- Start Pre Output ------------------- " >> result.$dsc_basename
-                ${SHELL} ${dsc_pre} ${TPKG_ARGS} >> result.$dsc_basename
-                echo "----------- End Pre Output ------------------- " >> result.$dsc_basename
+                echo "--------- Start Pre Output ------------------- " | write_result result.$dsc_basename
+                ${SHELL} ${dsc_pre} ${TPKG_ARGS} | write_result result.$dsc_basename
+                echo "----------- End Pre Output ------------------- " | write_result result.$dsc_basename
                 result=$?
                 if [ $result -ne 0 ]; then
                         err "[warning] Pre-script executed with errors: $result."
@@ -179,14 +188,18 @@ function usage() {
 	out " -h\t\tshow this help"
 	out " -v\t\tshow version"
         out " -q\t\tonly print errors"
+	out " -V\t\tshow live output when executing tests"
         out " -l\t\tlog test name to syslog when starting the test (using logger)"
         out " -p PRI\tlog using PRI as priority"
         out " -k\t\tdon't remove test directory when creating/executing a tpkg package"
         out " -n NUM\tif less than NUM of the tests are passed exit with 1"
+        out " \t\tOtherwise exit with 0.  When NUM is -1, no tests may fail"
+	out " \t\tOnly valid when running tpkg report"
         out " \t\tOtherwise exit with 0. Only valid when running tpkg report"
 	out " -b DIR\tuse DIR is a base directory in stead of ."
 	out " -a ARGS\tpass the string ARGS through to the test scripts"
 	out " -d\t\tUse directories instead of tar.gz for tpkg archive format"
+	out " -f\t\tForce test to be re-run if already executed"
         out 
         out " (C) NLnetLabs, Miek Gieben. Licensed under the GPL version 2."
 }
@@ -299,9 +312,9 @@ function report() {
                 pper=0
                 uper=0
         else
-                fper=`echo -e "scale=4\n$failed/$total*100" | bc | sed 's/00$//'`
-                pper=`echo -e "scale=4\n$passed/$total*100" | bc | sed 's/00$//'`
-                uper=`echo -e "scale=4\n$unknown/$total*100" | bc | sed 's/00$//'`
+		fper=`awk -vN=$failed -vT=$total 'BEGIN{printf("%.0f",(N/T*100))}'`
+		pper=`awk -vN=$passed -vT=$total 'BEGIN{printf("%.0f",(N/T*100))}'`
+		uper=`awk -vN=$unknown -vT=$total 'BEGIN{printf("%.0f",(N/T*100))}'`
         fi
         echo
         echo -e "$tp: $passed ($pper %)\t$tf: $failed ($fper %)\t$tu: $unknown ($uper %)"
@@ -319,8 +332,12 @@ function report() {
                 if [[ $passed -lt $TPKG_PASS ]]; then
                         exit 1
                 fi
+	elif [[  $TPKG_PASS -lt 0 ]]; then
+		if [[ $failed -gt 0 ]]; then
+			exit 1
+		fi
         fi
-        exit 0
+	exit 0
 }
 
 # clone test1 to test2
@@ -355,9 +372,17 @@ function clone() {
         # rename the dir
         mv $test1.dir $test2.dir
         if [ $TPKG_KEEP -eq 0 ]; then
-                $0 create $test2.tpkg
+		if [ $TPKG_FORMAT = "dir" ]; then
+                	$0 -d create $test2.tpkg
+		else
+                	$0 create $test2.tpkg
+		fi
         else
-                $0 -k create $test2.tpkg
+		if [ $TPKG_FORMAT = "dir" ]; then
+                	$0 -d -k create $test2.tpkg
+		else
+                	$0 -k create $test2.tpkg
+		fi
         fi
         if [ $? -ne 0 ]; then
                 err "[warning] Creating of $test2.tpkg failed."
@@ -378,11 +403,11 @@ function find_cmd {
 function extract_tpkg_to { # <dir>
         out "[log] Extracting..."
         # tar xfz ${testname}.tpkg -C $1 2>/dev/null
-	if [ -d ${testname}.tpkg ]
+	if [ -d "${test_pkg}" ]
 	then
-		cp -pr ${testname}.tpkg $1/${testname}.dir
+		cp -pr "${test_pkg}" "$1/${testname}.dir"
 	else
-		gzip -cd ${testname}.tpkg | (cd $1; tar xf -) 2>/dev/null
+		gzip -cd "${test_pkg}" | (cd $1; tar xf -) 2>/dev/null
 	fi
 	if [ $? -ne 0 ]; then
 		err "[fatal] Could not untar archive. Abort."
@@ -396,15 +421,22 @@ function extract_tpkg_to { # <dir>
 
 ### MAIN 
 # check the arguments
-while getopts ":vhkqb:a:n:lp:df" o
+while getopts ":vhkqVb:a:n:lp:df" o
 do case "$o" in
 	b) 	TPKG_BASE="$OPTARG";;
 	h) 	usage; exit 0;;
 	v) 	version; exit 0;;
         l)      TPKG_LOG=1;;
         p)      TPKG_PRI="$OPTARG";;
-	a) 	TPKG_ARGS="$OPTARG";;
+	a) 	if [ -z "$TPKG_ARGS" ]
+		then
+			TPKG_ARGS="$OPTARG"
+		else
+			TPKG_ARGS="$TPKG_ARGS $OPTARG"
+		fi
+		;;
         q)      TPKG_QUIET=1;;
+	V)	TPKG_VERBOSE=`expr $TPKG_VERBOSE + 1`;;
         k)      TPKG_KEEP=1;;
         n)      TPKG_PASS=$OPTARG
                 if [ $TPKG_PASS -eq 0 ]; then
@@ -478,12 +510,14 @@ if [ -z "${archive}" ]; then
         goal="exe"
 fi
 
-if [ -z $archive ]; then
+if [ -z "${archive}" ]; then
         usage; cd $TPKG_CURRENT; exit 0
 fi
 
-testname=`basename $archive .tpkg`
-testpath=`dirname $archive`
+testname=`basename "${archive}" .tpkg`
+export TPKG_SRCDIR=`dirname "${archive}"`
+export TPKG_NAME=${testname}
+test_pkg="${TPKG_SRCDIR}/${testname}.tpkg"
 dsc_file=$testname.dsc                  
 if  [ -z $testname ]; then
         err "[fatal] The test package should have a .tpkg extension. Abort."
@@ -528,25 +562,25 @@ if [ $goal = "create" ]; then
 
         # tar --create --file $testname.tpkg --gzip ${testname}.dir
 	(
-		if [ -d "${testname}.tpkg" ]
+		if [ -d "${test_pkg}" ]
 		then
 			TPKG_FORMAT="dir"
 		fi
 		if [ $TPKG_FORMAT = "dir" ]
 		then
-			if [ -e "${testname}.tpkg" ]
+			if [ -e "${test_pkg}" ]
 			then
-				rm -fr "${testname}.tpkg"
+				rm -fr "${test_pkg}"
 			fi
-			cp -pr "${testname}.dir" "${testname}.tpkg" \
-			|| cp -pr "${testname}.dir" "${testname}.tpkg" \
-			|| (   mkdir "${testname}.tpkg" \
+			cp -pr "${testname}.dir" "${test_pkg}" \
+			|| cp -pr "${testname}.dir" "${test_pkg}" \
+			|| (   mkdir "${test_pkg}" \
 			   && ( ( cd "${testname}.dir" ; tar cf - . ) \
-			      | ( cd "${testname}.tpkg"; tar xf -)
+			      | ( cd "${test_pkg}"; tar xf -)
 			      )
 			   )
 		else
-			tar -cf - ${testname}.dir | gzip - > $testname.tpkg
+			tar -cf - ${testname}.dir | gzip - > "${test_pkg}"
 		fi
 	)
 	if [ $? -ne 0 ]; then
@@ -640,7 +674,7 @@ fi
 
 ## EXTRACT
 if [ $goal = "extract" ]; then
-        dir="${testpath}/${testname}.dir"
+        dir="${testname}.dir"
         if [ -d $dir ]; then 
                 err "[fatal] Directory $dir already exists. Abort."
 		cd $TPKG_CURRENT; exit 1
@@ -656,13 +690,13 @@ if [ $goal = "extract" ]; then
         trap cleanup_and_exit INT
 
         # stop here
-        out "[log] extracted $testname.tpkg to $dir."
+        out "[log] extracted ${test_pkg} $dir."
         cd $TPKG_CURRENT; exit 0
 fi
 
 ## LIST OR DESC OR HELP
 if [ $goal = "list" -o $goal = "desc" -o $goal = "help" ]; then
-        $0 extract ${testname}.tpkg
+        $0 extract "${archive}"
         if [ $? -ne 0 ]; then
                 cd $TPKG_CURRENT; exit 1
         fi
@@ -698,7 +732,7 @@ if [ "$goal" != "exe" ]; then
 	cd $TPKG_CURRENT; exit 1
 fi
 
-mktempdir "${testpath}/${testname}.XXXXXX"
+mktempdir "${testname}.XXXXXX"
 if [ ! -d $dir ]; then 
         err "[fatal] Failure to create a temporary working directory. Abort."
 	cd $TPKG_CURRENT; exit 1
@@ -773,8 +807,8 @@ done
 # if we depend on another test to that one first and then return
 for deptest in ${dsc_depends}; do
 	cd ..  # go up one dir
-        out "[log] executing dependency test: $deptest"
-        ${SHELL} $0 "-b ${TPKG_BASE}" exe $deptest
+        out "[log] executing dependency test: ${TPKG_SRCDIR}/${deptest}"
+        ${SHELL} $0 "-b ${TPKG_BASE}" exe "${TPKG_SRCDIR}/${deptest}"
         test_result=$?
         cd - > /dev/null  # back where we belong
         if [ $test_result -ne 0 ]; then
@@ -785,7 +819,7 @@ done
 
 # this enhances the template from above
 ## Post Processing of some of these variables
-# dsc_aux is a comma seperated list of files, max 8 files
+# dsc_aux is a comma separated list of files, max 8 files
 i=$( echo $dsc_aux | awk -F', ?' '{ print $1 "\n" $2 "\n" $3 "\n" $4 "\n" \
 $5 "\n" $6 "\n" $7 "\n" $8 }' )
 dsc_aux_files=($i)
@@ -799,7 +833,7 @@ dsc_cmddepends_files_total=${#dsc_cmddepends_files[*]}
 for i in ${dsc_cmddepends_files[*]}; do
         find_cmd $i
 done
-# depends can also be a comma seperated list of package
+# depends can also be a comma separated list of package
 # TODO 
 
 # check is the aux files are also really in the shar
@@ -819,17 +853,19 @@ fi
 tpkg_log "Starting test: '$dsc_basename'"
 
 epoch  # run before pre()
-echo "BaseName: $dsc_basename" > result.$dsc_basename
-echo "Description: $dsc_description" >> result.$dsc_basename
-echo "DateRunStart: $epoch " >> result.$dsc_basename
-echo "--------------- Test Output ------------------" >> result.$dsc_basename
+: > result.$dsc_basename
+echo "BaseName: $dsc_basename" | write_result result.$dsc_basename
+echo "Description: $dsc_description" | write_result result.$dsc_basename
+echo "DateRunStart: $epoch " | write_result result.$dsc_basename
+echo "--------------- Test Output ------------------" | write_result result.$dsc_basename
 
 pre
 
 out "[log] Executing test" 
-
-( ${SHELL} $dsc_test ${TPKG_ARGS} 2>&1 ) >> result.$dsc_basename
+( ${SHELL} $dsc_test ${TPKG_ARGS} 2>&1 ) > result.$dsc_basename.tmp
 test_result=$?
+write_result result.$dsc_basename < result.$dsc_basename.tmp
+rm -f result.$dsc_basename.tmp
 epoch   # would like to run after post, but that is not possible :-(
 if [ $test_result -ne 0 ]; then
         err "[warning] Test executed with errors: $test_result." 
