@@ -4,6 +4,7 @@
 # Created by Miek Gieben, NLnetLabs, (c) 2005, 2006
 # Licensed under GPL version 2
 
+export TPKG_EXTENSION="tpkg"
 export TPKG_VAR_MASTER="../.tpkg.var.master"
 export TPKG_VAR_TEST=".tpkg.var.test"
 export TPKG_VERSION="1.12";
@@ -514,13 +515,38 @@ if [ -z "${archive}" ]; then
         usage; cd $TPKG_CURRENT; exit 0
 fi
 
-testname=`basename "${archive}" .tpkg`
+echo archive: ${archive}
+if [ "${archive%.tdir}" != "${archive}" ]
+then
+	export TPKG_EXTENSION=tdir
+elif [ -d "${archive}.tdir" ]
+then
+	export TPKG_EXTENSION=tdir
+else
+	export TPKG_EXTENSION=tpkg
+fi
+testname=`basename "${archive}" .${TPKG_EXTENSION}`
 export TPKG_SRCDIR=`dirname "${archive}"`
 export TPKG_NAME=${testname}
-test_pkg="${TPKG_SRCDIR}/${testname}.tpkg"
+test_pkg="${TPKG_SRCDIR}/${testname}.${TPKG_EXTENSION}"
+if [ ! -e "${test_pkg}" ]
+then
+	if [ -e "${test_pkg%.tpkg}.tdir" ]
+	then
+		if [ "${archive%.tpkg}" != "${archive}" ]
+		then
+			export archive="${archive%.tpkg}.tdir"
+		fi
+		export TPKG_EXTENSION=tdir
+		testname=`basename "${archive}" .tdir`
+		export TPKG_SRCDIR=`dirname "${archive}"`
+		export TPKG_NAME=${testname}
+		test_pkg="${TPKG_SRCDIR}/${testname}.${TPKG_EXTENSION}"
+	fi
+fi
 dsc_file=$testname.dsc                  
 if  [ -z $testname ]; then
-        err "[fatal] The test package should have a .tpkg extension. Abort."
+        err "[fatal] The test package should have a .tpkg or a .tdir extension. Abort."
 	cd $TPKG_CURRENT; exit 1
 fi
 
@@ -662,7 +688,7 @@ TMPL_EOF
         echo "[ -f $TPKG_VAR_TEST ] && source $TPKG_VAR_TEST" >> $testname.pre
 
         out "[log] created $testname.{dsc, test, help, pre, post}"
-        out "[log] please create the script(s) and then run: tpkg create $testname.tpkg"
+        out "[log] please create the script(s) and then run: tpkg create $testname.$TPKG_EXTENSION"
         out "[log] created $testname in $dir."
 	cd $TPKG_CURRENT; exit 0
 fi
