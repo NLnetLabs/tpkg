@@ -113,6 +113,7 @@ function pre() {
         if [ -f "${dsc_pre}" ]; then 
                 err "[log] Executing pre script: ${dsc_pre} ${TPKG_ARGS}"
                 echo "--------- Start Pre Output ------------------- " | write_result result.$dsc_basename
+		echo "${SHELL} ${dsc_pre} ${TPKG_ARGS}" | write_result result.$dsc_basename
                 ${SHELL} ${dsc_pre} ${TPKG_ARGS} | write_result result.$dsc_basename
                 echo "----------- End Pre Output ------------------- " | write_result result.$dsc_basename
                 result=$?
@@ -515,12 +516,12 @@ if [ -z "${archive}" ]; then
         usage; cd $TPKG_CURRENT; exit 0
 fi
 
-echo archive: ${archive}
-if [ "${archive%.tdir}" != "${archive}" ]
-then
+if [ "${archive%/}" != "${archive}" ]; then
+	export archive="${archive%/}"
+fi
+if [ "${archive%.tdir}" != "${archive}" ]; then
 	export TPKG_EXTENSION=tdir
-elif [ -d "${archive}.tdir" ]
-then
+elif [ -d "${archive}.tdir" ]; then
 	export TPKG_EXTENSION=tdir
 else
 	export TPKG_EXTENSION=tpkg
@@ -544,6 +545,10 @@ then
 		test_pkg="${TPKG_SRCDIR}/${testname}.${TPKG_EXTENSION}"
 	fi
 fi
+if [ ! -e "${archive}" -a -e "${test_pkg}" ]; then
+	export archive="${test_pkg}"
+fi
+echo archive: "${archive#${TPKG_SRCDIR}/}"
 dsc_file=$testname.dsc                  
 if  [ -z $testname ]; then
         err "[fatal] The test package should have a .tpkg or a .tdir extension. Abort."
