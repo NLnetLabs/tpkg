@@ -243,18 +243,34 @@ function report() {
         passed=0
         failed=0
         unknown=0
+	skipped=0
         first=0
 
         tp="passed"
         tf="failed"
         tu="unknown"
-        for result in `ls result.* 2>/dev/null` ; do 
-                passfailed=`head -1 $result | awk ' { print $2 }'`
-                basename=`head -3 $result | grep BaseName | awk -F': ?' ' { print $2 }'`
-                description=`head -4 $result | grep Description | awk -F': ?' ' { print $2 }'`
-                runend=`head -2 $result | grep DateRunEnd | awk -F': ?' ' { print $2 }'`
-                runstart=`head -5 $result | grep DateRunStart | awk -F': ?' ' { print $2 }'`
-
+	ts="skipped"
+        for tpkg_name in `ls -1d *.tdir *.tpkg 2>/dev/null` ; do 
+		name=`basename ${tpkg_name}`
+		if [ "${name%.tdir}" != "${name}" ]; then
+			name="${name%.tdir}"
+		else
+			name="${name%.tpkg}"
+		fi
+		result="result.${name}"
+		if [ -f "${result}" ]; then
+			passfailed=`head -1 $result | awk '{ print $2 }'`
+			basename=`head -3 $result | grep BaseName | awk -F': ?' ' { print $2 }'`
+			description=`head -4 $result | grep Description | awk -F': ?' ' { print $2 }'`
+			runend=`head -2 $result | grep DateRunEnd | awk -F': ?' ' { print $2 }'`
+			runstart=`head -5 $result | grep DateRunStart | awk -F': ?' ' { print $2 }'`
+		else
+			passfailed="SKIPPED"
+			basename="${name}"
+			description=""
+			runstart=0
+			runend=0
+		fi
                 # truncate the description to 35 chars
                 if [ ${#description} -gt $_DESC_WIDTH ]; then
                         description=${description:0:$_DESC_WIDTH}
@@ -296,6 +312,18 @@ function report() {
                         ((passed=$passed + 1)) 
                         tp="PASSED"
                         ;;
+                "SKIPPED")
+                        if [ $TPKG_QUIET -eq 0 ]; then
+                                if [ $first -eq 0 ]; then
+                                        echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
+                                        first=1
+                                fi
+                                echo -e ">> $passfailed<< : $period s : $basename : $description"
+                        fi
+                        ((skipped=$skipped + 1)) 
+                        ts="SKIPPED"
+                        ;;
+
                 *) 
                         if [ $first -eq 0 ]; then
                                 echo "   STATUS    : ELAPSED : TESTNAME : TESTDESCRIPTION"
@@ -308,18 +336,20 @@ function report() {
                         ;;
                 esac
         done
-        ((total=$passed + $failed + $unknown))
+        ((total=$passed + $failed + $skipped + $unknown))
         if [[ $total -eq 0 ]]; then
                 fper=0
                 pper=0
+                sper=0
                 uper=0
         else
 		fper=`awk -vN=$failed -vT=$total 'BEGIN{printf("%.0f",(N/T*100))}'`
 		pper=`awk -vN=$passed -vT=$total 'BEGIN{printf("%.0f",(N/T*100))}'`
+		sper=`awk -vN=$skipped -vT=$total 'BEGIN{printf("%.0f",(N/T*100))}'`
 		uper=`awk -vN=$unknown -vT=$total 'BEGIN{printf("%.0f",(N/T*100))}'`
         fi
         echo
-        echo -e "$tp: $passed ($pper %)\t$tf: $failed ($fper %)\t$tu: $unknown ($uper %)"
+	echo -e "$tp: $passed ($pper %)\t$tf: $failed ($fper %)\t%ts: $skipped ($sper %)\t$tu: $unknown ($uper %)"
 
         # for each failed test include the complete result file
         # $i is basename
