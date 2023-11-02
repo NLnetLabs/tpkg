@@ -546,8 +546,11 @@ if [ -z "${archive}" ]; then
         usage; cd $TPKG_CURRENT; exit 0
 fi
 
+# Remove trailing slashes or dot's caused by tab completion
 if [ "${archive%/}" != "${archive}" ]; then
 	export archive="${archive%/}"
+elif [ "${archive%.}" != "${archive}" ]; then
+	export archive="${archive%.}"
 fi
 if [ "${archive%.tdir}" != "${archive}" ]; then
 	export TPKG_EXTENSION=tdir
